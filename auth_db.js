@@ -1,29 +1,18 @@
 // auth_db.js - Gerenciamento de Autenticação e Sincronização em Nuvem (Supabase / Simulado)
 
 (function () {
-  // Configuração opcional do Supabase (Pode ser injetada pelo usuário)
+  // Configuração opcional do Supabase (Carregada de window.SUPABASE_URL ou configurada pelo usuário)
   const SUPABASE_URL = window.SUPABASE_URL || "";
   const SUPABASE_KEY = window.SUPABASE_KEY || "";
   
   let supabaseClient = null;
   const isDemoMode = !SUPABASE_URL || !SUPABASE_KEY;
 
-  if (!isDemoMode && typeof supabase !== 'undefined') {
-    try {
-      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      console.log("Supabase inicializado com sucesso em modo nuvem.");
-    } catch (e) {
-      console.error("Falha ao inicializar o cliente do Supabase:", e);
-    }
-  } else {
-    console.log("Supabase não configurado. Rodando em Modo de Simulação (Demo).");
-  }
-
   // Estado local do usuário autenticado
   let currentUser = null;
-  
-  // Carrega sessão salva no LocalStorage
   const sessionKey = "album_auth_session";
+
+  // Carrega sessão salva no LocalStorage como fallback imediato
   const savedSession = localStorage.getItem(sessionKey);
   if (savedSession) {
     try {
@@ -33,32 +22,117 @@
     }
   }
 
-  // Banco de Dados Simulado da Comunidade
+  // Inicialização e escuta da autenticação do Supabase
+  if (!isDemoMode && typeof supabase !== 'undefined') {
+    try {
+      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      console.log("Supabase inicializado com sucesso em modo nuvem.");
+
+      // Escuta mudanças de estado da autenticação (Login, Logout, etc.)
+      supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        console.log("Supabase Auth Event:", event, session);
+        
+        if (session && session.user) {
+          const user = session.user;
+          
+          let stickers = {};
+          let latitude = currentUser ? currentUser.latitude : null;
+          let longitude = currentUser ? currentUser.longitude : null;
+          let birthdate = currentUser ? currentUser.birthdate : "";
+
+          // Sincroniza dados do perfil na nuvem
+          try {
+            const { data: profile, error } = await supabaseClient
+              .from('profiles')
+              .select('*')
+              .eq('uid', user.id)
+              .maybeSingle();
+
+            if (profile) {
+              stickers = profile.stickers || {};
+              if (profile.latitude !== null && profile.latitude !== undefined) latitude = profile.latitude;
+              if (profile.longitude !== null && profile.longitude !== undefined) longitude = profile.longitude;
+              
+              // Sincroniza o álbum local se o perfil na nuvem tiver figurinhas
+              if (profile.stickers && Object.keys(profile.stickers).length > 0) {
+                const activeAlbumId = localStorage.getItem('currentAlbumId');
+                const albums = JSON.parse(localStorage.getItem('albums') || '{}');
+                if (activeAlbumId && albums[activeAlbumId]) {
+                  albums[activeAlbumId].stickers = { ...albums[activeAlbumId].stickers, ...profile.stickers };
+                  localStorage.setItem('albums', JSON.stringify(albums));
+                }
+              }
+            } else {
+              // Se o perfil do usuário não existe na tabela profiles, cria um novo
+              await supabaseClient.from('profiles').insert({
+                uid: user.id,
+                name: user.user_metadata.full_name || user.user_metadata.name || "Colecionador",
+                photo_url: user.user_metadata.avatar_url || "",
+                latitude: latitude,
+                longitude: longitude,
+                last_seen: new Date().toISOString()
+              });
+            }
+          } catch (profileError) {
+            console.error("Erro ao sincronizar perfil do Supabase:", profileError);
+          }
+
+          currentUser = {
+            uid: user.id,
+            name: user.user_metadata.full_name || user.user_metadata.name || "Colecionador",
+            photo_url: user.user_metadata.avatar_url || "",
+            provider: user.app_metadata.provider || "oauth",
+            birthdate: birthdate,
+            latitude: latitude,
+            longitude: longitude,
+            last_seen: new Date().toISOString()
+          };
+
+          localStorage.setItem(sessionKey, JSON.stringify(currentUser));
+          
+          // Recarrega cabeçalho e redireciona se o usuário estiver na tela de login
+          if (typeof renderHeader === 'function') renderHeader();
+          if (window.location.hash === '#login') {
+            window.location.hash = '#home';
+          }
+        } else {
+          // Se não houver sessão ativa no Supabase, limpa os dados locais de login de nuvem
+          if (!isDemoMode) {
+            currentUser = null;
+            localStorage.removeItem(sessionKey);
+            if (typeof renderHeader === 'function') renderHeader();
+          }
+        }
+      });
+    } catch (e) {
+      console.error("Falha ao inicializar o cliente do Supabase:", e);
+    }
+  } else {
+    console.log("Supabase não configurado. Rodando em Modo de Simulação (Demo).");
+  }
+
+  // Banco de Dados Simulado da Comunidade (Usado apenas no Modo Demo)
   const MOCK_COLLECTORS = [
     {
       uid: "mock-carlos",
       name: "Carlos Silva",
       photo_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80",
-      offsetLat: 0.008,  // ~1.2 km de distância
+      offsetLat: 0.008,
       offsetLng: -0.005,
       birthdate: "1990-05-15",
-      // Carlos terá um match perfeito: tem o que você quer e quer o que você tem repetido
       generateStickers: (userStickers) => {
         const stickers = {};
-        // Carlos possui quase todas, mas faltam algumas que o usuário tem repetidas
         for (let team of ['USA', 'MEX', 'CAN', 'BRA', 'ARG', 'URU', 'FRA', 'ENG', 'POR', 'EXTRAS']) {
           for (let i = 1; i <= 20; i++) {
             const key = `${team}-${i}`;
             stickers[key] = { owned: true, duplicate: 0 };
           }
         }
-        // Faltam para o Carlos as repetidas do usuário
         Object.entries(userStickers).forEach(([key, val]) => {
           if (val.duplicate > 0) {
             stickers[key] = { owned: false, duplicate: 0 };
           }
         });
-        // Carlos tem repetidas das figurinhas que faltam para o usuário
         Object.entries(userStickers).forEach(([key, val]) => {
           if (!val.owned) {
             stickers[key] = { owned: true, duplicate: 1 };
@@ -71,17 +145,16 @@
       uid: "mock-mariana",
       name: "Mariana Costa",
       photo_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&h=80&q=80",
-      offsetLat: -0.025, // ~3.5 km
+      offsetLat: -0.025,
       offsetLng: 0.015,
       birthdate: "1995-10-20",
-      // Mariana tem figurinhas que te faltam, mas não quer nada das suas repetidas
       generateStickers: (userStickers) => {
         const stickers = {};
         Object.entries(userStickers).forEach(([key, val]) => {
           if (!val.owned) {
-            stickers[key] = { owned: true, duplicate: 1 }; // Mariana tem de sobra
+            stickers[key] = { owned: true, duplicate: 1 };
           } else {
-            stickers[key] = { owned: true, duplicate: 0 }; // Ela já tem todas que o usuário tem
+            stickers[key] = { owned: true, duplicate: 0 };
           }
         });
         return stickers;
@@ -91,17 +164,16 @@
       uid: "mock-felipe",
       name: "Felipe Almeida",
       photo_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&h=80&q=80",
-      offsetLat: 0.085,  // ~12 km
+      offsetLat: 0.085,
       offsetLng: -0.045,
-      birthdate: "2012-08-12", // menor de idade
-      // Felipe quer suas repetidas, mas não tem nada para te dar de volta
+      birthdate: "2012-08-12",
       generateStickers: (userStickers) => {
         const stickers = {};
         Object.entries(userStickers).forEach(([key, val]) => {
           if (val.duplicate > 0) {
-            stickers[key] = { owned: false, duplicate: 0 }; // Felipe não tem e quer
+            stickers[key] = { owned: false, duplicate: 0 };
           } else {
-            stickers[key] = { owned: false, duplicate: 0 }; // Ele não tem nada
+            stickers[key] = { owned: false, duplicate: 0 };
           }
         });
         return stickers;
@@ -111,13 +183,11 @@
       uid: "mock-julia",
       name: "Júlia Mendes",
       photo_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&h=80&q=80",
-      offsetLat: -0.185, // ~28 km
+      offsetLat: -0.185,
       offsetLng: 0.125,
-      birthdate: "2013-03-04", // menor de idade
-      // Júlia tem um perfil médio/baixo
+      birthdate: "2013-03-04",
       generateStickers: (userStickers) => {
         const stickers = {};
-        // Só tem algumas
         for (let team of ['BRA', 'ARG']) {
           for (let i = 1; i <= 10; i++) {
             stickers[`${team}-${i}`] = { owned: true, duplicate: i === 1 ? 1 : 0 };
@@ -128,7 +198,7 @@
     }
   ];
 
-  // Cálculo da distância entre coordenadas usando a fórmula de Haversine
+  // Cálculo da distância entre coordenadas geográficas (Haversine)
   function getDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // Raio da Terra em km
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -141,7 +211,7 @@
     return parseFloat((R * c).toFixed(1));
   }
 
-  // Objeto Global exposto
+  // Objeto Global exposto no escopo de window
   window.authDb = {
     isDemoMode() {
       return isDemoMode;
@@ -153,7 +223,6 @@
 
     // Busca coordenadas geográficas aproximadas através de APIs de IP gratuitas
     async fetchLocationByIp() {
-      // 1. Tenta ipapi.co
       try {
         const res = await fetch("https://ipapi.co/json/");
         if (res.ok) {
@@ -165,7 +234,6 @@
       } catch (e) {
         console.warn("Erro ao buscar coordenadas por IP via ipapi.co:", e);
       }
-      // 2. Fallback ipinfo.io
       try {
         const res = await fetch("https://ipinfo.io/json");
         if (res.ok) {
@@ -185,10 +253,10 @@
       return null;
     },
 
-    // Login Simulado ou Real
+    // Realiza login dependendo do modo (Demo ou Supabase Real)
     async login(provider, username = "", birthdate = "") {
       if (isDemoMode) {
-        // Simulação de login
+        // Simulação de login no Modo Demo
         const randomId = Math.random().toString(36).substring(2, 10);
         let name = "Usuário Teste";
         let photo = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&h=80&q=80";
@@ -215,7 +283,6 @@
           last_seen: new Date().toISOString()
         };
 
-        // Tenta buscar geolocalização automática por IP no momento do login simulado
         try {
           const loc = await this.fetchLocationByIp();
           if (loc) {
@@ -229,12 +296,17 @@
         localStorage.setItem(sessionKey, JSON.stringify(currentUser));
         return currentUser;
       } else {
-        // Fluxo Real Supabase (Apenas o esqueleto de chamada OAuth)
+        // Fluxo Real Supabase (Chamada de Autenticação OAuth)
         try {
+          // Salva dados de idade localmente para recuperar pós-redirect
+          if (birthdate) {
+            localStorage.setItem("temp_birthdate", birthdate);
+          }
+          
           const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: provider,
             options: {
-              redirectTo: window.location.origin
+              redirectTo: window.location.origin + window.location.pathname
             }
           });
           if (error) throw error;
@@ -246,18 +318,18 @@
       }
     },
 
-    // Logout
+    // Logout da conta
     async logout() {
       currentUser = null;
       localStorage.removeItem(sessionKey);
+      localStorage.removeItem("temp_birthdate");
       if (!isDemoMode && supabaseClient) {
         await supabaseClient.auth.signOut();
       }
-      // Limpa dados de sincronização
       localStorage.removeItem("community_favorites");
     },
 
-    // Atualiza geolocalização do usuário
+    // Atualiza geolocalização do usuário (local e na nuvem)
     async updateLocation(lat, lng) {
       if (!currentUser) return;
       currentUser.latitude = lat;
@@ -300,13 +372,32 @@
       }
     },
 
-    // Retorna colecionadores próximos com raio ajustável
+    // Sincroniza dados do perfil (Nome e Foto)
+    async updateProfileInDb(user) {
+      if (!isDemoMode && supabaseClient) {
+        try {
+          const { error } = await supabaseClient
+            .from('profiles')
+            .upsert({
+              uid: user.uid,
+              name: user.name,
+              photo_url: user.photo_url,
+              latitude: user.latitude,
+              longitude: user.longitude,
+              last_seen: user.last_seen
+            });
+          if (error) throw error;
+        } catch (e) {
+          console.error("Erro ao atualizar perfil na tabela profiles:", e);
+        }
+      }
+    },
+
+    // Retorna colecionadores próximos na comunidade com raio ajustável
     async getNearbyCollectors(lat, lng, radiusKm = 99999) {
       if (!currentUser) return [];
 
       if (isDemoMode) {
-        // No modo demo, geramos os perfis com base nas coordenadas de GPS fornecidas
-        // e cruzamos com o estado do álbum ativo do próprio usuário para criar cenários de troca ideais
         const localAlbums = JSON.parse(localStorage.getItem('albums') || '{}');
         const activeAlbumId = localStorage.getItem('currentAlbumId');
         const activeAlbum = localAlbums[activeAlbumId] || { stickers: {} };
@@ -326,16 +417,13 @@
             distance: dist,
             birthdate: c.birthdate,
             stickers: c.generateStickers(userStickers),
-            last_seen: new Date(Date.now() - (dist * 120000)).toISOString() // tempo simulado
+            last_seen: new Date(Date.now() - (dist * 120000)).toISOString()
           };
         });
 
-        // Filtra pelo raio
         return results.filter(c => c.distance <= radiusKm).sort((a, b) => a.distance - b.distance);
       } else {
-        // Supabase query real de distância geográfica usando PostGIS ou cálculo Haversine puro em SQL
         try {
-          // Exemplo de RPC ou query de perfis ativos
           const { data, error } = await supabaseClient
             .from('profiles')
             .select('*')
@@ -343,13 +431,15 @@
           
           if (error) throw error;
 
-          const results = data.map(item => {
-            const dist = getDistance(lat, lng, item.latitude, item.longitude);
-            return {
-              ...item,
-              distance: dist
-            };
-          });
+          const results = data
+            .filter(item => item.latitude !== null && item.longitude !== null)
+            .map(item => {
+              const dist = getDistance(lat, lng, item.latitude, item.longitude);
+              return {
+                ...item,
+                distance: dist
+              };
+            });
 
           return results.filter(c => c.distance <= radiusKm).sort((a, b) => a.distance - b.distance);
         } catch (e) {
@@ -359,10 +449,9 @@
       }
     },
 
-    // Carrega perfil individual do colecionador
+    // Carrega perfil de outro colecionador individual
     async getCollectorProfile(uid, lat = null, lng = null) {
       if (isDemoMode) {
-        // No modo demo, procuramos o colecionador na lista gerada
         const userLat = lat || (currentUser ? currentUser.latitude : 0) || 0;
         const userLng = lng || (currentUser ? currentUser.longitude : 0) || 0;
         const list = await this.getNearbyCollectors(userLat, userLng);
@@ -416,4 +505,12 @@
       return this.getFavorites().includes(uid);
     }
   };
+
+  // Recupera idade salva após retorno do redirect de login
+  const tempBirthdate = localStorage.getItem("temp_birthdate");
+  if (tempBirthdate && currentUser) {
+    currentUser.birthdate = tempBirthdate;
+    localStorage.setItem(sessionKey, JSON.stringify(currentUser));
+    localStorage.removeItem("temp_birthdate");
+  }
 })();
