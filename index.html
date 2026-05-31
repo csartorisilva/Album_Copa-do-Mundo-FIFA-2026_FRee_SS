@@ -24,10 +24,10 @@
         extend: {
           colors: {
             copaBlue: '#0033A0',   // azul escuro oficial
-            copaGreen: '#009639',  // verde floresta oficial
+            copaGreen: '#00e676',  // verde neon vibrante FUT
             copaYellow: '#FFC726', // amarelo dourado oficial
-            darkBg: '#050814',
-            panelBg: 'rgba(13, 20, 41, 0.6)',
+            darkBg: '#090a1a',
+            panelBg: 'rgba(19, 21, 56, 0.7)',
           },
         },
       },
@@ -40,48 +40,81 @@
   <!-- Container principal simulando formato de app móvel (Padrão Web App) -->
   <div class="w-full max-w-[480px] bg-[#050814] border-x border-white/5 flex flex-col min-h-screen sm:min-h-[90vh] sm:my-auto sm:rounded-2xl sm:overflow-hidden shadow-2xl relative">
     
-    <!-- Header compacto ajustado para Web App -->
-    <header class="bg-[#070d1e]/90 border-b border-white/10 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
-      <div class="flex flex-col gap-2">
+    <!-- Header compacto ajustado para Web App com Ações Rápidas -->
+    <header class="bg-[#070d1e]/95 border-b border-white/10 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
+      <div class="flex flex-col gap-2.5">
+        
         <!-- Linha superior do Header -->
         <div class="flex justify-between items-center w-full">
           <div class="flex items-center gap-2">
             <div class="bg-gradient-to-r from-copaBlue via-copaGreen to-copaYellow p-[2px] rounded-lg">
-              <div class="bg-[#050814] px-2 py-0.5 rounded-[6px] font-black text-[10px] tracking-wider uppercase text-white">
-                FIFA 26
+              <div class="bg-[#090a1a] px-2 py-0.5 rounded-[6px] font-black text-[10px] tracking-wider uppercase text-white">
+                FUT 26
               </div>
             </div>
-            <h1 class="text-sm font-black tracking-tight text-white">
-              Álbum Copa do Mundo
+            <h1 class="text-sm font-black tracking-tight text-white uppercase">
+              Álbum Copa
             </h1>
           </div>
+          
           <!-- Seletor de Álbum -->
           <select id="albumSelector" 
-                  class="bg-white/5 border border-white/10 text-white text-xs px-2.5 py-1 rounded-lg focus:outline-none focus:border-copaYellow cursor-pointer hover:bg-white/10 transition-colors"
+                  class="bg-white/5 border border-white/10 text-white text-xs px-2 py-1 rounded-lg focus:outline-none focus:border-copaYellow cursor-pointer hover:bg-white/10 transition-colors"
                   onchange="switchAlbum(this.value)">
           </select>
         </div>
 
-        <!-- Links adicionais requeridos (Linha inferior) -->
+        <!-- Linha inferior do Header: Links à esquerda e Ações Rápidas com ícones à direita -->
         <div class="flex items-center justify-between border-t border-white/5 pt-2 text-[10px] text-gray-400 font-semibold">
-          <a href="https://www.fifa.com/fifaplus/pt/tournaments/mens/worldcup/canadamexicousa2026" 
-             target="_blank" 
-             rel="noopener noreferrer" 
-             class="hover:text-copaYellow transition-colors flex items-center gap-1">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-            FIFA Plus
-          </a>
-          <a href="https://panini.com.br" 
-             target="_blank" 
-             rel="noopener noreferrer" 
-             class="hover:text-copaGreen transition-colors flex items-center gap-1">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-            Panini
-          </a>
+          
+          <!-- Links externos requeridos -->
+          <div class="flex items-center gap-2.5">
+            <a href="https://www.fifa.com/fifaplus/pt/tournaments/mens/worldcup/canadamexicousa2026" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="hover:text-copaYellow transition-colors flex items-center gap-0.5">
+              FIFA+
+            </a>
+            <span class="text-white/10">|</span>
+            <a href="https://panini.com.br" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="hover:text-copaGreen transition-colors flex items-center gap-0.5">
+              Panini
+            </a>
+          </div>
+
+          <!-- Ações Rápidas Compactas baseadas em Ícones -->
+          <div class="flex items-center gap-2">
+            <!-- 1. Criar Novo Álbum -->
+            <button onclick="createNewAlbum()" 
+                    class="flex items-center gap-1 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-copaYellow/30 px-2 py-1 rounded-lg text-white transition text-[9px] font-bold uppercase tracking-wider"
+                    title="Iniciar nova coleção do zero">
+              <svg class="w-3 h-3 text-copaYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+              </svg>
+              Novo
+            </button>
+
+            <!-- 2. Importar Códigos (Ícone de documento/código) -->
+            <button onclick="location.hash = '#import'" 
+                    class="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-copaGreen/30 p-1 rounded-lg text-white transition"
+                    title="Importar lista de figurinhas">
+              <svg class="w-3.5 h-3.5 text-copaGreen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </button>
+
+            <!-- 3. Minhas Figurinhas Repetidas (Ícone de cartas duplas/setas de troca) -->
+            <button onclick="location.hash = '#trades'" 
+                    class="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-copaYellow/30 p-1 rounded-lg text-white transition"
+                    title="Minhas figurinhas repetidas">
+              <svg class="w-3.5 h-3.5 text-copaYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+            </button>
+          </div>
+
         </div>
       </div>
     </header>

@@ -3,14 +3,11 @@
 
 const PALLETE = {
   blue: '#0033A0',
-  green: '#009639',
-  yellow: '#FFC726',
+  green: '#00e676', // verde neon FUT
+  yellow: '#FFC726', // dourado FUT
 };
 
 // Estrutura de dados no localStorage
-// albums: { [albumId]: { name: string, stickers: { [code]: { owned: bool, duplicate: number } } } }
-// currentAlbumId: string
-
 const storage = {
   getAlbums() {
     try {
@@ -31,20 +28,72 @@ const storage = {
   },
 };
 
+// Mapeamento de URLs estáveis e públicas de brasões/logos das federações de futebol reais (Wikimedia Commons)
+const crestsMap = {
+  US: 'https://upload.wikimedia.org/wikipedia/commons/8/82/US_Soccer_Federation_logo.svg',
+  MX: 'https://upload.wikimedia.org/wikipedia/commons/6/64/Federacion_Mexicana_de_Futbol_Asociacion.svg',
+  CA: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/Canada_Soccer_logo.svg',
+  CR: 'https://upload.wikimedia.org/wikipedia/commons/d/da/Costa_Rica_Football_Federation_logo.svg',
+  BR: 'https://upload.wikimedia.org/wikipedia/commons/9/99/Brazilian_Football_Confederation_logo.svg',
+  CO: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Federacion_Colombiana_de_Futbol_logo.svg',
+  PY: 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Asociacion_Paraguaya_de_Futbol_logo.svg',
+  CM: 'https://upload.wikimedia.org/wikipedia/commons/0/07/F%C3%A9d%C3%A9ration_Camerounaise_de_Football_logo.svg',
+  AR: 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Asociaci%C3%B3n_del_F%C3%BAtbol_Argentino_logo.svg',
+  CL: 'https://upload.wikimedia.org/wikipedia/commons/8/83/Federaci%C3%B3n_de_F%C3%BAtbol_de_Chile_logo.svg',
+  UY: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg',
+  SA: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Saudi_Arabia_Football_Federation_logo.svg',
+  FR: 'https://upload.wikimedia.org/wikipedia/commons/d/df/Logo_F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football.svg',
+  MA: 'https://upload.wikimedia.org/wikipedia/commons/7/75/F%C3%A9d%C3%A9ration_royale_marocaine_de_football.svg',
+  AT: 'https://upload.wikimedia.org/wikipedia/commons/d/df/Austrian_Football_Association_logo.svg',
+  NG: 'https://upload.wikimedia.org/wikipedia/commons/7/74/Nigeria_Football_Federation_logo.svg',
+  ES: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Real_Federaci%C3%B3n_Espa%C3%B1ola_de_F%C3%BAtbol_logo.svg',
+  JP: 'https://upload.wikimedia.org/wikipedia/commons/8/87/Japan_Football_Association_logo.svg',
+  EC: 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Federacion_Ecuatoriana_de_Futbol.svg',
+  EG: 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Egyptian_Football_Association_logo.svg',
+  DE: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Deutscher_Fu%C3%9Fball-Bund_logo.svg',
+  BE: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Royal_Belgian_FA_logo.svg',
+  KR: 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Korea_Football_Association_logo.svg',
+  TN: 'https://upload.wikimedia.org/wikipedia/commons/c/cf/Tunisian_Football_Federation_logo.svg',
+  'GB-ENG': 'https://upload.wikimedia.org/wikipedia/en/3/38/England_crest_2009.svg',
+  SN: 'https://upload.wikimedia.org/wikipedia/commons/5/52/F%C3%A9d%C3%A9ration_S%C3%A9n%C3%A9galaise_de_Football.svg',
+  IR: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Football_Federation_Islamic_Republic_of_Iran_logo.svg',
+  HN: 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Federaci%C3%B3n_Nacional_Aut%C3%B3noma_de_Honduras_logo.svg',
+  PT: 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Federa%C3%A7%C3%A3o_Portuguesa_de_Futebol_logo.svg',
+  GH: 'https://upload.wikimedia.org/wikipedia/commons/3/33/Ghana_Football_Association_logo.svg',
+  TR: 'https://upload.wikimedia.org/wikipedia/commons/4/43/Turkish_Football_Federation_logo.svg',
+  PE: 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Federaci%C3%B3n_Peruana_de_F%C3%BAtbol_logo.svg',
+  IT: 'https://upload.wikimedia.org/wikipedia/commons/f/f6/Italy_national_football_team_logo_%282023%29.svg',
+  AU: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Football_Australia_logo.svg',
+  DZ: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Algerian_Football_Federation_logo.svg',
+  JM: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Jamaica_Football_Federation_logo.svg',
+  NL: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Knvb_logo.svg',
+  HR: 'https://upload.wikimedia.org/wikipedia/commons/2/25/Croatian_Football_Federation_logo.svg',
+  'GB-SCT': 'https://upload.wikimedia.org/wikipedia/en/6/65/Scottish_Football_Association_crest.svg',
+  ML: 'https://upload.wikimedia.org/wikipedia/commons/8/87/F%C3%A9d%C3%A9ration_Malienne_de_Football.svg',
+  DK: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Dansk_Boldspil-Union_logo.svg',
+  CH: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Swiss_Football_Association_logo.svg',
+  RS: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Football_Association_of_Serbia_logo.svg',
+  PA: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Federacion_Panamena_de_Futbol.svg',
+  UA: 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Ukrainian_Association_of_Football_logo.svg',
+  SE: 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Swedish_Football_Association_logo.svg',
+  PL: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Polish_Football_Association_logo.svg',
+  NZ: 'https://upload.wikimedia.org/wikipedia/commons/2/2d/New_Zealand_Football_logo.svg'
+};
+
 // Dados estruturados das seleções e grupos da Copa 2026 (48 seleções)
 const groupsData = [
   { name: 'Grupo A', teams: [{ code: 'US', name: 'EUA' }, { code: 'MX', name: 'México' }, { code: 'CA', name: 'Canadá' }, { code: 'CR', name: 'Costa Rica' }] },
   { name: 'Grupo B', teams: [{ code: 'BR', name: 'Brasil' }, { code: 'CO', name: 'Colômbia' }, { code: 'PY', name: 'Paraguai' }, { code: 'CM', name: 'Camarões' }] },
-  { name: 'Grupo C', teams: [{ code: 'AR', name: 'Argentina' }, { code: 'CL', name: 'Chile' }, { code: 'UY', name: 'Uruguai' }, { code: 'SA', name: 'Arábia Saudita' }] },
+  { name: 'Grupo C', teams: [{ code: 'AR', name: 'Argentina' }, { code: 'CL', name: 'Chile' }, { code: 'UY', name: 'Uruguai' }, { code: 'SA', name: 'Arábia S.' }] },
   { name: 'Grupo D', teams: [{ code: 'FR', name: 'França' }, { code: 'MA', name: 'Marrocos' }, { code: 'AT', name: 'Áustria' }, { code: 'NG', name: 'Nigéria' }] },
   { name: 'Grupo E', teams: [{ code: 'ES', name: 'Espanha' }, { code: 'JP', name: 'Japão' }, { code: 'EC', name: 'Equador' }, { code: 'EG', name: 'Egito' }] },
-  { name: 'Grupo F', teams: [{ code: 'DE', name: 'Alemanha' }, { code: 'BE', name: 'Bélgica' }, { code: 'KR', name: 'Coreia do Sul' }, { code: 'TN', name: 'Tunísia' }] },
+  { name: 'Grupo F', teams: [{ code: 'DE', name: 'Alemanha' }, { code: 'BE', name: 'Bélgica' }, { code: 'KR', name: 'Coreia do S.' }, { code: 'TN', name: 'Tunísia' }] },
   { name: 'Grupo G', teams: [{ code: 'GB-ENG', name: 'Inglaterra' }, { code: 'SN', name: 'Senegal' }, { code: 'IR', name: 'Irã' }, { code: 'HN', name: 'Honduras' }] },
   { name: 'Grupo H', teams: [{ code: 'PT', name: 'Portugal' }, { code: 'GH', name: 'Gana' }, { code: 'TR', name: 'Turquia' }, { code: 'PE', name: 'Peru' }] },
   { name: 'Grupo I', teams: [{ code: 'IT', name: 'Itália' }, { code: 'AU', name: 'Austrália' }, { code: 'DZ', name: 'Argélia' }, { code: 'JM', name: 'Jamaica' }] },
   { name: 'Grupo J', teams: [{ code: 'NL', name: 'Holanda' }, { code: 'HR', name: 'Croácia' }, { code: 'GB-SCT', name: 'Escócia' }, { code: 'ML', name: 'Mali' }] },
   { name: 'Grupo K', teams: [{ code: 'DK', name: 'Dinamarca' }, { code: 'CH', name: 'Suíça' }, { code: 'RS', name: 'Sérvia' }, { code: 'PA', name: 'Panamá' }] },
-  { name: 'Grupo L', teams: [{ code: 'UA', name: 'Ucrânia' }, { code: 'SE', name: 'Suécia' }, { code: 'PL', name: 'Polônia' }, { code: 'NZ', name: 'Nova Zelândia' }] }
+  { name: 'Grupo L', teams: [{ code: 'UA', name: 'Ucrânia' }, { code: 'SE', name: 'Suécia' }, { code: 'PL', name: 'Polônia' }, { code: 'NZ', name: 'N. Zelândia' }] }
 ];
 
 // Mapeamento plano de seleções para busca rápida
@@ -62,7 +111,7 @@ function generateId() {
 
 // Inicializa a aplicação
 function initApp() {
-  console.log('Inicializando App FIFA 2026...');
+  console.log('Inicializando App FIFA 2026 com visual FUT...');
   try {
     let albums = storage.getAlbums();
     if (Object.keys(albums).length === 0) {
@@ -77,16 +126,25 @@ function initApp() {
     route();
   } catch (e) {
     console.error('Erro na inicialização do aplicativo:', e);
-    document.getElementById('appRoot').innerHTML = `
-      <div class="glass-panel p-6 rounded-2xl max-w-md mx-auto mt-12 text-center border-red-500/30">
-        <h2 class="text-xl font-bold text-red-400 mb-2">Erro de Inicialização</h2>
-        <p class="text-gray-400 text-sm mb-4">Não foi possível carregar os dados salvos localmente no seu navegador.</p>
-        <button onclick="localStorage.clear(); location.reload();" class="px-4 py-2 bg-red-600 text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-700 transition-colors">
-          Resetar Dados Locais
-        </button>
-      </div>
-    `;
   }
+}
+
+// Cria novo álbum do zero
+function createNewAlbum() {
+  const name = prompt('Digite o nome do seu novo álbum de figurinhas:', 'Nova Coleção Copa 2026');
+  if (!name || name.trim() === '') return;
+
+  const albums = storage.getAlbums();
+  const newId = generateId();
+  albums[newId] = { name: name.trim(), stickers: {} };
+  
+  storage.setAlbums(albums);
+  storage.setCurrentAlbumId(newId);
+  
+  renderHeader();
+  location.hash = '#home';
+  route();
+  alert(`Álbum "${name.trim()}" criado com sucesso!`);
 }
 
 // Renderiza a barra superior (seletor de álbum)
@@ -111,28 +169,59 @@ function switchAlbum(id) {
   route();
 }
 
-// Roteador baseado em Hash
+// Roteador baseado em Hash com efeito 3D Page Flip
 function route() {
   const hash = location.hash || '#home';
   const root = document.getElementById('appRoot');
   if (!root) return;
   
+  const currentContainer = root.querySelector('.page-transition-container');
+  if (currentContainer) {
+    // 1. Inicia animação de saída da página anterior (virada para a esquerda)
+    currentContainer.classList.remove('page-active');
+    currentContainer.classList.add('page-exit');
+    
+    // 2. Aguarda a finalização do CSS Page-Exit (400ms)
+    setTimeout(() => {
+      renderNewPage(hash, root);
+    }, 380);
+  } else {
+    // Carregamento inicial limpo
+    renderNewPage(hash, root);
+  }
+}
+
+function renderNewPage(hash, root) {
   root.innerHTML = '';
   
+  // Cria o wrapper que contém a folha/página tridimensional
+  const pageContainer = document.createElement('div');
+  pageContainer.className = 'page-transition-container page-enter';
+  
   if (hash.startsWith('#home')) {
-    renderHome();
+    renderHome(pageContainer);
   } else if (hash.startsWith('#import')) {
-    renderImport();
+    renderImport(pageContainer);
   } else if (hash.startsWith('#team-')) {
     const code = hash.split('-')[1];
-    renderTeamPage(code);
+    renderTeamPage(code, pageContainer);
   } else if (hash.startsWith('#trades')) {
-    renderTrades();
+    renderTrades(pageContainer);
   } else if (hash.startsWith('#login')) {
-    renderLogin();
+    renderLogin(pageContainer);
   } else {
     location.hash = '#home';
+    return;
   }
+  
+  root.appendChild(pageContainer);
+  
+  // Força o reflow do navegador para engatilhar transição CSS
+  pageContainer.offsetHeight;
+  
+  // Transiciona para ativa (página aberta/abotoada)
+  pageContainer.classList.remove('page-enter');
+  pageContainer.classList.add('page-active');
 }
 
 // Calcula estatísticas do álbum atual
@@ -148,7 +237,6 @@ function getAlbumStats() {
   let dupCount = 0;
   
   Object.entries(album.stickers).forEach(([key, val]) => {
-    // Apenas conta se pertencer às seleções cadastradas
     const parts = key.split('-');
     if (teamsMap[parts[0]]) {
       if (val.owned) ownedCount++;
@@ -166,41 +254,37 @@ function getAlbumStats() {
 }
 
 // ------------------- LOGIN -------------------
-function renderLogin() {
-  const root = document.getElementById('appRoot');
+function renderLogin(container) {
   const wrapper = document.createElement('div');
   wrapper.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 relative overflow-hidden';
   
-  // Efeito brilhoso de fundo
   const glow = document.createElement('div');
-  glow.className = 'absolute -top-24 -left-24 w-48 h-48 rounded-full bg-copaBlue/30 blur-3xl pointer-events-none';
+  glow.className = 'absolute -top-24 -left-24 w-48 h-48 rounded-full bg-copaGreen/15 blur-3xl pointer-events-none';
   wrapper.appendChild(glow);
 
   const title = document.createElement('h2');
   title.className = 'text-2xl font-black text-center mb-1 uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400';
-  title.textContent = 'Acessar Álbum';
+  title.textContent = 'Acessar Coleções';
   wrapper.appendChild(title);
 
   const sub = document.createElement('p');
   sub.className = 'text-center text-xs text-gray-400 mb-8';
-  sub.textContent = 'Escolha um método rápido para gerenciar sua coleção';
+  sub.textContent = 'Escolha um método simulado para entrar';
   wrapper.appendChild(sub);
 
   const grid = document.createElement('div');
   grid.className = 'flex flex-col gap-3';
 
   const methods = [
-    { id: 'sms', label: 'SMS de 6 Dígitos', desc: 'Acesso rápido por telefone' },
-    { id: 'google', label: 'Google Account', desc: 'Sincronizar com sua conta Google' },
-    { id: 'apple', label: 'Apple ID', desc: 'Entrar usando Apple' },
-    { id: 'biometrics', label: 'Biometria local', desc: 'FaceID ou Digital no aparelho' }
+    { id: 'sms', label: 'SMS de 6 Dígitos' },
+    { id: 'google', label: 'Google Account' },
+    { id: 'apple', label: 'Apple ID' }
   ];
 
   methods.forEach(m => {
     const btn = document.createElement('button');
     btn.className = 'flex items-center justify-between text-left p-4 rounded-xl bg-white/5 border border-white/5 hover:border-copaYellow/30 hover:bg-white/10 transition duration-200 group';
     btn.onclick = () => {
-      // Cria/Seleciona álbum simulado
       const albums = storage.getAlbums();
       const newId = generateId();
       albums[newId] = { name: `Álbum (${m.label})`, stickers: {} };
@@ -210,19 +294,12 @@ function renderLogin() {
       location.hash = '#home';
     };
 
-    const info = document.createElement('div');
-    const lText = document.createElement('div');
-    lText.className = 'font-bold text-sm text-gray-200 group-hover:text-white';
-    lText.textContent = m.label;
-    const dText = document.createElement('div');
-    dText.className = 'text-[10px] text-gray-500';
-    dText.textContent = m.desc;
+    const label = document.createElement('span');
+    label.className = 'font-bold text-sm text-gray-200 group-hover:text-white';
+    label.textContent = m.label;
+    btn.appendChild(label);
 
-    info.appendChild(lText);
-    info.appendChild(dText);
-    btn.appendChild(info);
-
-    const arrow = document.createElement('div');
+    const arrow = document.createElement('span');
     arrow.className = 'text-gray-500 group-hover:text-copaYellow transition';
     arrow.innerHTML = '➔';
     btn.appendChild(arrow);
@@ -231,27 +308,26 @@ function renderLogin() {
   });
 
   wrapper.appendChild(grid);
-  root.appendChild(wrapper);
+  container.appendChild(wrapper);
 }
 
 // ------------------- HOME -------------------
-function renderHome() {
-  const root = document.getElementById('appRoot');
+function renderHome(container) {
   const stats = getAlbumStats();
 
-  const container = document.createElement('div');
-  container.className = 'space-y-6 py-4 animate-fade-in';
+  const rootHome = document.createElement('div');
+  rootHome.className = 'space-y-6 py-2';
 
   // 1. Painel de Estatísticas / Ultimate Progress
   const statsPanel = document.createElement('div');
-  statsPanel.className = 'glass-panel p-6 rounded-2xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 border-white/5';
+  statsPanel.className = 'glass-panel p-5 rounded-2xl relative overflow-hidden flex flex-col gap-4 border-white/5';
   
   const statsGlow = document.createElement('div');
-  statsGlow.className = 'absolute right-0 top-0 w-64 h-64 bg-copaGreen/10 rounded-full blur-3xl pointer-events-none';
+  statsGlow.className = 'absolute right-0 top-0 w-48 h-48 bg-copaGreen/10 rounded-full blur-3xl pointer-events-none';
   statsPanel.appendChild(statsGlow);
 
   const progressSection = document.createElement('div');
-  progressSection.className = 'flex-1 space-y-2';
+  progressSection.className = 'space-y-2';
   
   const progressHeader = document.createElement('div');
   progressHeader.className = 'flex justify-between items-center text-xs font-black uppercase tracking-wider text-gray-400';
@@ -259,7 +335,7 @@ function renderHome() {
   progressSection.appendChild(progressHeader);
 
   const progressBarBg = document.createElement('div');
-  progressBarBg.className = 'h-3 bg-white/5 rounded-full overflow-hidden border border-white/10';
+  progressBarBg.className = 'h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/10';
   const progressBarFill = document.createElement('div');
   progressBarFill.className = 'h-full bg-gradient-to-r from-copaBlue via-copaGreen to-copaYellow rounded-full transition-all duration-500';
   progressBarFill.style.width = `${stats.percent}%`;
@@ -267,126 +343,121 @@ function renderHome() {
   progressSection.appendChild(progressBarBg);
 
   const textStats = document.createElement('div');
-  textStats.className = 'flex gap-6 mt-4 text-xs font-semibold text-gray-300';
+  textStats.className = 'flex justify-between mt-3 text-xs font-semibold text-gray-300';
   textStats.innerHTML = `
-    <div><span class="text-lg font-black text-white">${stats.owned}</span> / ${stats.total} Figurinhas</div>
-    <div class="border-l border-white/10 pl-6"><span class="text-lg font-black text-copaYellow">${stats.duplicates}</span> Repetidas</div>
+    <div><span class="text-base font-black text-white">${stats.owned}</span> / ${stats.total} Adquiridas</div>
+    <div><span class="text-base font-black text-copaYellow">${stats.duplicates}</span> Repetidas</div>
   `;
   progressSection.appendChild(textStats);
   statsPanel.appendChild(progressSection);
-
-  // Botões de Ação Rápidos do Painel
-  const quickActions = document.createElement('div');
-  quickActions.className = 'flex gap-3 self-stretch md:self-center';
-  
-  const btnImport = document.createElement('button');
-  btnImport.className = 'flex-1 md:flex-none px-4 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold uppercase tracking-wider rounded-xl transition text-center';
-  btnImport.textContent = 'Importar Códigos';
-  btnImport.onclick = () => location.hash = '#import';
-  
-  const btnTrades = document.createElement('button');
-  btnTrades.className = 'flex-1 md:flex-none px-4 py-2.5 bg-gradient-to-r from-copaBlue to-copaGreen hover:opacity-90 text-xs font-bold uppercase text-white tracking-wider rounded-xl transition text-center';
-  btnTrades.textContent = 'Minhas Trocas';
-  btnTrades.onclick = () => location.hash = '#trades';
-
-  quickActions.appendChild(btnImport);
-  quickActions.appendChild(btnTrades);
-  statsPanel.appendChild(quickActions);
-  container.appendChild(statsPanel);
+  rootHome.appendChild(statsPanel);
 
   // 2. Banner de Troca Qualificada (Simulado)
   if (stats.duplicates > 0) {
     const banner = document.createElement('div');
-    banner.className = 'bg-gradient-to-r from-copaYellow via-[#ffdd67] to-copaYellow text-black py-2.5 px-4 rounded-xl text-center text-xs font-black uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 border border-white/10 animate-pulse';
+    banner.className = 'bg-gradient-to-r from-copaYellow via-[#ffdd67] to-copaYellow text-black py-2 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider text-center flex items-center justify-center gap-2 border border-white/10 animate-pulse';
     banner.innerHTML = `
-      <span class="inline-block w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
-      Troca Qualificada Disponível! Você possui cromos repetidos para negociar.
+      <span class="w-1.5 h-1.5 bg-red-600 rounded-full animate-ping"></span>
+      Trocas Qualificadas Disponíveis na aba de repetidas!
     `;
-    container.appendChild(banner);
+    banner.onclick = () => location.hash = '#trades';
+    banner.style.cursor = 'pointer';
+    rootHome.appendChild(banner);
   }
 
-  // 3. Seções Especiais / Seções do Álbum
-  const sectionsGrid = document.createElement('div');
-  sectionsGrid.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
+  // 3. PRIMEIRA LINHA: Seções Especiais (LADO A LADO na mesma linha)
+  const specialGrid = document.createElement('div');
+  specialGrid.className = 'grid grid-cols-3 gap-2.5';
   
   const specialSections = [
-    { title: 'FW Fifa (Copa Especial)', desc: '10 cromos especiais lendários' },
-    { title: 'FW Seleções (Estádios & Escudos)', desc: 'Cromos especiais metalizados' },
-    { title: 'Figurinhas Extras / Premium', desc: 'Extra Gold, Silver e Bronze' }
+    { title: 'FW FIFA', desc: 'Especial Copa', hash: '#team-FWFIFA' },
+    { title: 'Escudos', desc: 'Metálicos', hash: '#team-ESCUDOS' },
+    { title: 'Premium', desc: 'Fig. Extras', hash: '#team-EXTRAS' }
   ];
 
   specialSections.forEach(sec => {
     const box = document.createElement('div');
-    box.className = 'glass-panel p-4 rounded-xl border-white/5 hover:border-white/10 transition relative group cursor-pointer overflow-hidden';
-    
-    // Efeito holográfico na borda ao passar o mouse
-    const edge = document.createElement('div');
-    edge.className = 'absolute inset-0 border border-transparent group-hover:border-copaYellow/30 rounded-xl transition duration-300';
-    box.appendChild(edge);
+    box.className = 'glass-panel p-3 rounded-xl border-white/5 hover:border-copaYellow/30 cursor-pointer flex flex-col justify-center items-center text-center transition group relative overflow-hidden';
+    box.onclick = () => location.hash = sec.hash;
 
     const title = document.createElement('h4');
-    title.className = 'font-black text-sm text-copaYellow uppercase tracking-wider mb-1';
+    title.className = 'font-black text-xs text-copaYellow uppercase tracking-wider group-hover:scale-105 transition';
     title.textContent = sec.title;
     
     const desc = document.createElement('p');
-    desc.className = 'text-xs text-gray-400';
+    desc.className = 'text-[9px] text-gray-500 font-semibold';
     desc.textContent = sec.desc;
 
     box.appendChild(title);
     box.appendChild(desc);
-    sectionsGrid.appendChild(box);
+    specialGrid.appendChild(box);
   });
-  container.appendChild(sectionsGrid);
+  rootHome.appendChild(specialGrid);
 
   // 4. Divisor de Título Grupos
   const groupsTitle = document.createElement('h3');
-  groupsTitle.className = 'text-sm font-black uppercase tracking-wider text-gray-400 border-b border-white/5 pb-2 mt-8';
+  groupsTitle.className = 'text-xs font-black uppercase tracking-wider text-gray-500 border-b border-white/5 pb-1 mt-6';
   groupsTitle.textContent = 'Seleções por Grupos';
-  container.appendChild(groupsTitle);
+  rootHome.appendChild(groupsTitle);
 
-  // 5. Grid de Grupos (A a L)
+  // 5. LINHAS SEGUINTES: Cada grupo exibido abaixo do outro (Vertical)
   const groupsContainer = document.createElement('div');
-  groupsContainer.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
+  groupsContainer.className = 'space-y-5';
 
   groupsData.forEach(g => {
     const groupCard = document.createElement('div');
-    groupCard.className = 'glass-panel p-4 rounded-2xl border-white/5';
+    groupCard.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
     
     const gTitle = document.createElement('h4');
-    gTitle.className = 'font-black text-xs text-gray-400 uppercase tracking-widest mb-3 border-b border-white/5 pb-1';
+    gTitle.className = 'font-black text-[10px] text-gray-500 uppercase tracking-widest border-b border-white/5 pb-1';
     gTitle.textContent = g.name;
     groupCard.appendChild(gTitle);
 
+    // Grid de 2 colunas para caber perfeitamente no container de 480px com visual FUT
     const grid = document.createElement('div');
-    grid.className = 'grid grid-cols-2 sm:grid-cols-4 gap-2';
+    grid.className = 'grid grid-cols-2 gap-2.5';
 
     g.teams.forEach(team => {
       const card = document.createElement('div');
-      card.className = 'bg-white/5 border border-white/5 hover:border-copaYellow/30 hover:bg-white/10 p-3 rounded-xl text-center cursor-pointer transition flex flex-col items-center justify-between gap-2 group';
+      card.className = 'bg-white/5 border border-white/5 hover:border-copaYellow/30 p-3 rounded-xl cursor-pointer transition flex flex-col items-center justify-between gap-1 group relative overflow-hidden';
       card.onclick = () => location.hash = `#team-${team.code}`;
 
-      // Bandeira da seleção
-      const img = document.createElement('img');
-      img.src = `https://flagcdn.com/w80/${team.code.toLowerCase()}.png`;
-      img.alt = team.name;
-      img.className = 'w-10 h-7 object-cover rounded shadow border border-white/10 group-hover:scale-105 transition duration-200';
-      
-      const name = document.createElement('div');
-      name.className = 'text-[10px] font-black uppercase tracking-wider text-gray-300 group-hover:text-white mt-1';
-      name.textContent = team.name;
+      // FUT Layout: Escudo grande destacado no centro com a bandeira no canto inferior direito
+      const crestWrapper = document.createElement('div');
+      crestWrapper.className = 'relative w-14 h-14 flex items-center justify-center mt-1';
 
-      // Calcula progresso da seleção específica
+      // Escudo real do Wikimedia
+      const crestImg = document.createElement('img');
+      crestImg.src = crestsMap[team.code] || `https://flagcdn.com/w80/${team.code.toLowerCase()}.png`; // fallback
+      crestImg.alt = team.name;
+      crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_2px_5px_rgba(0,0,0,0.5)] group-hover:scale-105 transition duration-200';
+      crestWrapper.appendChild(crestImg);
+
+      // Bandeira compacta no canto inferior direito do escudo
+      const flagImg = document.createElement('img');
+      flagImg.src = `https://flagcdn.com/w40/${team.code.toLowerCase()}.png`;
+      flagImg.alt = 'Bandeira';
+      flagImg.className = 'absolute bottom-0 right-0 w-6 h-4 object-cover border border-white/10 rounded shadow-md pointer-events-none';
+      crestWrapper.appendChild(flagImg);
+      card.appendChild(crestWrapper);
+
+      // Nome do país centralizado abaixo do escudo
+      const name = document.createElement('div');
+      name.className = 'text-[10px] font-black uppercase tracking-wider text-gray-300 group-hover:text-white mt-1.5 text-center';
+      name.textContent = team.name;
+      card.appendChild(name);
+
+      // Progresso numérico
       const teamStats = getTeamProgress(team.code);
       const progSpan = document.createElement('span');
-      progSpan.className = 'text-[9px] font-bold text-copaGreen bg-copaGreen/10 px-1.5 py-0.5 rounded-full';
+      progSpan.className = 'text-[9px] font-black text-copaGreen bg-copaGreen/10 px-2 py-0.5 rounded-full';
       progSpan.textContent = `${teamStats.owned}/20`;
+      
       if (teamStats.owned === 20) {
-        progSpan.className = 'text-[9px] font-bold text-copaYellow bg-copaYellow/10 px-1.5 py-0.5 rounded-full animate-bounce';
+        progSpan.className = 'text-[9px] font-black text-copaYellow bg-copaYellow/20 px-2 py-0.5 rounded-full border border-copaYellow/20 animate-bounce';
       }
-
-      card.appendChild(img);
-      card.appendChild(name);
       card.appendChild(progSpan);
+
       grid.appendChild(card);
     });
 
@@ -394,8 +465,8 @@ function renderHome() {
     groupsContainer.appendChild(groupCard);
   });
 
-  container.appendChild(groupsContainer);
-  root.appendChild(container);
+  rootHome.appendChild(groupsContainer);
+  container.appendChild(rootHome);
 }
 
 // Auxiliar para obter progresso por seleção (máximo 20 figurinhas)
@@ -416,62 +487,58 @@ function getTeamProgress(teamCode) {
 }
 
 // ------------------- IMPORTAR -------------------
-function renderImport() {
-  const root = document.getElementById('appRoot');
-  const container = document.createElement('div');
-  container.className = 'max-w-xl mx-auto my-6 glass-panel p-6 rounded-2xl border-white/5 space-y-4';
+function renderImport(container) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'glass-panel p-5 rounded-2xl border-white/5 space-y-4';
 
   const title = document.createElement('h2');
-  title.className = 'text-xl font-black uppercase tracking-wider text-copaYellow';
-  title.textContent = 'Importar Lista de Figurinhas';
-  container.appendChild(title);
+  title.className = 'text-base font-black uppercase tracking-wider text-copaYellow';
+  title.textContent = 'Importar Figurinhas';
+  wrapper.appendChild(title);
 
   const hint = document.createElement('p');
-  hint.className = 'text-xs text-gray-400';
+  hint.className = 'text-[10px] text-gray-400 leading-relaxed';
   hint.innerHTML = `
-    Cole abaixo sua lista de figurinhas. Aceita formatos flexíveis separados por vírgula, ponto e vírgula ou linha. 
-    <br>Exemplos: <strong>BR 1, BR 2, BR 15</strong> ou <strong>AR 1 2 5 10</strong>.
+    Insira seus códigos de cromos. Formatos aceitos: 
+    <br><strong>BR 1, BR 2, BR 15</strong> ou <strong>AR 1 2 5 10</strong>.
   `;
-  container.appendChild(hint);
+  wrapper.appendChild(hint);
 
   const textarea = document.createElement('textarea');
   textarea.id = 'importArea';
-  textarea.className = 'w-full h-44 p-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-copaYellow text-sm text-white placeholder-gray-600';
+  textarea.className = 'w-full h-36 p-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-copaYellow text-xs text-white placeholder-gray-600';
   textarea.placeholder = 'Exemplo:\nBR 1, BR 2, BR 5\nAR 3 4 8 9';
-  container.appendChild(textarea);
+  wrapper.appendChild(textarea);
 
   const btnContainer = document.createElement('div');
-  btnContainer.className = 'flex flex-col sm:flex-row gap-3';
+  btnContainer.className = 'flex flex-col gap-2';
 
   const btnHave = document.createElement('button');
-  btnHave.className = 'flex-1 px-4 py-2.5 bg-copaGreen hover:bg-copaGreen/90 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition';
+  btnHave.className = 'w-full px-4 py-2.5 bg-copaGreen hover:opacity-90 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition';
   btnHave.textContent = "Importar como 'Tenho'";
   btnHave.onclick = () => processImport(false);
 
   const btnDup = document.createElement('button');
-  btnDup.className = 'flex-1 px-4 py-2.5 bg-copaYellow hover:bg-copaYellow/90 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition';
+  btnDup.className = 'w-full px-4 py-2.5 bg-copaYellow hover:opacity-90 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition';
   btnDup.textContent = "Importar como 'Repetidas'";
   btnDup.onclick = () => processImport(true);
 
   btnContainer.appendChild(btnHave);
   btnContainer.appendChild(btnDup);
-  container.appendChild(btnContainer);
+  wrapper.appendChild(btnContainer);
 
   const back = document.createElement('button');
   back.className = 'w-full px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold uppercase text-gray-300 tracking-wider rounded-xl transition';
   back.textContent = 'Voltar para Home';
   back.onclick = () => location.hash = '#home';
-  container.appendChild(back);
+  wrapper.appendChild(back);
 
-  root.appendChild(container);
+  container.appendChild(wrapper);
 }
 
 function processImport(asDuplicate) {
   const text = document.getElementById('importArea').value.trim();
-  if (!text) {
-    alert('Nenhum dado digitado.');
-    return;
-  }
+  if (!text) return alert('Insira códigos para importar.');
 
   const lines = text.split(/\n|,|;/).map(s => s.trim()).filter(Boolean);
   const albumId = storage.getCurrentAlbumId();
@@ -481,7 +548,6 @@ function processImport(asDuplicate) {
   let importCount = 0;
 
   lines.forEach(line => {
-    // Tenta casar formato: "BR 1 2 3" ou "BR-1 BR-2"
     const m1 = line.match(/^([A-Z]{2,3}(?:-[A-Z]+)?)\s+([0-9\s,]+)$/i);
     if (m1) {
       const code = m1[1].toUpperCase();
@@ -494,7 +560,6 @@ function processImport(asDuplicate) {
         }
       });
     } else {
-      // Caso cole "BR-1", "AR-5" de forma individual
       const m2 = line.match(/^([A-Z]{2,3}(?:-[A-Z]+)?)-([0-9]+)$/i);
       if (m2) {
         const code = m2[1].toUpperCase();
@@ -508,7 +573,7 @@ function processImport(asDuplicate) {
   });
 
   storage.setAlbums(albums);
-  alert(`Importação concluída! ${importCount} cromos adicionados.`);
+  alert(`Sucesso! ${importCount} figurinhas adicionadas.`);
   location.hash = '#home';
 }
 
@@ -518,7 +583,6 @@ function addSticker(album, key, duplicate) {
   }
   if (duplicate) {
     album.stickers[key].duplicate++;
-    // Se marcou como repetida, assume também a posse
     album.stickers[key].owned = true;
   } else {
     album.stickers[key].owned = true;
@@ -526,62 +590,50 @@ function addSticker(album, key, duplicate) {
 }
 
 // ------------------- TEAM PAGE -------------------
-function renderTeamPage(code) {
-  const root = document.getElementById('appRoot');
+function renderTeamPage(code, container) {
   const teamName = teamsMap[code] || code;
 
-  const container = document.createElement('div');
-  container.className = 'space-y-6 py-4';
+  const rootTeam = document.createElement('div');
+  rootTeam.className = 'space-y-5 py-2';
 
   // Cabeçalho da página de seleção
   const headerPanel = document.createElement('div');
-  headerPanel.className = 'glass-panel p-6 rounded-2xl flex items-center justify-between gap-4 border-white/5';
+  headerPanel.className = 'glass-panel p-5 rounded-2xl flex items-center justify-between gap-4 border-white/5';
   
   const infoSide = document.createElement('div');
-  infoSide.className = 'flex items-center gap-4';
+  infoSide.className = 'flex items-center gap-3.5';
   
   const flag = document.createElement('img');
   flag.src = `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
   flag.alt = teamName;
-  flag.className = 'w-16 h-11 object-cover rounded shadow border border-white/10';
+  flag.className = 'w-12 h-8 object-cover rounded shadow border border-white/10';
   infoSide.appendChild(flag);
 
   const textBlock = document.createElement('div');
   const teamTitle = document.createElement('h2');
-  teamTitle.className = 'text-2xl font-black uppercase tracking-wide';
+  teamTitle.className = 'text-lg font-black uppercase tracking-wide';
   teamTitle.textContent = teamName;
   const countSub = document.createElement('p');
-  countSub.className = 'text-xs text-gray-400';
+  countSub.className = 'text-[10px] text-gray-400';
   
   const stats = getTeamProgress(code);
   countSub.id = 'teamProgressLabel';
-  countSub.textContent = `${stats.owned} de 20 cromos adquiridos`;
+  countSub.textContent = `${stats.owned} de 20 figurinhas coladas`;
   textBlock.appendChild(teamTitle);
   textBlock.appendChild(countSub);
   infoSide.appendChild(textBlock);
   headerPanel.appendChild(infoSide);
 
   const backBtn = document.createElement('button');
-  backBtn.className = 'px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center gap-1.5';
+  backBtn.className = 'p-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl transition flex items-center justify-center';
   backBtn.innerHTML = `
-    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
     </svg>
-    Voltar
   `;
   backBtn.onclick = () => location.hash = '#home';
   headerPanel.appendChild(backBtn);
-  container.appendChild(headerPanel);
-
-  // Legenda de tipos de figurinhas
-  const legend = document.createElement('div');
-  legend.className = 'text-[11px] text-gray-500 flex flex-wrap gap-4 items-center pl-2';
-  legend.innerHTML = `
-    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-copaYellow shadow-sm"></span> Nº 1 Escudo / Nº 2 Equipe (Shiny Gold)</span>
-    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-copaGreen shadow-sm"></span> Nº 3 a 20 Elenco (Normais)</span>
-    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-white/15"></span> Clique para colar/remover a figurinha do álbum</span>
-  `;
-  container.appendChild(legend);
+  rootTeam.appendChild(headerPanel);
 
   // Grade responsiva de figurinhas (20 cromos)
   const grid = document.createElement('div');
@@ -591,7 +643,6 @@ function renderTeamPage(code) {
     const key = `${code}-${i}`;
     const isSpecial = (i === 1 || i === 2); // Escudo e Time
 
-    // Cria o sticker-card tridimensional
     const card = document.createElement('div');
     card.className = `sticker-card ${isSpecial ? 'special' : ''}`;
     card.id = `card-${key}`;
@@ -610,7 +661,7 @@ function renderTeamPage(code) {
 
     const backNum = document.createElement('div');
     backNum.className = 'card-back-number';
-    backNum.textContent = isSpecial ? (i === 1 ? 'ESCUDO' : 'TIME') : `${code} ${i}`;
+    backNum.textContent = isSpecial ? (i === 1 ? '★ ESCUDO' : '★ TIME') : `${i}`;
     cardBack.appendChild(backNum);
     inner.appendChild(cardBack);
 
@@ -618,13 +669,12 @@ function renderTeamPage(code) {
     const cardFront = document.createElement('div');
     cardFront.className = `card-front ${isSpecial ? 'special shiny-effect' : ''}`;
     
-    // Frente superior
     const frontHeader = document.createElement('div');
     frontHeader.className = 'flex justify-between items-center w-full';
     
     const miniFlag = document.createElement('img');
     miniFlag.src = `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
-    miniFlag.className = 'w-6 h-4 object-cover rounded border border-white/10';
+    miniFlag.className = 'w-5 h-3.5 object-cover rounded border border-white/10';
     frontHeader.appendChild(miniFlag);
 
     const teamTag = document.createElement('span');
@@ -635,7 +685,7 @@ function renderTeamPage(code) {
 
     // Frente centro (Número do cromo)
     const frontNum = document.createElement('div');
-    frontNum.className = 'text-center font-black text-2xl py-1 my-auto tracking-tighter text-white';
+    frontNum.className = 'text-center font-black text-xl py-1 my-auto tracking-tighter text-white';
     frontNum.textContent = isSpecial ? (i === 1 ? '★ ESC' : '★ TIM') : i;
     cardFront.appendChild(frontNum);
 
@@ -643,14 +693,12 @@ function renderTeamPage(code) {
     const frontActions = document.createElement('div');
     frontActions.className = 'card-actions';
 
-    // Os botões serão injetados dinamicamente via updateCard
     cardFront.appendChild(frontActions);
     inner.appendChild(cardFront);
     card.appendChild(inner);
 
     // Clique no card
     card.onclick = (e) => {
-      // Se clicou em botões de ação na frente, evita clique duplo
       if (e.target.closest('.action-btn')) return;
       
       const album = storage.getAlbums()[storage.getCurrentAlbumId()];
@@ -658,28 +706,26 @@ function renderTeamPage(code) {
       const isOwned = sticker && sticker.owned;
       
       if (!isOwned) {
-        // Se não possui, clica para obter
         toggleOwned(key);
         updateCard(card, key);
         updateTeamProgressLabel(code);
       }
     };
 
-    // Inicia e atualiza o estado visual do card
     updateCard(card, key);
     grid.appendChild(card);
   }
 
-  container.appendChild(grid);
-  root.appendChild(container);
+  rootTeam.appendChild(grid);
+  container.appendChild(rootTeam);
 }
 
-// Atualiza o contador de progresso da seleção em tempo real
+// Contador de progresso da seleção
 function updateTeamProgressLabel(code) {
   const label = document.getElementById('teamProgressLabel');
   if (label) {
     const stats = getTeamProgress(code);
-    label.textContent = `${stats.owned} de 20 cromos adquiridos`;
+    label.textContent = `${stats.owned} de 20 figurinhas coladas`;
   }
 }
 
@@ -695,7 +741,6 @@ function toggleOwned(key) {
   }
   
   album.stickers[key].owned = !album.stickers[key].owned;
-  // Se tirou a posse, reseta as duplicadas
   if (!album.stickers[key].owned) {
     album.stickers[key].duplicate = 0;
   }
@@ -744,7 +789,7 @@ function updateCard(card, key) {
     card.classList.remove('is-flipped');
   }
 
-  // 2. Atualiza a Badge de duplicata no canto superior do card (FUT style)
+  // 2. Badge de repetida (FUT style)
   let badge = card.querySelector('.rep-badge');
   if (isOwned && duplicates > 0) {
     if (!badge) {
@@ -757,16 +802,15 @@ function updateCard(card, key) {
     badge.remove();
   }
 
-  // 3. Atualiza os botões de ação na base do card de frente
+  // 3. Botões de ação
   const actionsContainer = card.querySelector('.card-actions');
   if (actionsContainer) {
     actionsContainer.innerHTML = '';
 
-    // Botão esquerdo: Diminuir repetida (-) ou Remover cromo (×)
     const btnLeft = document.createElement('button');
     btnLeft.className = `action-btn ${duplicates > 0 ? 'btn-minus' : 'btn-remove'}`;
     btnLeft.innerHTML = duplicates > 0 ? '–' : '×';
-    btnLeft.title = duplicates > 0 ? 'Remover 1 Repetida' : 'Remover do Álbum';
+    btnLeft.title = duplicates > 0 ? 'Remover 1 repetida' : 'Remover do álbum';
     btnLeft.onclick = (e) => {
       e.stopPropagation();
       if (duplicates > 0) {
@@ -778,11 +822,10 @@ function updateCard(card, key) {
       updateTeamProgressLabel(key.split('-')[0]);
     };
 
-    // Botão direito: Adicionar repetida (+)
     const btnRight = document.createElement('button');
     btnRight.className = 'action-btn btn-add';
     btnRight.innerHTML = '+';
-    btnRight.title = 'Adicionar Repetida';
+    btnRight.title = 'Adicionar repetida';
     btnRight.onclick = (e) => {
       e.stopPropagation();
       toggleDuplicate(key, true);
@@ -795,18 +838,15 @@ function updateCard(card, key) {
 }
 
 // ------------------- TROCAS -------------------
-function renderTrades() {
-  const root = document.getElementById('appRoot');
-  
-  const container = document.createElement('div');
-  container.className = 'max-w-2xl mx-auto my-6 glass-panel p-6 rounded-2xl border-white/5 space-y-6';
+function renderTrades(container) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'glass-panel p-5 rounded-2xl border-white/5 space-y-4';
 
   const title = document.createElement('h2');
-  title.className = 'text-xl font-black uppercase tracking-wider text-copaYellow';
-  title.textContent = 'Minhas Figurinhas Repetidas';
-  container.appendChild(title);
+  title.className = 'text-base font-black uppercase tracking-wider text-copaYellow';
+  title.textContent = 'Figurinhas Repetidas';
+  wrapper.appendChild(title);
 
-  // Lista todas as repetidas
   const albumId = storage.getCurrentAlbumId();
   const albums = storage.getAlbums();
   const album = albums[albumId];
@@ -816,12 +856,11 @@ function renderTrades() {
 
   if (!album) {
     listDiv.innerHTML = '<p class="text-xs text-gray-500">Nenhum álbum ativo.</p>';
-    container.appendChild(listDiv);
-    root.appendChild(container);
+    wrapper.appendChild(listDiv);
+    container.appendChild(wrapper);
     return;
   }
 
-  // Filtragem de duplicatas
   const duplicates = [];
   Object.entries(album.stickers).forEach(([key, val]) => {
     if (val.owned && val.duplicate > 0) {
@@ -841,27 +880,26 @@ function renderTrades() {
 
   if (duplicates.length === 0) {
     listDiv.innerHTML = `
-      <div class="text-center py-8 space-y-2">
-        <div class="text-3xl">📭</div>
-        <p class="text-sm font-bold text-gray-300">Nenhuma repetida encontrada.</p>
-        <p class="text-xs text-gray-500">Marque cromos extras na tela de seleções para que apareçam aqui.</p>
+      <div class="text-center py-6 space-y-2">
+        <div class="text-2xl">📭</div>
+        <p class="text-xs font-bold text-gray-300">Nenhuma repetida encontrada.</p>
+        <p class="text-[10px] text-gray-500">Marque cromos extras na tela de seleções para listar aqui.</p>
       </div>
     `;
   } else {
-    // Grade de repetidas resumidas
     const grid = document.createElement('div');
-    grid.className = 'grid grid-cols-2 sm:grid-cols-3 gap-3';
+    grid.className = 'grid grid-cols-2 gap-3';
     
     duplicates.forEach(item => {
       const itemCard = document.createElement('div');
-      itemCard.className = 'bg-white/5 border border-white/5 p-3 rounded-xl flex items-center justify-between gap-3';
+      itemCard.className = 'bg-white/5 border border-white/5 p-3 rounded-xl flex items-center justify-between gap-2';
       
       const info = document.createElement('div');
       const teamLabel = document.createElement('div');
       teamLabel.className = 'text-[9px] font-black uppercase tracking-wider text-copaYellow';
       teamLabel.textContent = item.team;
       const numLabel = document.createElement('div');
-      numLabel.className = 'text-sm font-black text-white';
+      numLabel.className = 'text-xs font-black text-white';
       numLabel.textContent = `Nº ${item.number}`;
       
       info.appendChild(teamLabel);
@@ -869,7 +907,7 @@ function renderTrades() {
       itemCard.appendChild(info);
 
       const qty = document.createElement('div');
-      qty.className = 'bg-white/10 text-white font-black text-xs px-2 py-1 rounded-lg';
+      qty.className = 'bg-copaYellow text-black font-black text-xs px-2 py-1 rounded-lg';
       qty.textContent = `${item.count}x`;
       itemCard.appendChild(qty);
 
@@ -878,17 +916,21 @@ function renderTrades() {
     listDiv.appendChild(grid);
   }
 
-  container.appendChild(listDiv);
+  wrapper.appendChild(listDiv);
 
   const back = document.createElement('button');
   back.className = 'w-full px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold uppercase text-gray-300 tracking-wider rounded-xl transition';
   back.textContent = 'Voltar para Home';
   back.onclick = () => location.hash = '#home';
-  container.appendChild(back);
+  wrapper.appendChild(back);
 
-  root.appendChild(container);
+  container.appendChild(wrapper);
 }
 
-// ------------------- INICIALIZAÇÃO EVENTOS -------------------
-window.addEventListener('hashchange', route);
+// Vincula funções utilitárias ao escopo global window para acesso no HTML
+window.switchAlbum = switchAlbum;
+window.createNewAlbum = createNewAlbum;
+
+// Inicialização por DOMContentLoaded
 window.addEventListener('DOMContentLoaded', initApp);
+window.addEventListener('hashchange', route);
