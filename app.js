@@ -3276,29 +3276,57 @@ function renderCollectorProfile(uid, container) {
     allCodes.push('FWC', 'CC', 'EXTRAS');
 
     allCodes.forEach(code => {
-      const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
-      for (let i = 1; i <= limit; i++) {
-        const key = `${code}-${i}`;
-        
-        const userSticker = userStickers[key];
-        const userOwned = userSticker ? userSticker.owned : false;
-        const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
+      if (code === 'EXTRAS') {
+        const variants = ['ouro', 'prata', 'bronze', 'bordo'];
+        for (let i = 1; i <= 20; i++) {
+          variants.forEach(v => {
+            const key = `${code}-${i}-${v}`;
+            const userSticker = userStickers[key];
+            const userOwned = userSticker ? userSticker.owned : false;
+            const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
 
-        const collectorSticker = collector.stickers[key];
-        const collectorOwned = collectorSticker ? collectorSticker.owned : false;
-        const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
+            const collectorSticker = collector.stickers[key];
+            const collectorOwned = collectorSticker ? collectorSticker.owned : false;
+            const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
 
-        // Ele tem (e tem de sobra para trocar) que te falta
-        if (collectorOwned && collectorDup > 0 && !userOwned) {
-          cardsHeHasLackingYou.push(key);
-        } else if (collectorOwned && !userOwned) {
-          // Fallback para quando o outro colecionador possui o card em geral
-          cardsHeHasLackingYou.push(key);
+            // Ele tem (e tem de sobra para trocar) que te falta
+            if (collectorOwned && collectorDup > 0 && !userOwned) {
+              cardsHeHasLackingYou.push(key);
+            } else if (collectorOwned && !userOwned) {
+              cardsHeHasLackingYou.push(key);
+            }
+
+            // Você tem repetido que falta para ele
+            if (userDup > 0 && !collectorOwned) {
+              cardsYouHaveLackingHim.push(key);
+            }
+          });
         }
+      } else {
+        const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
+        for (let i = 1; i <= limit; i++) {
+          const key = `${code}-${i}`;
+          
+          const userSticker = userStickers[key];
+          const userOwned = userSticker ? userSticker.owned : false;
+          const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
 
-        // Você tem repetido que falta para ele
-        if (userDup > 0 && !collectorOwned) {
-          cardsYouHaveLackingHim.push(key);
+          const collectorSticker = collector.stickers[key];
+          const collectorOwned = collectorSticker ? collectorSticker.owned : false;
+          const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
+
+          // Ele tem (e tem de sobra para trocar) que te falta
+          if (collectorOwned && collectorDup > 0 && !userOwned) {
+            cardsHeHasLackingYou.push(key);
+          } else if (collectorOwned && !userOwned) {
+            // Fallback para quando o outro colecionador possui o card em geral
+            cardsHeHasLackingYou.push(key);
+          }
+
+          // Você tem repetido que falta para ele
+          if (userDup > 0 && !collectorOwned) {
+            cardsYouHaveLackingHim.push(key);
+          }
         }
       }
     });
@@ -3308,7 +3336,9 @@ function renderCollectorProfile(uid, container) {
     const matchPerfectUserGives = [];
     const matchPerfectUserReceives = [];
 
+    // 1. Para normais, FWC e CC
     allCodes.forEach(code => {
+      if (code === 'EXTRAS') return;
       const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
       for (let i = 1; i <= limit; i++) {
         const key = `${code}-${i}`;
@@ -3321,14 +3351,46 @@ function renderCollectorProfile(uid, container) {
         const collectorOwned = collectorSticker ? collectorSticker.owned : false;
         const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
 
-        // Figurinhas que você pode DAR para ele
+        // Figurinhas que você pode DAR para ele (repetida sua que ele não tem)
         if (userDup > 0 && !collectorOwned) {
           matchPerfectUserGives.push(key);
         }
-        // Figurinhas que você pode RECEBER dele (ele tem repetida e você não tem)
+        // Figurinhas que você pode RECEBER dele (repetida dele que você não tem)
         if (collectorDup > 0 && !userOwned) {
           matchPerfectUserReceives.push(key);
         }
+      }
+    });
+
+    // 2. Tratamento de EXTRAS com paridade exata para Match Perfeito (Ouro por Ouro, etc.)
+    const premiumVariants = ['ouro', 'prata', 'bronze', 'bordo'];
+    premiumVariants.forEach(variant => {
+      const userDupExtrasOfVariant = [];
+      const collectorDupExtrasOfVariant = [];
+
+      for (let i = 1; i <= 20; i++) {
+        const key = `EXTRAS-${i}-${variant}`;
+        
+        const userSticker = userStickers[key];
+        const userOwned = userSticker ? userSticker.owned : false;
+        const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
+
+        const collectorSticker = collector.stickers[key];
+        const collectorOwned = collectorSticker ? collectorSticker.owned : false;
+        const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
+
+        if (userDup > 0 && !collectorOwned) {
+          userDupExtrasOfVariant.push(key);
+        }
+        if (collectorDup > 0 && !userOwned) {
+          collectorDupExtrasOfVariant.push(key);
+        }
+      }
+
+      // Se ambos tiverem cruzamento na mesma categoria, prioriza match por paridade
+      if (userDupExtrasOfVariant.length > 0 && collectorDupExtrasOfVariant.length > 0) {
+        userDupExtrasOfVariant.forEach(k => matchPerfectUserGives.push(k));
+        collectorDupExtrasOfVariant.forEach(k => matchPerfectUserReceives.push(k));
       }
     });
 
@@ -3480,22 +3542,207 @@ function renderCollectorProfile(uid, container) {
 
       const el = document.createElement('div');
       el.className = `text-[9px] font-black px-2 py-1 rounded border tracking-wide uppercase transition-all duration-150 select-none ${isSpecial ? 'bg-copaYellow/10 text-copaYellow border-copaYellow/20 hover:bg-copaYellow/20' : 'bg-copaGreen/10 text-copaGreen border-copaGreen/20 hover:bg-copaGreen/20'}`;
-      el.textContent = key;
       
       let pName = key;
       if (isSpecial) {
-        pName = legendsData[i - 1] ? legendsData[i - 1].name : key;
+        const variant = key.split('-')[2];
+        const capVariant = variant ? variant.charAt(0).toUpperCase() + variant.slice(1) : '';
+        pName = (legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`) + ' ' + capVariant;
+        el.textContent = `${legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`} ${capVariant}`;
       } else if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][i - 1]) {
         pName = albumData[code][i - 1].nome;
+        el.textContent = `${code} ${i}`;
       } else {
         pName = playerNames[i] || key;
+        el.textContent = key;
       }
       el.title = pName;
       return el;
     }
 
     setProfileTabState();
+
+    // Botões de Negociação e Proposta Customizada no rodapé do perfil
+    const bottomActions = document.createElement('div');
+    bottomActions.className = 'flex flex-col gap-3 mt-6';
+
+    const btnWhatsApp = document.createElement('button');
+    btnWhatsApp.className = 'w-full py-3 px-4 bg-copaGreen hover:bg-opacity-95 text-black font-black uppercase text-[10px] tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-lg';
+    btnWhatsApp.innerHTML = `
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.574 1.97 14.101.947 11.487.947c-5.441 0-9.866 4.372-9.87 9.802 0 1.772.465 3.508 1.346 5.042L1.99 21.53l5.83-1.517zM17.75 14.61c-.347-.174-2.057-1.014-2.375-1.13-.318-.116-.549-.174-.78.174-.23.348-.895 1.13-1.097 1.362-.202.23-.404.26-.75.087-.348-.174-1.468-.541-2.796-1.728-1.034-.922-1.731-2.06-1.933-2.408-.202-.348-.022-.536.151-.708.156-.154.348-.406.52-.609.174-.203.23-.348.348-.58.116-.232.058-.435-.029-.609-.087-.174-.78-1.884-1.068-2.58-.28-.677-.566-.584-.78-.596-.202-.01-.433-.01-.664-.01-.23 0-.606.087-.923.435-.317.348-1.213 1.188-1.213 2.898 0 1.71 1.243 3.361 1.417 3.593.173.232 2.447 3.738 5.928 5.24 2.85 1.228 3.525.986 4.774.87.535-.05 2.058-.84 2.346-1.652.289-.812.289-1.507.202-1.652-.086-.145-.318-.232-.664-.406z"/>
+      </svg>
+      Abrir Negociação
+    `;
+    btnWhatsApp.onclick = () => {
+      let msg = `Fala, ${collector.name}! Vi seu perfil no Ultimate Cromo 2026. `;
+      if (hasMatchPerfect) {
+        const userGivesNames = matchPerfectUserGives.map(k => {
+          const parts = k.split('-');
+          if (parts[0] === 'EXTRAS') {
+            const name = legendsData[parseInt(parts[1], 10) - 1] ? legendsData[parseInt(parts[1], 10) - 1].name : `Lendário ${parts[1]}`;
+            return `${name} ${parts[2].toUpperCase()}`;
+          }
+          return getStickerDisplayName(parts[0], parseInt(parts[1], 10));
+        }).join(', ');
+        const userReceivesNames = matchPerfectUserReceives.map(k => {
+          const parts = k.split('-');
+          if (parts[0] === 'EXTRAS') {
+            const name = legendsData[parseInt(parts[1], 10) - 1] ? legendsData[parseInt(parts[1], 10) - 1].name : `Lendário ${parts[1]}`;
+            return `${name} ${parts[2].toUpperCase()}`;
+          }
+          return getStickerDisplayName(parts[0], parseInt(parts[1], 10));
+        }).join(', ');
+        msg += `Temos um Match Perfeito de trocas! 🔄\nPosso te entregar: ${userGivesNames}\nE receber de você: ${userReceivesNames}\nO que acha?`;
+      } else {
+        msg += `Gostaria de propor algumas trocas com você!`;
+      }
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+    bottomActions.appendChild(btnWhatsApp);
+
+    const btnCustomProposal = document.createElement('button');
+    btnCustomProposal.className = 'w-full py-2.5 px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-copaYellow font-bold text-[10px] uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5';
+    btnCustomProposal.innerHTML = `✨ Enviar Proposta (Premium)`;
+    btnCustomProposal.onclick = () => {
+      openCustomProposalModal(collector, userStickers);
+    };
+    bottomActions.appendChild(btnCustomProposal);
+
+    mainDiv.appendChild(bottomActions);
   });
+}
+
+function openCustomProposalModal(collector, userStickers) {
+  document.getElementById('custom-proposal-modal')?.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'custom-proposal-modal';
+  modal.className = 'fixed inset-0 z-[9999] flex items-end justify-center';
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'absolute inset-0 bg-black/75 backdrop-blur-sm';
+  backdrop.onclick = () => modal.remove();
+  modal.appendChild(backdrop);
+
+  const sheet = document.createElement('div');
+  sheet.className = 'relative w-full max-w-[480px] bg-[#07091c] border border-white/10 rounded-t-2xl shadow-2xl p-5 space-y-4 animate-fade-in max-h-[85vh] overflow-y-auto';
+
+  // Encontra opções de Premium (Legends) do usuário (suas repetidas)
+  const userPremiumDupes = [];
+  const variants = ['ouro', 'prata', 'bronze', 'bordo'];
+  for (let i = 1; i <= 20; i++) {
+    variants.forEach(v => {
+      const key = `EXTRAS-${i}-${v}`;
+      const sticker = userStickers[key];
+      if (sticker && sticker.duplicate > 0) {
+        const name = legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`;
+        const cat = v.charAt(0).toUpperCase() + v.slice(1);
+        userPremiumDupes.push({ key, label: `${name} ${cat} (${sticker.duplicate}x)` });
+      }
+    });
+  }
+
+  // Encontra opções de Premium (Legends) do colecionador (as que ele tem ou que faltam para nós)
+  const collectorPremiumCards = [];
+  for (let i = 1; i <= 20; i++) {
+    variants.forEach(v => {
+      const key = `EXTRAS-${i}-${v}`;
+      const sticker = collector.stickers[key];
+      if (sticker && (sticker.owned || sticker.duplicate > 0)) {
+        const name = legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`;
+        const cat = v.charAt(0).toUpperCase() + v.slice(1);
+        collectorPremiumCards.push({ key, label: `${name} ${cat}` });
+      }
+    });
+  }
+
+  // Fallbacks se nenhum dado estiver preenchido para não travar
+  if (userPremiumDupes.length === 0) {
+    for (let i = 1; i <= 20; i++) {
+      variants.forEach(v => {
+        const name = legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`;
+        const cat = v.charAt(0).toUpperCase() + v.slice(1);
+        userPremiumDupes.push({ key: `EXTRAS-${i}-${v}`, label: `${name} ${cat}` });
+      });
+    }
+  }
+  if (collectorPremiumCards.length === 0) {
+    for (let i = 1; i <= 20; i++) {
+      variants.forEach(v => {
+        const name = legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`;
+        const cat = v.charAt(0).toUpperCase() + v.slice(1);
+        collectorPremiumCards.push({ key: `EXTRAS-${i}-${v}`, label: `${name} ${cat}` });
+      });
+    }
+  }
+
+  const userOptionsHtml = userPremiumDupes.map(item => `<option value="${item.key}">${item.label}</option>`).join('');
+  const collectorOptionsHtml = collectorPremiumCards.map(item => `<option value="${item.key}">${item.label}</option>`).join('');
+
+  sheet.innerHTML = `
+    <div class="flex justify-between items-center border-b border-white/5 pb-3">
+      <h3 class="font-black text-white text-xs uppercase tracking-wider">Proposta Customizada (Premium)</h3>
+      <button onclick="document.getElementById('custom-proposal-modal').remove()" class="text-gray-400 hover:text-white text-lg">×</button>
+    </div>
+    
+    <div class="space-y-4 py-2">
+      <div class="space-y-1.5">
+        <label class="text-[9px] font-black text-copaGreen uppercase tracking-wider block">Minha Figurinha Premium (Oferecer):</label>
+        <select id="userPremiumSelect" class="w-full bg-[#131735] text-white border border-white/10 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-copaGreen cursor-pointer">
+          ${userOptionsHtml}
+        </select>
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="text-[9px] font-black text-copaYellow uppercase tracking-wider block">Figurinha Premium Dele (Pedir):</label>
+        <select id="collectorPremiumSelect" class="w-full bg-[#131735] text-white border border-white/10 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-copaYellow cursor-pointer">
+          ${collectorOptionsHtml}
+        </select>
+      </div>
+
+      <button id="btnSendCustomProposal" class="w-full mt-4 py-3 bg-copaGreen hover:bg-opacity-95 text-black font-black uppercase text-xs tracking-wider rounded-xl transition flex items-center justify-center gap-2">
+        Abrir Negociação 🔄
+      </button>
+    </div>
+  `;
+
+  sheet.querySelector('#btnSendCustomProposal').onclick = () => {
+    const userVal = sheet.querySelector('#userPremiumSelect').value;
+    const collectorVal = sheet.querySelector('#collectorPremiumSelect').value;
+
+    const userStickerNum = parseInt(userVal.split('-')[1], 10);
+    const userStickerVar = userVal.split('-')[2];
+    const userStickerName = legendsData[userStickerNum - 1] ? legendsData[userStickerNum - 1].name : `Lendário ${userStickerNum}`;
+    const userStickerFull = `${userStickerName} ${userStickerVar.charAt(0).toUpperCase() + userStickerVar.slice(1)}`;
+
+    const collectorStickerNum = parseInt(collectorVal.split('-')[1], 10);
+    const collectorStickerVar = collectorVal.split('-')[2];
+    const collectorStickerName = legendsData[collectorStickerNum - 1] ? legendsData[collectorStickerNum - 1].name : `Lendário ${collectorStickerNum}`;
+    const collectorStickerFull = `${collectorStickerName} ${collectorStickerVar.charAt(0).toUpperCase() + collectorStickerVar.slice(1)}`;
+
+    const appLink = window.location.origin + window.location.pathname;
+
+    const messageText = `Fala! Vi seu perfil no Ultimate Cromo 2026 e tenho uma proposta para as figurinhas Premium (Legends)! 🔄\nGostaria de oferecer a minha extra ${userStickerFull} em troca da sua ${collectorStickerFull}. O que acha?\nGerencie seu álbum e envie propostas customizadas também. Baixe o Ultimate Cromo FIFA/Panini 2026: ${appLink}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: 'Proposta Premium - Ultimate Cromo 2026',
+        text: messageText
+      }).then(() => {
+        modal.remove();
+      }).catch(err => {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`, '_blank');
+        modal.remove();
+      });
+    } else {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`, '_blank');
+      modal.remove();
+    }
+  };
+
+  modal.appendChild(sheet);
+  document.body.appendChild(modal);
 }
 
 function handleAuthHeaderClick() {
