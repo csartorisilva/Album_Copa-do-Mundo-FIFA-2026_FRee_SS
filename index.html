@@ -58,11 +58,18 @@
             </h1>
           </div>
           
-          <!-- Seletor de Álbum -->
-          <select id="albumSelector" 
-                  class="bg-[#131735] text-white border border-white/10 text-xs px-2 py-1 rounded-lg focus:outline-none focus:border-copaYellow cursor-pointer hover:bg-[#1a1e43] transition-colors"
-                  onchange="switchAlbum(this.value)">
-          </select>
+          <!-- Seletor de Álbum e Perfil -->
+          <div class="flex items-center gap-2">
+            <select id="albumSelector" 
+                    class="bg-[#131735] text-white border border-white/10 text-xs px-2 py-1 rounded-lg focus:outline-none focus:border-copaYellow cursor-pointer hover:bg-[#1a1e43] transition-colors"
+                    onchange="switchAlbum(this.value)">
+            </select>
+            <button id="authHeaderBtn" onclick="location.hash = '#login'"
+                    class="w-7 h-7 rounded-full border border-white/10 hover:border-copaYellow/40 bg-white/5 flex items-center justify-center text-xs overflow-hidden transition-all duration-200"
+                    title="Minha Conta / Login">
+              👤
+            </button>
+          </div>
         </div>
 
         <!-- Linha inferior do Header: Links à esquerda e Ações Rápidas com ícones à direita -->
@@ -122,6 +129,13 @@
               </svg>
             </button>
 
+            <!-- 4. Comunidade (Ícone de Pessoas 👥) -->
+            <button onclick="location.hash = '#community'" 
+                    class="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-copaYellow/30 w-7 h-7 flex items-center justify-center rounded-lg text-white transition"
+                    title="Comunidade de Trocas">
+              <span class="text-xs">👥</span>
+            </button>
+
             <!-- 3. Compartilhar Geral (Ícone de share) -->
             <button onclick="shareApp()" 
                     class="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-copaYellow/30 w-7 h-7 flex items-center justify-center rounded-lg text-white transition"
@@ -162,6 +176,8 @@
     
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth_db.js"></script>
   <script src="players_db.js"></script>
   <script src="app.js" defer></script>
 </body>

@@ -820,7 +820,7 @@ function createNewAlbum() {
   alert(`Álbum "${name.trim()}" criado com sucesso!`);
 }
 
-// Renderiza a barra superior (seletor de álbum)
+// Renderiza a barra superior (seletor de álbum e perfil)
 function renderHeader() {
   const selector = document.getElementById('albumSelector');
   if (!selector) return;
@@ -834,6 +834,18 @@ function renderHeader() {
     if (id === storage.getCurrentAlbumId()) opt.selected = true;
     selector.appendChild(opt);
   });
+
+  const authBtn = document.getElementById('authHeaderBtn');
+  if (authBtn) {
+    const user = authDb.getCurrentUser();
+    if (user) {
+      authBtn.innerHTML = `<img src="${user.photo_url}" class="w-full h-full object-cover" alt="Perfil">`;
+      authBtn.title = `Logado como ${user.name} (Clique para Sair)`;
+    } else {
+      authBtn.innerHTML = '👤';
+      authBtn.title = "Minha Conta / Login";
+    }
+  }
 }
 
 // Troca de álbum ativo
@@ -883,6 +895,11 @@ function renderNewPage(hash, root) {
     renderTrades(pageContainer);
   } else if (hash.startsWith('#login')) {
     renderLogin(pageContainer);
+  } else if (hash.startsWith('#community-profile-')) {
+    const uid = hash.substring('#community-profile-'.length);
+    renderCollectorProfile(uid, pageContainer);
+  } else if (hash.startsWith('#community')) {
+    renderCommunity(pageContainer);
   } else {
     location.hash = '#home';
     return;
@@ -936,59 +953,193 @@ function getAlbumStats() {
 
 // ------------------- LOGIN -------------------
 function renderLogin(container) {
+  const user = authDb.getCurrentUser();
+  const isDemo = authDb.isDemoMode();
+
   const wrapper = document.createElement('div');
-  wrapper.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 relative overflow-hidden';
+  wrapper.className = 'max-w-md mx-auto my-8 glass-panel p-8 rounded-2xl border-white/5 relative overflow-hidden animate-fade-in';
   
   const glow = document.createElement('div');
-  glow.className = 'absolute -top-24 -left-24 w-48 h-48 rounded-full bg-copaGreen/15 blur-3xl pointer-events-none';
+  glow.className = 'absolute -top-24 -left-24 w-48 h-48 rounded-full bg-copaGreen/10 blur-3xl pointer-events-none';
   wrapper.appendChild(glow);
 
-  const title = document.createElement('h2');
-  title.className = 'text-2xl font-black text-center mb-1 uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400';
-  title.textContent = 'Acessar Coleções';
-  wrapper.appendChild(title);
+  if (user) {
+    // Tela de Perfil Logado
+    const title = document.createElement('h2');
+    title.className = 'text-xl font-black text-center mb-6 uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400';
+    title.textContent = 'Minha Conta';
+    wrapper.appendChild(title);
 
-  const sub = document.createElement('p');
-  sub.className = 'text-center text-xs text-gray-400 mb-8';
-  sub.textContent = 'Escolha um método simulado para entrar';
-  wrapper.appendChild(sub);
+    const profileBox = document.createElement('div');
+    profileBox.className = 'flex flex-col items-center gap-4 mb-6 bg-white/5 p-4 rounded-xl border border-white/5';
 
-  const grid = document.createElement('div');
-  grid.className = 'flex flex-col gap-3';
+    const avatar = document.createElement('img');
+    avatar.src = user.photo_url;
+    avatar.className = 'w-16 h-16 rounded-full border-2 border-copaYellow object-cover shadow-lg';
+    profileBox.appendChild(avatar);
 
-  const methods = [
-    { id: 'google', label: 'Acesso via Gmail' },
-    { id: 'apple', label: 'Acesso via Apple ID' },
-    { id: 'android', label: 'Acesso via Android/Google' }
-  ];
+    const name = document.createElement('h3');
+    name.className = 'font-black text-white text-base';
+    name.textContent = user.name;
+    profileBox.appendChild(name);
 
-  methods.forEach(m => {
-    const btn = document.createElement('button');
-    btn.className = 'flex items-center justify-between text-left p-4 rounded-xl bg-white/5 border border-white/5 hover:border-copaYellow/30 hover:bg-white/10 transition duration-200 group';
-    btn.onclick = () => {
-      const albums = storage.getAlbums();
-      const newId = generateId();
-      albums[newId] = { name: `Álbum (${m.label})`, stickers: {} };
-      storage.setAlbums(albums);
-      storage.setCurrentAlbumId(newId);
-      renderHeader();
-      location.hash = '#home';
+    const details = document.createElement('div');
+    details.className = 'w-full text-center text-xs space-y-2 mt-2 pt-2 border-t border-white/5 text-gray-400';
+    
+    const dbMode = document.createElement('p');
+    dbMode.innerHTML = `Banco de Dados: <span class="${isDemo ? 'text-copaYellow' : 'text-copaGreen'} font-bold">${isDemo ? 'Modo Simulado (Demo)' : 'Nuvem Real (Supabase)'}</span>`;
+    details.appendChild(dbMode);
+
+    const locationText = document.createElement('p');
+    if (user.latitude && user.longitude) {
+      locationText.innerHTML = `GPS: <span class="text-white font-bold">${user.latitude.toFixed(4)}, ${user.longitude.toFixed(4)}</span>`;
+    } else {
+      locationText.innerHTML = `GPS: <span class="text-red-400 font-bold">Não Compartilhado</span>`;
+    }
+    details.appendChild(locationText);
+
+    profileBox.appendChild(details);
+    wrapper.appendChild(profileBox);
+
+    // Botões de Ação de Conta
+    const actionGrid = document.createElement('div');
+    actionGrid.className = 'flex flex-col gap-3';
+
+    // Botão de Atualizar GPS
+    const btnGPS = document.createElement('button');
+    btnGPS.className = 'w-full py-3 rounded-xl bg-white/5 border border-white/10 hover:border-copaGreen/40 hover:bg-white/10 text-white font-bold text-xs transition duration-200 flex items-center justify-center gap-2';
+    btnGPS.innerHTML = `📍 Atualizar Localização (GPS)`;
+    btnGPS.onclick = () => {
+      btnGPS.textContent = "Obtendo GPS...";
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          await authDb.updateLocation(position.coords.latitude, position.coords.longitude);
+          // Sincroniza figurinhas
+          const activeAlbumId = storage.getCurrentAlbumId();
+          const albums = storage.getAlbums();
+          if (activeAlbumId && albums[activeAlbumId]) {
+            await authDb.syncStickers(albums[activeAlbumId].stickers);
+          }
+          renderHeader();
+          renderLogin(container);
+          alert("Localização e álbum atualizados com sucesso!");
+        },
+        (error) => {
+          console.error(error);
+          btnGPS.innerHTML = `📍 Erro ao obter GPS`;
+          alert("Não foi possível acessar a geolocalização. Por favor, ative a permissão do GPS no seu navegador.");
+        }
+      );
     };
+    actionGrid.appendChild(btnGPS);
 
-    const label = document.createElement('span');
-    label.className = 'font-bold text-sm text-gray-200 group-hover:text-white';
-    label.textContent = m.label;
-    btn.appendChild(label);
+    // Botão de Logout
+    const btnLogout = document.createElement('button');
+    btnLogout.className = 'w-full py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 font-bold text-xs transition duration-200';
+    btnLogout.textContent = 'Sair da Conta / Logout';
+    btnLogout.onclick = async () => {
+      await authDb.logout();
+      renderHeader();
+      renderLogin(container);
+    };
+    actionGrid.appendChild(btnLogout);
 
-    const arrow = document.createElement('span');
-    arrow.className = 'text-gray-500 group-hover:text-copaYellow transition';
-    arrow.innerHTML = '➔';
-    btn.appendChild(arrow);
+    wrapper.appendChild(actionGrid);
+  } else {
+    // Formulário de Login
+    const title = document.createElement('h2');
+    title.className = 'text-2xl font-black text-center mb-1 uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400';
+    title.textContent = 'Acessar Coleções';
+    wrapper.appendChild(title);
 
-    grid.appendChild(btn);
-  });
+    const sub = document.createElement('p');
+    sub.className = 'text-center text-xs text-gray-400 mb-6';
+    sub.textContent = isDemo ? 'Conecte um perfil simulado para testar trocas' : 'Faça login na sua conta em nuvem';
+    wrapper.appendChild(sub);
 
-  wrapper.appendChild(grid);
+    // Entrada opcional de nome para customizar o login na demo
+    let nameInput = null;
+    if (isDemo) {
+      const form = document.createElement('div');
+      form.className = 'mb-6 space-y-1.5';
+      
+      const label = document.createElement('label');
+      label.className = 'text-[10px] font-black text-gray-400 uppercase tracking-wider';
+      label.textContent = 'Seu Nome de Colecionador';
+      form.appendChild(label);
+
+      nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.placeholder = 'Digite seu nome (ex: João)';
+      nameInput.className = 'w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-copaYellow transition';
+      form.appendChild(nameInput);
+      wrapper.appendChild(form);
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'flex flex-col gap-3';
+
+    const methods = [
+      { id: 'google', label: 'Acesso via Google Account', color: 'hover:border-red-500/30' },
+      { id: 'apple', label: 'Acesso via Apple ID', color: 'hover:border-gray-300/30' },
+      { id: 'android', label: 'Acesso via Android Device', color: 'hover:border-copaGreen/30' }
+    ];
+
+    methods.forEach(m => {
+      const btn = document.createElement('button');
+      btn.className = `flex items-center justify-between text-left p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition duration-200 group ${m.color}`;
+      btn.onclick = async () => {
+        const username = nameInput ? nameInput.value.trim() : "";
+        btn.innerHTML = '<span class="text-xs font-bold text-gray-400">Autenticando...</span>';
+        
+        try {
+          const user = await authDb.login(m.id, username);
+          if (isDemo) {
+            // Sincroniza figurinhas atuais para a nuvem/demo
+            const activeAlbumId = storage.getCurrentAlbumId();
+            const albums = storage.getAlbums();
+            if (activeAlbumId && albums[activeAlbumId]) {
+              await authDb.syncStickers(albums[activeAlbumId].stickers);
+            }
+            renderHeader();
+            // Solicita GPS após login
+            navigator.geolocation.getCurrentPosition(
+              async (pos) => {
+                await authDb.updateLocation(pos.coords.latitude, pos.coords.longitude);
+                renderHeader();
+                location.hash = '#home';
+              },
+              (err) => {
+                console.warn("GPS negado durante o login", err);
+                location.hash = '#home';
+              }
+            );
+          } else {
+            renderHeader();
+            location.hash = '#home';
+          }
+        } catch (e) {
+          alert("Ocorreu um erro ao fazer o login. Veja o console.");
+          renderLogin(container);
+        }
+      };
+
+      const label = document.createElement('span');
+      label.className = 'font-bold text-sm text-gray-200 group-hover:text-white';
+      label.textContent = m.label;
+      btn.appendChild(label);
+
+      const arrow = document.createElement('span');
+      arrow.className = 'text-gray-500 group-hover:text-copaYellow transition';
+      arrow.innerHTML = '➔';
+      btn.appendChild(arrow);
+
+      grid.appendChild(btn);
+    });
+
+    wrapper.appendChild(grid);
+  }
+
   container.appendChild(wrapper);
 }
 
@@ -1137,11 +1288,28 @@ function renderHome(container) {
   });
   rootHome.appendChild(specialGrid);
 
-  // 4. Divisor de Título Grupos
+  // 4. Divisor de Título Grupos + Link Classificação Geral (Movido para cá)
+  const groupsHeaderRow = document.createElement('div');
+  groupsHeaderRow.className = 'flex justify-between items-center border-b border-white/5 pb-1 mt-6';
+
   const groupsTitle = document.createElement('h3');
-  groupsTitle.className = 'text-xs font-black uppercase tracking-wider text-gray-500 border-b border-white/5 pb-1 mt-6';
+  groupsTitle.className = 'text-xs font-black uppercase tracking-wider text-gray-500';
   groupsTitle.textContent = 'Seleções por Grupos';
-  rootHome.appendChild(groupsTitle);
+  groupsHeaderRow.appendChild(groupsTitle);
+
+  const tableLink = document.createElement('a');
+  tableLink.href = 'https://www.fifa.com/pt/tournaments/mens/worldcup/canadamexicousa2026/standings';
+  tableLink.target = '_blank';
+  tableLink.rel = 'noopener noreferrer';
+  tableLink.className = 'text-[9px] font-black text-copaGreen hover:text-white transition flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-0.5 rounded border border-white/5';
+  tableLink.innerHTML = `
+    <span>Classificação Geral</span>
+    <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+    </svg>
+  `;
+  groupsHeaderRow.appendChild(tableLink);
+  rootHome.appendChild(groupsHeaderRow);
 
   // 5. LINHAS SEGUINTES: Cada grupo exibido abaixo do outro (Vertical)
   const groupsContainer = document.createElement('div');
@@ -1151,28 +1319,14 @@ function renderHome(container) {
     const groupCard = document.createElement('div');
     groupCard.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
     
-    // Contêiner de cabeçalho do grupo para alinhar título e link na mesma linha
+    // Contêiner de cabeçalho do grupo contendo apenas o nome do grupo
     const groupHeader = document.createElement('div');
-    groupHeader.className = 'flex justify-between items-center border-b border-white/5 pb-1 w-full';
+    groupHeader.className = 'border-b border-white/5 pb-1 w-full';
 
     const gTitle = document.createElement('h4');
     gTitle.className = 'font-black text-[10px] text-gray-400 uppercase tracking-widest';
     gTitle.textContent = g.name;
     groupHeader.appendChild(gTitle);
-
-    // Link oficial da classificação da FIFA
-    const tableLink = document.createElement('a');
-    tableLink.href = 'https://www.fifa.com/pt/tournaments/mens/worldcup/canadamexicousa2026/standings';
-    tableLink.target = '_blank';
-    tableLink.rel = 'noopener noreferrer';
-    tableLink.className = 'text-[8px] font-black text-copaGreen hover:text-white transition flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-0.5 rounded border border-white/5';
-    tableLink.innerHTML = `
-      <span>Classificação Geral</span>
-      <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-      </svg>
-    `;
-    groupHeader.appendChild(tableLink);
     groupCard.appendChild(groupHeader);
 
     // Grid de 4 colunas para caber as 4 seleções na mesma linha horizontal
@@ -1186,14 +1340,14 @@ function renderHome(container) {
       card.className = 'cursor-pointer transition flex flex-col items-center justify-center gap-1 group relative py-1.5 px-0.5 hover:scale-105 mt-2 h-20';
       card.onclick = () => location.hash = `#team-${team.code}`;
 
-      // Injeta o Balãozinho de Fase se estiver no mata-mata
+      // Injeta o Balãozinho de Fase (FG, R16, etc. com cores dinâmicas)
       const cachedData = localStorage.getItem(STANDINGS_CACHE_KEY);
       const standings = cachedData ? JSON.parse(cachedData) : null;
-      const phase = getTeamPhase(team, standings);
-      if (phase) {
+      const phaseInfo = getPhaseInfo(team, standings);
+      if (phaseInfo) {
         const balloon = document.createElement('span');
-        balloon.className = 'phase-balloon';
-        balloon.textContent = phase;
+        balloon.className = `phase-balloon border ${phaseInfo.color}`;
+        balloon.textContent = phaseInfo.label;
         card.appendChild(balloon);
       }
 
@@ -1865,6 +2019,8 @@ function toggleOwned(key) {
   }
   
   storage.setAlbums(albums);
+  // Sincroniza com a nuvem/demo
+  authDb.syncStickers(album.stickers);
 }
 
 // Adiciona ou remove quantidade de figurinhas repetidas
@@ -1888,6 +2044,8 @@ function toggleDuplicate(key, increment) {
   }
 
   storage.setAlbums(albums);
+  // Sincroniza com a nuvem/demo
+  authDb.syncStickers(album.stickers);
 }
 
 // Atualiza o estado visual da carta 3D e renderiza seus botões/badges
@@ -2361,6 +2519,603 @@ function shareDuplicatesList() {
   }
 
   shareText('Figurinhas Copa 2026 - Repetidas', text.trim());
+}
+
+// ------------------- COMUNIDADE E COMBINAÇÃO DE TROCAS -------------------
+
+let currentCommunityRadius = 50; // default 50km
+let currentCommunityTab = "nearby"; // "nearby" ou "favorites"
+let activeProfileTab = "perfect"; // "perfect", "heHas", "youHave"
+
+function renderCommunity(container) {
+  const user = authDb.getCurrentUser();
+  if (!user) {
+    // Caso deslogado, mostra aviso e redireciona para login
+    const lockBox = document.createElement('div');
+    lockBox.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 text-center space-y-6 animate-fade-in';
+    
+    lockBox.innerHTML = `
+      <div class="text-5xl">🔒</div>
+      <h2 class="text-xl font-black text-white uppercase tracking-wider">Acesso Restrito</h2>
+      <p class="text-xs text-gray-400">Faça login para participar da Comunidade de Colecionadores e ver pessoas próximas com quem você pode trocar figurinhas.</p>
+      <button onclick="location.hash = '#login'" class="w-full py-3 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 text-black font-black text-xs uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition">
+        Entrar / Fazer Login
+      </button>
+    `;
+    container.appendChild(lockBox);
+    return;
+  }
+
+  if (!user.latitude || !user.longitude) {
+    // Caso logado, mas sem GPS ativado
+    const gpsBox = document.createElement('div');
+    gpsBox.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 text-center space-y-6 animate-fade-in';
+    
+    gpsBox.innerHTML = `
+      <div class="text-5xl">📍</div>
+      <h2 class="text-xl font-black text-white uppercase tracking-wider">Permissão de GPS Requerida</h2>
+      <p class="text-xs text-gray-400">Para calcular a distância e listar outros colecionadores que estão ao seu redor, precisamos que você compartilhe sua geolocalização.</p>
+      <button id="btnRequestGPSCommunity" class="w-full py-3 rounded-xl bg-[#00e676] text-black font-black text-xs uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition">
+        Permitir Acesso ao GPS
+      </button>
+      <p class="text-[10px] text-gray-500 font-bold mt-4">Nota: Em modo Simulado, suas coordenadas reais serão usadas apenas localmente para calcular a distância dos colecionadores fictícios ao seu redor.</p>
+    `;
+    
+    gpsBox.querySelector('#btnRequestGPSCommunity').onclick = () => {
+      gpsBox.querySelector('#btnRequestGPSCommunity').textContent = "Obtendo GPS...";
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          await authDb.updateLocation(position.coords.latitude, position.coords.longitude);
+          // Sincroniza figurinhas
+          const activeAlbumId = storage.getCurrentAlbumId();
+          const albums = storage.getAlbums();
+          if (activeAlbumId && albums[activeAlbumId]) {
+            await authDb.syncStickers(albums[activeAlbumId].stickers);
+          }
+          renderHeader();
+          route();
+        },
+        (error) => {
+          console.error(error);
+          alert("Não foi possível acessar sua localização. Certifique-se de que deu permissão no seu navegador.");
+          route();
+        }
+      );
+    };
+
+    container.appendChild(gpsBox);
+    return;
+  }
+
+  // Página da Comunidade Principal
+  const mainDiv = document.createElement('div');
+  mainDiv.className = 'space-y-6 py-2 animate-fade-in';
+
+  // Cabeçalho da Comunidade com Filtros
+  const headerCard = document.createElement('div');
+  headerCard.className = 'glass-panel p-5 rounded-2xl border-white/5 flex flex-col gap-4';
+
+  const headerTitleRow = document.createElement('div');
+  headerTitleRow.className = 'flex justify-between items-center w-full';
+  
+  const titleInfo = document.createElement('div');
+  titleInfo.innerHTML = `
+    <h2 class="text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
+      <span>👥 Comunidade</span>
+    </h2>
+    <p class="text-[10px] text-gray-400 mt-0.5">Encontre colecionadores ao seu redor para trocas</p>
+  `;
+  headerTitleRow.appendChild(titleInfo);
+
+  // Seletor de Raio
+  const filterWrapper = document.createElement('div');
+  filterWrapper.className = 'flex items-center gap-1.5';
+  
+  const filterLabel = document.createElement('span');
+  filterLabel.className = 'text-[9px] font-black text-gray-400 uppercase tracking-wider';
+  filterLabel.textContent = 'Raio:';
+  filterWrapper.appendChild(filterLabel);
+
+  const radiusSelector = document.createElement('select');
+  radiusSelector.className = 'bg-[#131735] text-white border border-white/10 text-[10px] px-2 py-1 rounded-lg focus:outline-none cursor-pointer';
+  
+  const options = [
+    { value: 1, label: '1 km' },
+    { value: 5, label: '5 km' },
+    { value: 15, label: '15 km' },
+    { value: 50, label: '50 km' },
+    { value: 99999, label: 'Ilimitado' }
+  ];
+
+  options.forEach(opt => {
+    const el = document.createElement('option');
+    el.value = opt.value;
+    el.textContent = opt.label;
+    if (opt.value === currentCommunityRadius) el.selected = true;
+    radiusSelector.appendChild(el);
+  });
+
+  radiusSelector.onchange = (e) => {
+    currentCommunityRadius = parseInt(e.target.value, 10);
+    renderCommunityList();
+  };
+
+  filterWrapper.appendChild(radiusSelector);
+  headerTitleRow.appendChild(filterWrapper);
+  headerCard.appendChild(headerTitleRow);
+
+  // Tabs de Navegação da Comunidade
+  const tabRow = document.createElement('div');
+  tabRow.className = 'flex border-b border-white/5';
+  
+  const tabNearby = document.createElement('button');
+  tabNearby.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentCommunityTab === 'nearby' ? 'active-tab' : ''}`;
+  tabNearby.textContent = 'Próximos de Mim';
+  tabNearby.onclick = () => {
+    currentCommunityTab = 'nearby';
+    tabNearby.classList.add('active-tab');
+    tabFavs.classList.remove('active-tab');
+    renderCommunityList();
+  };
+
+  const tabFavs = document.createElement('button');
+  tabFavs.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentCommunityTab === 'favorites' ? 'active-tab' : ''}`;
+  tabFavs.textContent = 'Minha Rede (Favoritos)';
+  tabFavs.onclick = () => {
+    currentCommunityTab = 'favorites';
+    tabFavs.classList.add('active-tab');
+    tabNearby.classList.remove('active-tab');
+    renderCommunityList();
+  };
+
+  tabRow.appendChild(tabNearby);
+  tabRow.appendChild(tabFavs);
+  headerCard.appendChild(tabRow);
+  mainDiv.appendChild(headerCard);
+
+  // Container da Lista de Colecionadores
+  const listContainer = document.createElement('div');
+  listContainer.className = 'space-y-3';
+  mainDiv.appendChild(listContainer);
+  container.appendChild(mainDiv);
+
+  // Carrega e renderiza a lista de colecionadores
+  async function renderCommunityList() {
+    listContainer.innerHTML = '<p class="text-center text-xs text-gray-400 py-6 animate-pulse">Buscando colecionadores...</p>';
+    
+    try {
+      const collectors = await authDb.getNearbyCollectors(user.latitude, user.longitude, currentCommunityRadius);
+      listContainer.innerHTML = '';
+
+      // Filtra se a tab for favoritos
+      let filtered = collectors;
+      if (currentCommunityTab === 'favorites') {
+        const favs = authDb.getFavorites();
+        filtered = collectors.filter(c => favs.includes(c.uid));
+      }
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div class="glass-panel p-8 rounded-2xl border-white/5 text-center py-10">
+            <p class="text-xs text-gray-400">${currentCommunityTab === 'favorites' ? 'Nenhum colecionador favoritado na sua rede.' : 'Nenhum colecionador encontrado neste raio.'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Dados locais para calcular interesses de troca
+      const localAlbums = JSON.parse(localStorage.getItem('albums') || '{}');
+      const activeAlbumId = localStorage.getItem('currentAlbumId');
+      const activeAlbum = localAlbums[activeAlbumId] || { stickers: {} };
+      const userStickers = activeAlbum.stickers || {};
+
+      filtered.forEach(c => {
+        // Calcula o cruzamento rápido para exibir estatísticas resumidas
+        let missingForUser = 0; // O que ele tem que te falta
+        let missingForCollector = 0; // O que você tem repetido que falta para ele
+
+        Object.entries(c.stickers).forEach(([key, val]) => {
+          const userSticker = userStickers[key];
+          const userOwned = userSticker ? userSticker.owned : false;
+          const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
+          
+          if (val.owned && !userOwned) {
+            missingForUser++;
+          }
+          if (userDup > 0 && !val.owned) {
+            missingForCollector++;
+          }
+        });
+
+        const isPerfectMatch = (missingForUser > 0 && missingForCollector > 0);
+
+        const card = document.createElement('div');
+        card.className = `glass-panel p-4 rounded-xl border-white/5 flex items-center justify-between gap-4 collector-card cursor-pointer ${isPerfectMatch ? 'perfect-match-box' : ''}`;
+        card.onclick = (e) => {
+          if (e.target.closest('button')) return;
+          location.hash = `#community-profile-${c.uid}`;
+        };
+
+        const avatar = document.createElement('img');
+        avatar.src = c.photo_url;
+        avatar.className = 'w-10 h-10 rounded-full object-cover border border-white/10';
+        card.appendChild(avatar);
+
+        const info = document.createElement('div');
+        info.className = 'flex-1 min-w-0';
+        
+        const nameRow = document.createElement('div');
+        nameRow.className = 'flex items-center gap-1.5';
+        
+        const nameText = document.createElement('h3');
+        nameText.className = 'font-bold text-xs text-white truncate';
+        nameText.textContent = c.name;
+        nameRow.appendChild(nameText);
+
+        if (isPerfectMatch) {
+          const matchBadge = document.createElement('span');
+          matchBadge.className = 'text-[7px] font-black uppercase bg-copaYellow text-black px-1.5 py-0.5 rounded-full tracking-wider animate-pulse';
+          matchBadge.textContent = 'Troca Certeira';
+          nameRow.appendChild(matchBadge);
+        }
+
+        info.appendChild(nameRow);
+
+        const subInfo = document.createElement('p');
+        subInfo.className = 'text-[9px] text-gray-400 mt-1';
+        subInfo.innerHTML = `📍 <strong>${c.distance} km</strong> de distância • Visto há pouco`;
+        info.appendChild(subInfo);
+
+        const stats = document.createElement('p');
+        stats.className = 'text-[9px] text-copaGreen font-bold mt-1.5 flex items-center gap-2';
+        
+        let statsHtml = "";
+        if (missingForUser > 0) {
+          statsHtml += `<span class="text-copaYellow font-bold">Te falta: ${missingForUser}</span>`;
+        }
+        if (missingForCollector > 0) {
+          if (statsHtml) statsHtml += ` <span class="text-white/10">|</span> `;
+          statsHtml += `<span class="text-copaGreen font-bold">Falta para ele: ${missingForCollector}</span>`;
+        }
+        if (!statsHtml) {
+          statsHtml = `<span class="text-gray-500 font-normal">Nenhuma troca qualificada</span>`;
+        }
+        stats.innerHTML = statsHtml;
+        info.appendChild(stats);
+
+        card.appendChild(info);
+
+        // Ações: Favoritar
+        const favBtn = document.createElement('button');
+        favBtn.className = 'w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-xs transition duration-200';
+        
+        const isFav = authDb.isFavorite(c.uid);
+        favBtn.innerHTML = isFav ? '❤️' : '🤍';
+        favBtn.title = isFav ? 'Remover da Minha Rede' : 'Adicionar à Minha Rede';
+        favBtn.onclick = (e) => {
+          e.stopPropagation();
+          const state = authDb.toggleFavorite(c.uid);
+          favBtn.innerHTML = state ? '❤️' : '🤍';
+          if (currentCommunityTab === 'favorites') {
+            renderCommunityList(); // atualiza a lista se for aba de favoritos
+          }
+        };
+
+        card.appendChild(favBtn);
+        listContainer.appendChild(card);
+      });
+
+    } catch (e) {
+      console.error(e);
+      listContainer.innerHTML = '<p class="text-center text-xs text-red-400 py-6">Erro ao carregar colecionadores.</p>';
+    }
+  }
+
+  // Inicializa a lista
+  renderCommunityList();
+}
+
+function renderCollectorProfile(uid, container) {
+  const user = authDb.getCurrentUser();
+  if (!user) {
+    location.hash = '#login';
+    return;
+  }
+
+  const mainDiv = document.createElement('div');
+  mainDiv.className = 'space-y-6 py-2 animate-fade-in';
+
+  // Buscar colecionador
+  mainDiv.innerHTML = '<p class="text-center text-xs text-gray-400 py-6 animate-pulse">Carregando perfil...</p>';
+  container.appendChild(mainDiv);
+
+  authDb.getCollectorProfile(uid, user.latitude, user.longitude).then(collector => {
+    if (!collector) {
+      mainDiv.innerHTML = `
+        <div class="glass-panel p-8 rounded-2xl border-white/5 text-center space-y-4">
+          <p class="text-xs text-gray-400">Colecionador não encontrado.</p>
+          <button onclick="location.hash = '#community'" class="py-2 px-4 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-xs">Voltar à Comunidade</button>
+        </div>
+      `;
+      return;
+    }
+
+    mainDiv.innerHTML = '';
+
+    // Header Card do Perfil do Colecionador
+    const headerCard = document.createElement('div');
+    headerCard.className = 'glass-panel p-5 rounded-2xl border-white/5 relative overflow-hidden flex flex-col gap-4';
+
+    const backRow = document.createElement('div');
+    backRow.className = 'flex justify-between items-center w-full';
+
+    const backBtn = document.createElement('button');
+    backBtn.className = 'w-7 h-7 bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center rounded-lg text-white transition';
+    backBtn.innerHTML = `
+      <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+    `;
+    backBtn.onclick = () => location.hash = '#community';
+    backRow.appendChild(backBtn);
+
+    const favBtn = document.createElement('button');
+    favBtn.className = 'w-7 h-7 bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center rounded-lg text-white transition';
+    const isFav = authDb.isFavorite(collector.uid);
+    favBtn.innerHTML = isFav ? '❤️' : '🤍';
+    favBtn.onclick = () => {
+      const state = authDb.toggleFavorite(collector.uid);
+      favBtn.innerHTML = state ? '❤️' : '🤍';
+    };
+    backRow.appendChild(favBtn);
+
+    headerCard.appendChild(backRow);
+
+    const userProfileRow = document.createElement('div');
+    userProfileRow.className = 'flex items-center gap-4';
+
+    const avatar = document.createElement('img');
+    avatar.src = collector.photo_url;
+    avatar.className = 'w-14 h-14 rounded-full object-cover border-2 border-copaYellow shadow-lg';
+    userProfileRow.appendChild(avatar);
+
+    const userInfo = document.createElement('div');
+    userInfo.innerHTML = `
+      <h3 class="font-black text-white text-base leading-snug">${collector.name}</h3>
+      <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1.5">
+        📍 <strong>${collector.distance} km</strong> de distância • Visto há pouco
+      </p>
+    `;
+    userProfileRow.appendChild(userInfo);
+    headerCard.appendChild(userProfileRow);
+    mainDiv.appendChild(headerCard);
+
+    // Listas locais de dados para cálculo de cruzamento
+    const localAlbums = JSON.parse(localStorage.getItem('albums') || '{}');
+    const activeAlbumId = localStorage.getItem('currentAlbumId');
+    const activeAlbum = localAlbums[activeAlbumId] || { stickers: {} };
+    const userStickers = activeAlbum.stickers || {};
+
+    const cardsHeHasLackingYou = [];
+    const cardsYouHaveLackingHim = [];
+    
+    // Cruzamento real de dados
+    const allCodes = [];
+    groupsData.forEach(g => g.teams.forEach(t => allCodes.push(t.code)));
+    allCodes.push('FWC', 'CC', 'EXTRAS');
+
+    allCodes.forEach(code => {
+      const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
+      for (let i = 1; i <= limit; i++) {
+        const key = `${code}-${i}`;
+        
+        const userSticker = userStickers[key];
+        const userOwned = userSticker ? userSticker.owned : false;
+        const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
+
+        const collectorSticker = collector.stickers[key];
+        const collectorOwned = collectorSticker ? collectorSticker.owned : false;
+        const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
+
+        // Ele tem (e tem de sobra para trocar) que te falta
+        if (collectorOwned && collectorDup > 0 && !userOwned) {
+          cardsHeHasLackingYou.push(key);
+        } else if (collectorOwned && !userOwned) {
+          // Fallback para quando o outro colecionador possui o card em geral
+          cardsHeHasLackingYou.push(key);
+        }
+
+        // Você tem repetido que falta para ele
+        if (userDup > 0 && !collectorOwned) {
+          cardsYouHaveLackingHim.push(key);
+        }
+      }
+    });
+
+    // Match Perfeito real:
+    // Você tem repetidas que ele quer, E ele tem repetidas que você quer
+    const matchPerfectUserGives = [];
+    const matchPerfectUserReceives = [];
+
+    allCodes.forEach(code => {
+      const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
+      for (let i = 1; i <= limit; i++) {
+        const key = `${code}-${i}`;
+        
+        const userSticker = userStickers[key];
+        const userOwned = userSticker ? userSticker.owned : false;
+        const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
+
+        const collectorSticker = collector.stickers[key];
+        const collectorOwned = collectorSticker ? collectorSticker.owned : false;
+        const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
+
+        // Figurinhas que você pode DAR para ele
+        if (userDup > 0 && !collectorOwned) {
+          matchPerfectUserGives.push(key);
+        }
+        // Figurinhas que você pode RECEBER dele (ele tem repetida e você não tem)
+        if (collectorDup > 0 && !userOwned) {
+          matchPerfectUserReceives.push(key);
+        }
+      }
+    });
+
+    const hasMatchPerfect = (matchPerfectUserGives.length > 0 && matchPerfectUserReceives.length > 0);
+
+    // Estrutura das Tabs
+    const crossTabsCard = document.createElement('div');
+    crossTabsCard.className = 'glass-panel p-5 rounded-2xl border-white/5 space-y-4';
+
+    const crossTabs = document.createElement('div');
+    crossTabs.className = 'flex border-b border-white/5 text-[9px] font-bold text-gray-400 tracking-wider uppercase';
+
+    const tabPerfect = document.createElement('button');
+    tabPerfect.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'perfect' ? 'active-tab' : ''}`;
+    tabPerfect.innerHTML = `Match Perfeito ${hasMatchPerfect ? '⭐' : ''}`;
+    tabPerfect.onclick = () => {
+      activeProfileTab = 'perfect';
+      setProfileTabState();
+    };
+
+    const tabHeHas = document.createElement('button');
+    tabHeHas.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'heHas' ? 'active-tab' : ''}`;
+    tabHeHas.textContent = `Ele Tem (${cardsHeHasLackingYou.length})`;
+    tabHeHas.onclick = () => {
+      activeProfileTab = 'heHas';
+      setProfileTabState();
+    };
+
+    const tabYouHave = document.createElement('button');
+    tabYouHave.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'youHave' ? 'active-tab' : ''}`;
+    tabYouHave.textContent = `Você Tem (${cardsYouHaveLackingHim.length})`;
+    tabYouHave.onclick = () => {
+      activeProfileTab = 'youHave';
+      setProfileTabState();
+    };
+
+    crossTabs.appendChild(tabPerfect);
+    crossTabs.appendChild(tabHeHas);
+    crossTabs.appendChild(tabYouHave);
+    crossTabsCard.appendChild(crossTabs);
+
+    const tabContentContainer = document.createElement('div');
+    crossTabsCard.appendChild(tabContentContainer);
+    mainDiv.appendChild(crossTabsCard);
+
+    function setProfileTabState() {
+      tabPerfect.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'perfect' ? 'active-tab' : ''}`;
+      tabHeHas.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'heHas' ? 'active-tab' : ''}`;
+      tabYouHave.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'youHave' ? 'active-tab' : ''}`;
+
+      tabContentContainer.innerHTML = '';
+
+      if (activeProfileTab === 'perfect') {
+        if (!hasMatchPerfect) {
+          tabContentContainer.innerHTML = `
+            <div class="text-center py-8 space-y-2">
+              <p class="text-xs text-gray-400">Nenhum Match Perfeito de Troca 1:1.</p>
+              <p class="text-[9px] text-gray-500 px-4">O match perfeito surge quando você possui alguma repetida de interesse dele E ele possui alguma repetida de seu interesse.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const containerBox = document.createElement('div');
+        containerBox.className = 'perfect-match-box p-4 rounded-xl space-y-4 animate-fade-in';
+
+        containerBox.innerHTML = `
+          <div class="text-center space-y-1">
+            <h4 class="text-copaYellow font-black text-xs uppercase tracking-wider">Match Perfeito Encontrado! 🤝</h4>
+            <p class="text-[9px] text-gray-400">Excelente! Vocês podem trocar figurinhas repetidas diretamente!</p>
+          </div>
+        `;
+
+        const splitGrid = document.createElement('div');
+        splitGrid.className = 'grid grid-cols-2 gap-4 border-t border-white/5 pt-3';
+
+        const leftCol = document.createElement('div');
+        leftCol.className = 'space-y-2';
+        leftCol.innerHTML = `<h5 class="text-[9px] font-black text-copaYellow uppercase tracking-wider">Você Recebe dele:</h5>`;
+        const leftGrid = document.createElement('div');
+        leftGrid.className = 'flex flex-wrap gap-1.5';
+        matchPerfectUserReceives.forEach(k => {
+          const cap = createMiniStickerCapsule(k);
+          leftGrid.appendChild(cap);
+        });
+        leftCol.appendChild(leftGrid);
+
+        const rightCol = document.createElement('div');
+        rightCol.className = 'space-y-2';
+        rightCol.innerHTML = `<h5 class="text-[9px] font-black text-copaGreen uppercase tracking-wider">Você Entrega:</h5>`;
+        const rightGrid = document.createElement('div');
+        rightGrid.className = 'flex flex-wrap gap-1.5';
+        matchPerfectUserGives.forEach(k => {
+          const cap = createMiniStickerCapsule(k);
+          rightGrid.appendChild(cap);
+        });
+        rightCol.appendChild(rightGrid);
+
+        splitGrid.appendChild(leftCol);
+        splitGrid.appendChild(rightCol);
+        containerBox.appendChild(splitGrid);
+        tabContentContainer.appendChild(containerBox);
+
+      } else if (activeProfileTab === 'heHas') {
+        if (cardsHeHasLackingYou.length === 0) {
+          tabContentContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Ele não tem figurinhas que faltam para você.</p>`;
+          return;
+        }
+
+        const details = document.createElement('div');
+        details.className = 'space-y-3 animate-fade-in';
+        details.innerHTML = `<h4 class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Figurinhas que ele tem e você não possui:</h4>`;
+        
+        const grid = document.createElement('div');
+        grid.className = 'flex flex-wrap gap-1.5';
+        cardsHeHasLackingYou.forEach(k => {
+          const cap = createMiniStickerCapsule(k);
+          grid.appendChild(cap);
+        });
+        details.appendChild(grid);
+        tabContentContainer.appendChild(details);
+
+      } else if (activeProfileTab === 'youHave') {
+        if (cardsYouHaveLackingHim.length === 0) {
+          tabContentContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Você não possui repetidas que faltam para ele.</p>`;
+          return;
+        }
+
+        const details = document.createElement('div');
+        details.className = 'space-y-3 animate-fade-in';
+        details.innerHTML = `<h4 class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Suas repetidas que faltam para ele:</h4>`;
+        
+        const grid = document.createElement('div');
+        grid.className = 'flex flex-wrap gap-1.5';
+        cardsYouHaveLackingHim.forEach(k => {
+          const cap = createMiniStickerCapsule(k);
+          grid.appendChild(cap);
+        });
+        details.appendChild(grid);
+        tabContentContainer.appendChild(details);
+      }
+    }
+
+    // Auxiliar de Cápsula Visual
+    function createMiniStickerCapsule(key) {
+      const code = key.split('-')[0];
+      const i = parseInt(key.split('-')[1], 10);
+      const isSpecial = (code === 'EXTRAS');
+
+      const el = document.createElement('div');
+      el.className = `text-[9px] font-black px-2 py-1 rounded border tracking-wide uppercase transition-all duration-150 select-none ${isSpecial ? 'bg-copaYellow/10 text-copaYellow border-copaYellow/20 hover:bg-copaYellow/20' : 'bg-copaGreen/10 text-copaGreen border-copaGreen/20 hover:bg-copaGreen/20'}`;
+      el.textContent = key;
+      el.title = (code === 'EXTRAS') ? legendsData[i - 1].name : playerNames[i] || key;
+      return el;
+    }
+
+    setProfileTabState();
+  });
 }
 
 // Vincula funções utilitárias ao escopo global window para acesso no HTML
