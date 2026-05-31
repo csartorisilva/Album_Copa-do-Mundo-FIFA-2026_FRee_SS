@@ -83,18 +83,114 @@ const crestsMap = {
 
 // Dados estruturados das seleções e grupos da Copa 2026 (48 seleções)
 const groupsData = [
-  { name: 'Grupo A', teams: [{ code: 'US', name: 'EUA' }, { code: 'MX', name: 'México' }, { code: 'CA', name: 'Canadá' }, { code: 'CR', name: 'Costa Rica' }] },
-  { name: 'Grupo B', teams: [{ code: 'BR', name: 'Brasil' }, { code: 'CO', name: 'Colômbia' }, { code: 'PY', name: 'Paraguai' }, { code: 'CM', name: 'Camarões' }] },
-  { name: 'Grupo C', teams: [{ code: 'AR', name: 'Argentina' }, { code: 'CL', name: 'Chile' }, { code: 'UY', name: 'Uruguai' }, { code: 'SA', name: 'Arábia S.' }] },
-  { name: 'Grupo D', teams: [{ code: 'FR', name: 'França' }, { code: 'MA', name: 'Marrocos' }, { code: 'AT', name: 'Áustria' }, { code: 'NG', name: 'Nigéria' }] },
-  { name: 'Grupo E', teams: [{ code: 'ES', name: 'Espanha' }, { code: 'JP', name: 'Japão' }, { code: 'EC', name: 'Equador' }, { code: 'EG', name: 'Egito' }] },
-  { name: 'Grupo F', teams: [{ code: 'DE', name: 'Alemanha' }, { code: 'BE', name: 'Bélgica' }, { code: 'KR', name: 'Coreia do S.' }, { code: 'TN', name: 'Tunísia' }] },
-  { name: 'Grupo G', teams: [{ code: 'GB-ENG', name: 'Inglaterra' }, { code: 'SN', name: 'Senegal' }, { code: 'IR', name: 'Irã' }, { code: 'HN', name: 'Honduras' }] },
-  { name: 'Grupo H', teams: [{ code: 'PT', name: 'Portugal' }, { code: 'GH', name: 'Gana' }, { code: 'TR', name: 'Turquia' }, { code: 'PE', name: 'Peru' }] },
-  { name: 'Grupo I', teams: [{ code: 'IT', name: 'Itália' }, { code: 'AU', name: 'Austrália' }, { code: 'DZ', name: 'Argélia' }, { code: 'JM', name: 'Jamaica' }] },
-  { name: 'Grupo J', teams: [{ code: 'NL', name: 'Holanda' }, { code: 'HR', name: 'Croácia' }, { code: 'GB-SCT', name: 'Escócia' }, { code: 'ML', name: 'Mali' }] },
-  { name: 'Grupo K', teams: [{ code: 'DK', name: 'Dinamarca' }, { code: 'CH', name: 'Suíça' }, { code: 'RS', name: 'Sérvia' }, { code: 'PA', name: 'Panamá' }] },
-  { name: 'Grupo L', teams: [{ code: 'UA', name: 'Ucrânia' }, { code: 'SE', name: 'Suécia' }, { code: 'PL', name: 'Polônia' }, { code: 'NZ', name: 'N. Zelândia' }] }
+  {
+    name: 'Grupo A',
+    teams: [
+      { code: 'US', name: 'EUA', rank: 1, points: 7, eliminated: false },
+      { code: 'MX', name: 'México', rank: 2, points: 4, eliminated: true, eliminatedStage: 'Oitavas' },
+      { code: 'CA', name: 'Canadá', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'CR', name: 'Costa Rica', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo B',
+    teams: [
+      { code: 'BR', name: 'Brasil', rank: 1, points: 9, eliminated: false },
+      { code: 'CO', name: 'Colômbia', rank: 2, points: 6, eliminated: true, eliminatedStage: 'Quartas' },
+      { code: 'PY', name: 'Paraguai', rank: 3, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'CM', name: 'Camarões', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo C',
+    teams: [
+      { code: 'AR', name: 'Argentina', rank: 1, points: 7, eliminated: false },
+      { code: 'UY', name: 'Uruguai', rank: 2, points: 5, eliminated: false },
+      { code: 'CL', name: 'Chile', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'SA', name: 'Arábia S.', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo D',
+    teams: [
+      { code: 'FR', name: 'França', rank: 1, points: 7, eliminated: false },
+      { code: 'MA', name: 'Marrocos', rank: 2, points: 6, eliminated: true, eliminatedStage: 'Oitavas' },
+      { code: 'AT', name: 'Áustria', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'NG', name: 'Nigéria', rank: 4, points: 0, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo E',
+    teams: [
+      { code: 'ES', name: 'Espanha', rank: 1, points: 9, eliminated: false },
+      { code: 'JP', name: 'Japão', rank: 2, points: 4, eliminated: true, eliminatedStage: 'Oitavas' },
+      { code: 'EC', name: 'Equador', rank: 3, points: 2, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'EG', name: 'Egito', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo F',
+    teams: [
+      { code: 'DE', name: 'Alemanha', rank: 1, points: 7, eliminated: false },
+      { code: 'BE', name: 'Bélgica', rank: 2, points: 5, eliminated: true, eliminatedStage: 'Quartas' },
+      { code: 'KR', name: 'Coreia do S.', rank: 3, points: 2, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'TN', name: 'Tunísia', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo G',
+    teams: [
+      { code: 'GB-ENG', name: 'Inglaterra', rank: 1, points: 7, eliminated: false },
+      { code: 'SN', name: 'Senegal', rank: 2, points: 4, eliminated: true, eliminatedStage: 'Oitavas' },
+      { code: 'IR', name: 'Irã', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'HN', name: 'Honduras', rank: 4, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo H',
+    teams: [
+      { code: 'PT', name: 'Portugal', rank: 1, points: 7, eliminated: false },
+      { code: 'TR', name: 'Turquia', rank: 2, points: 6, eliminated: true, eliminatedStage: 'Oitavas' },
+      { code: 'GH', name: 'Gana', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'PE', name: 'Peru', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo I',
+    teams: [
+      { code: 'IT', name: 'Itália', rank: 1, points: 7, eliminated: false },
+      { code: 'AU', name: 'Austrália', rank: 2, points: 4, eliminated: true, eliminatedStage: 'Oitavas' },
+      { code: 'DZ', name: 'Argélia', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'JM', name: 'Jamaica', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo J',
+    teams: [
+      { code: 'NL', name: 'Holanda', rank: 1, points: 9, eliminated: false },
+      { code: 'HR', name: 'Croácia', rank: 2, points: 6, eliminated: true, eliminatedStage: 'Quartas' },
+      { code: 'GB-SCT', name: 'Escócia', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'ML', name: 'Mali', rank: 4, points: 0, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo K',
+    teams: [
+      { code: 'DK', name: 'Dinamarca', rank: 1, points: 7, eliminated: true, eliminatedStage: 'Oitavas' },
+      { code: 'CH', name: 'Suíça', rank: 2, points: 5, eliminated: true, eliminatedStage: 'Oitavas' },
+      { code: 'RS', name: 'Sérvia', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'PA', name: 'Panamá', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  },
+  {
+    name: 'Grupo L',
+    teams: [
+      { code: 'UA', name: 'Ucrânia', rank: 1, points: 6, eliminated: true, eliminatedStage: 'Oitavas' },
+      { code: 'SE', name: 'Suécia', rank: 2, points: 5, eliminated: true, eliminatedStage: 'Oitavas' },
+      { code: 'PL', name: 'Polônia', rank: 3, points: 4, eliminated: true, eliminatedStage: 'Fase de Grupos' },
+      { code: 'NZ', name: 'N. Zelândia', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+    ]
+  }
 ];
 
 // Mapeamento plano de seleções para busca rápida
@@ -489,20 +585,52 @@ function renderHome(container) {
     const groupCard = document.createElement('div');
     groupCard.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
     
+    // Contêiner de cabeçalho do grupo para alinhar título e link na mesma linha
+    const groupHeader = document.createElement('div');
+    groupHeader.className = 'flex justify-between items-center border-b border-white/5 pb-1 w-full';
+
     const gTitle = document.createElement('h4');
-    gTitle.className = 'font-black text-[10px] text-gray-500 uppercase tracking-widest border-b border-white/5 pb-1';
+    gTitle.className = 'font-black text-[10px] text-gray-400 uppercase tracking-widest';
     gTitle.textContent = g.name;
-    groupCard.appendChild(gTitle);
+    groupHeader.appendChild(gTitle);
+
+    // Link oficial da classificação da FIFA
+    const tableLink = document.createElement('a');
+    tableLink.href = 'https://www.fifa.com/pt/tournaments/mens/worldcup/canadamexicousa2026/standings';
+    tableLink.target = '_blank';
+    tableLink.rel = 'noopener noreferrer';
+    tableLink.className = 'text-[8px] font-black text-copaGreen hover:text-white transition flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-0.5 rounded border border-white/5';
+    tableLink.innerHTML = `
+      <span>Tabela FIFA</span>
+      <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+    `;
+    groupHeader.appendChild(tableLink);
+    groupCard.appendChild(groupHeader);
 
     // Grid de 4 colunas para caber as 4 seleções na mesma linha horizontal
     const grid = document.createElement('div');
     grid.className = 'grid grid-cols-4 gap-1';
 
-    g.teams.forEach(team => {
+    // Ordenação dinâmica por classificação (rank ascendente: 1º primeiro)
+    const sortedTeams = [...g.teams].sort((a, b) => a.rank - b.rank);
+    sortedTeams.forEach(team => {
       const card = document.createElement('div');
-      // SEM QUADRANTE: apenas padding, cursor, flex e hover scale
       card.className = 'cursor-pointer transition flex flex-col items-center justify-start gap-1 group relative py-1.5 px-0.5 hover:scale-105';
       card.onclick = () => location.hash = `#team-${team.code}`;
+
+      // Texto de classificação ou eliminação acima do brasão
+      const statusText = document.createElement('span');
+      if (team.eliminated) {
+        statusText.className = 'text-[5.5px] xs:text-[6px] font-black uppercase text-red-500 tracking-tighter text-center leading-none max-w-[78px] bg-red-500/10 px-0.5 py-0.5 rounded border border-red-500/10 mb-0.5 h-[18px] flex items-center justify-center';
+        const prep = team.eliminatedStage.startsWith('Fase') ? 'na' : 'nas';
+        statusText.textContent = `Eliminado ${prep} ${team.eliminatedStage}`;
+      } else {
+        statusText.className = 'text-[7px] font-bold text-gray-400 tracking-wider text-center mb-0.5 h-[18px] flex items-center justify-center';
+        statusText.textContent = `${team.rank}º • ${team.points}pts`;
+      }
+      card.appendChild(statusText);
 
       // FUT Layout: Escudo de tamanho w-12 h-12 com a bandeira no canto inferior direito
       const crestWrapper = document.createElement('div');
