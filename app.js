@@ -225,6 +225,30 @@ const playerNames = {
   20: "ATACANTE RESERVA"
 };
 
+// Lista Oficial dos 20 Jogadores Legends da seção "Figurinhas Extras / Premium" (Ordenado Alfabeticamente)
+const legendsData = [
+  { name: "Almoez Ali", country: "QA" },
+  { name: "Alphonso Davies", country: "CA" },
+  { name: "Christian Eriksen", country: "DK" },
+  { name: "Cristiano Ronaldo", country: "PT" },
+  { name: "Dusan Vlahovic", country: "RS" },
+  { name: "Gavi", country: "ES" },
+  { name: "Giovanni Reyna", country: "US" },
+  { name: "Guillermo Ochoa", country: "MX" },
+  { name: "Heung-Min Son", country: "KR" },
+  { name: "Jude Bellingham", country: "GB-ENG" },
+  { name: "Kevin de Bruyne", country: "BE" },
+  { name: "Kylian Mbappé", country: "FR" },
+  { name: "Lionel Messi", country: "AR" },
+  { name: "Luka Modric", country: "HR" },
+  { name: "Luis Suárez", country: "UY" },
+  { name: "Neymar Jr", country: "BR" },
+  { name: "Rafael Varane", country: "FR" },
+  { name: "Robert Lewandowski", country: "PL" },
+  { name: "Ryan Gravenberch", country: "NL" },
+  { name: "Sadio Mané", country: "SN" }
+];
+
 // Utilidades
 function generateId() {
   return 'alb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
@@ -821,7 +845,22 @@ function processImport(asDuplicate) {
   let importCount = 0;
 
   lines.forEach(line => {
-    const m1 = line.match(/^([A-Z]{2,3}(?:-[A-Z]+)?)\s+([0-9\s,]+)$/i);
+    // 1. Tenta casar primeiro por Nome Completo de Legend
+    let foundLegendIndex = -1;
+    for (let idx = 0; idx < legendsData.length; idx++) {
+      if (line.toLowerCase() === legendsData[idx].name.toLowerCase()) {
+        foundLegendIndex = idx;
+        break;
+      }
+    }
+    if (foundLegendIndex !== -1) {
+      addSticker(album, `EXTRAS-${foundLegendIndex + 1}`, asDuplicate);
+      importCount++;
+      return;
+    }
+
+    // 2. Se não casou com Legend, tenta o formato "CODIGO NUMERO" ou "CODIGO-NUMERO"
+    const m1 = line.match(/^([A-Z]{2,10}(?:-[A-Z]+)?)\s+([0-9\s,]+)$/i);
     if (m1) {
       const code = m1[1].toUpperCase();
       const nums = m1[2].split(/[\s,]+/).filter(Boolean);
@@ -833,7 +872,7 @@ function processImport(asDuplicate) {
         }
       });
     } else {
-      const m2 = line.match(/^([A-Z]{2,3}(?:-[A-Z]+)?)-([0-9]+)$/i);
+      const m2 = line.match(/^([A-Z]{2,10}(?:-[A-Z]+)?)-([0-9]+)$/i);
       if (m2) {
         const code = m2[1].toUpperCase();
         const numVal = parseInt(m2[2], 10);
@@ -860,6 +899,28 @@ function addSticker(album, key, duplicate) {
   } else {
     album.stickers[key].owned = true;
   }
+}
+
+// Composição do Logo da Copa 2026 com o código da figurinha sobreposto
+function createLogoComposition(stickerCode, isExtras = false) {
+  const container = document.createElement('div');
+  container.className = 'card-logo-container';
+
+  const logoImg = document.createElement('img');
+  logoImg.src = './logo2026.png';
+  logoImg.className = 'card-logo-image';
+  logoImg.alt = 'FIFA Logo';
+  container.appendChild(logoImg);
+
+  const codeEl = document.createElement('div');
+  codeEl.className = 'card-sticker-code';
+  if (isExtras) {
+    codeEl.classList.add('extras-font-size');
+  }
+  codeEl.textContent = stickerCode;
+  container.appendChild(codeEl);
+
+  return container;
 }
 
 // ------------------- TEAM PAGE -------------------
@@ -953,7 +1014,7 @@ function renderTeamPage(code, container) {
 
   for (let i = 1; i <= 20; i++) {
     const key = `${code}-${i}`;
-    const isSpecial = (i === 1 || i === 2); // Escudo e Time
+    const isSpecial = (code === 'EXTRAS' || i === 1 || i === 2); // Escudo, Time e Legends Premium
 
     const card = document.createElement('div');
     card.className = `sticker-card ${isSpecial ? 'special' : ''}`;
@@ -962,29 +1023,27 @@ function renderTeamPage(code, container) {
     const inner = document.createElement('div');
     inner.className = 'card-inner';
 
-    // 1. Verso (Não Possuído - FUT Card fechado, sem o "26" e com numeração no modelo "KOR 10")
+    // Determina o texto de identificação do cromo (sigla + número ou nome completo para Legends)
+    const stickerCode = (code === 'EXTRAS') ? legendsData[i - 1].name : `${code} ${i}`;
+    const isExtras = (code === 'EXTRAS');
+
+    // 1. Verso (Não Possuído - FUT Card fechado com marca d'água da Copa 2026)
     const cardBack = document.createElement('div');
     cardBack.className = 'card-back';
 
-    const backNum = document.createElement('div');
-    backNum.className = 'card-back-number';
-    backNum.textContent = `${code} ${i}`; // ex: KOR 10
-    cardBack.appendChild(backNum);
+    const backLogoComp = createLogoComposition(stickerCode, isExtras);
+    cardBack.appendChild(backLogoComp);
     inner.appendChild(cardBack);
 
-    // 2. Frente (Possuído - Panini Cromo Estilizado)
+    // 2. Frente (Possuído - FUT Card aberto com marca d'água da Copa 2026 e dados do atleta)
     const cardFront = document.createElement('div');
-    cardFront.className = `card-front panini-sticker ${isSpecial ? 'special shiny-effect' : ''} relative flex flex-col justify-between p-2 overflow-hidden`;
+    cardFront.className = `card-front ${isSpecial ? 'special shiny-effect' : ''} relative flex flex-col justify-between p-2 overflow-hidden`;
 
-    // Silhueta do atleta de fundo
-    const silhouette = document.createElement('div');
-    silhouette.className = 'absolute inset-0 flex items-center justify-center opacity-[0.08] pointer-events-none z-0';
-    silhouette.innerHTML = `
-      <svg class="w-full h-24 text-white" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 10.2v3.8c0 .6.4 1 1 1s1-.4 1-1v-2.8l1.8-.8c.4-.2.6-.5.7-.9l.8-2.6 1.7 1.7v5.8h-2c-.6 0-1 .4-1 1s.4 1 1 1h5v-8.2l-2.1-2.1c-.4-.4-1-.5-1.5-.3l-3.3 1.5c-.7.3-1.1 1-1 1.7.1.5.5.9 1 1zM20 22h-1.5l-3-6.5h-1L16 22h-2l-1.6-7.5c-.1-.5-.5-.9-1-.9h-.9L9 22H7l1.7-9.5c.1-.5.5-.9 1-.9h3.6c.8 0 1.5.5 1.7 1.2L16.5 18h1L19 14.5c.2-.5.7-.9 1.3-.9h1.7v2H20l-1.5 3.5h1.5v3z"/>
-      </svg>
-    `;
-    cardFront.appendChild(silhouette);
+    const frontLogoComp = createLogoComposition(stickerCode, isExtras);
+    cardFront.appendChild(frontLogoComp);
+
+    // Determina o país para bandeira/brasão (específico do jogador se for extras, ou o código da seleção se normal)
+    const stickerCountry = (code === 'EXTRAS') ? legendsData[i - 1].country : code;
 
     // Frente superior (Código e mini escudo redondo da federação)
     const frontHeader = document.createElement('div');
@@ -992,33 +1051,27 @@ function renderTeamPage(code, container) {
     
     const teamTag = document.createElement('span');
     teamTag.className = 'text-[9px] font-black uppercase tracking-wider text-white';
-    teamTag.textContent = code;
+    teamTag.textContent = stickerCountry;
     frontHeader.appendChild(teamTag);
 
     const miniCrest = document.createElement('img');
-    miniCrest.src = crestsMap[code] || `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
+    miniCrest.src = crestsMap[stickerCountry] || `https://flagcdn.com/w40/${stickerCountry.toLowerCase()}.png`;
     miniCrest.alt = 'Escudo';
     miniCrest.className = 'w-5 h-5 object-contain rounded-full border border-white/20 bg-white/10';
     miniCrest.onerror = function() {
-      this.src = `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
+      this.src = `https://flagcdn.com/w40/${stickerCountry.toLowerCase()}.png`;
       this.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
     };
     frontHeader.appendChild(miniCrest);
     cardFront.appendChild(frontHeader);
 
-    // Frente centro (Número/Tipo de cromo)
-    const frontNum = document.createElement('div');
-    frontNum.className = 'text-center font-black text-2xl py-1 my-auto tracking-tighter text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
-    frontNum.textContent = isSpecial ? (i === 1 ? '★ ESC' : '★ TIM') : i;
-    cardFront.appendChild(frontNum);
+    // Nome/Posição do atleta centralizado no rodapé
+    const playerName = document.createElement('div');
+    playerName.className = 'player-name-label';
+    playerName.textContent = isExtras ? 'LENDA' : playerNames[i];
+    cardFront.appendChild(playerName);
 
-    // Rodapé Laranja/Coral da figurinha Panini contendo o número e nome do atleta
-    const playerFooter = document.createElement('div');
-    playerFooter.className = 'bg-[#ff5e62] text-white text-[7.5px] font-black py-0.5 px-1.5 rounded flex justify-between items-center w-full z-10 border border-white/10 tracking-wide';
-    playerFooter.innerHTML = `<span>Nº ${i}</span> <span class="truncate uppercase max-w-[65px]">${playerNames[i]}</span>`;
-    cardFront.appendChild(playerFooter);
-
-    // Frente inferior (Ações)
+    // Frente inferior (Ações discretas nos cantos inferiores)
     const frontActions = document.createElement('div');
     frontActions.className = 'card-actions z-10';
     cardFront.appendChild(frontActions);
@@ -1222,13 +1275,14 @@ function renderTrades(container) {
   Object.entries(album.stickers).forEach(([key, val]) => {
     if (val.owned && val.duplicate > 0) {
       const parts = key.split('-');
-      const teamName = teamsMap[parts[0]];
+      const code = parts[0];
+      const teamName = teamsMap[code] || (code === 'FWFIFA' ? 'FW FIFA' : code === 'ESCUDOS' ? 'Escudos' : code === 'EXTRAS' ? 'Premium' : null);
       if (teamName) {
         duplicates.push({
           key: key,
           team: teamName,
-          code: parts[0],
-          number: parts[1],
+          code: code,
+          number: parseInt(parts[1], 10),
           count: val.duplicate
         });
       }
@@ -1257,7 +1311,12 @@ function renderTrades(container) {
       teamLabel.textContent = item.team;
       const numLabel = document.createElement('div');
       numLabel.className = 'text-xs font-black text-white';
-      numLabel.textContent = `Nº ${item.number}`;
+      
+      if (item.code === 'EXTRAS') {
+        numLabel.textContent = legendsData[item.number - 1].name;
+      } else {
+        numLabel.textContent = `${item.code} ${item.number}`;
+      }
       
       info.appendChild(teamLabel);
       info.appendChild(numLabel);
@@ -1352,7 +1411,12 @@ function shareOwnedList() {
     const nums = grouped[code].sort((a, b) => a - b);
     if (nums.length > 0) {
       hasStickers = true;
-      const formattedList = nums.map(n => `${code} ${formatStickerNumber(n)}`).join(', ');
+      let formattedList;
+      if (code === 'EXTRAS') {
+        formattedList = nums.map(n => legendsData[n - 1].name).join(', ');
+      } else {
+        formattedList = nums.map(n => `${code} ${n}`).join(', ');
+      }
       text += `${code}: ${formattedList}\n`;
     }
   });
@@ -1399,7 +1463,12 @@ function shareMissingList() {
     const nums = grouped[code];
     if (nums.length > 0) {
       hasMissing = true;
-      const formattedList = nums.map(n => `${code} ${formatStickerNumber(n)}`).join(', ');
+      let formattedList;
+      if (code === 'EXTRAS') {
+        formattedList = nums.map(n => legendsData[n - 1].name).join(', ');
+      } else {
+        formattedList = nums.map(n => `${code} ${n}`).join(', ');
+      }
       text += `${code}: ${formattedList}\n`;
     }
   });
@@ -1448,7 +1517,12 @@ function shareDuplicatesList() {
     const list = grouped[code].sort((a, b) => a.num - b.num);
     if (list.length > 0) {
       hasDuplicates = true;
-      const formattedList = list.map(item => `${code} ${formatStickerNumber(item.num)} (x${item.count})`).join(', ');
+      let formattedList;
+      if (code === 'EXTRAS') {
+        formattedList = list.map(item => `${legendsData[item.num - 1].name} (x${item.count})`).join(', ');
+      } else {
+        formattedList = list.map(item => `${code} ${item.num} (x${item.count})`).join(', ');
+      }
       text += `${code}: ${formattedList}\n`;
     }
   });
