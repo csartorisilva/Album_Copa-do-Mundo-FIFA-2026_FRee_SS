@@ -609,8 +609,12 @@ function renderTeamPage(code, container) {
 
   // Cabeçalho da página de seleção
   const headerPanel = document.createElement('div');
-  headerPanel.className = 'glass-panel p-5 rounded-2xl flex items-center justify-between gap-4 border-white/5';
+  headerPanel.className = 'glass-panel p-5 rounded-2xl flex flex-col gap-3.5 border-white/5';
   
+  // Linha superior do Cabeçalho
+  const topRow = document.createElement('div');
+  topRow.className = 'flex items-center justify-between gap-4 w-full';
+
   const infoSide = document.createElement('div');
   infoSide.className = 'flex items-center gap-3.5';
   
@@ -621,19 +625,23 @@ function renderTeamPage(code, container) {
   infoSide.appendChild(flag);
 
   const textBlock = document.createElement('div');
+  
   const teamTitle = document.createElement('h2');
-  teamTitle.className = 'text-lg font-black uppercase tracking-wide';
+  teamTitle.id = 'teamTitleText';
+  teamTitle.className = 'text-lg font-black uppercase tracking-wide flex items-center';
   teamTitle.textContent = teamName;
+  
   const countSub = document.createElement('p');
   countSub.className = 'text-[10px] text-gray-400';
+  countSub.id = 'teamProgressLabel';
   
   const stats = getTeamProgress(code);
-  countSub.id = 'teamProgressLabel';
   countSub.textContent = `${stats.owned} de 20 figurinhas coladas`;
+  
   textBlock.appendChild(teamTitle);
   textBlock.appendChild(countSub);
   infoSide.appendChild(textBlock);
-  headerPanel.appendChild(infoSide);
+  topRow.appendChild(infoSide);
 
   const backBtn = document.createElement('button');
   backBtn.className = 'p-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl transition flex items-center justify-center';
@@ -643,12 +651,67 @@ function renderTeamPage(code, container) {
     </svg>
   `;
   backBtn.onclick = () => location.hash = '#home';
-  headerPanel.appendChild(backBtn);
+  topRow.appendChild(backBtn);
+  headerPanel.appendChild(topRow);
+
+  // Barra de progresso da seleção (idêntica à da Home)
+  const progressWrapper = document.createElement('div');
+  progressWrapper.className = 'w-full mt-1.5 space-y-1';
+  
+  const progLabel = document.createElement('div');
+  progLabel.className = 'flex justify-between items-center text-[9px] text-gray-400 font-bold uppercase';
+  const percent = Math.round((stats.owned / 20) * 100);
+  progLabel.innerHTML = `<span>Progresso de Conclusão</span> <span id="teamProgText" class="text-copaGreen font-bold">${stats.owned}/20 (${percent}%)</span>`;
+  
+  const progBg = document.createElement('div');
+  progBg.className = 'h-2 bg-white/5 border border-white/10 rounded-full overflow-hidden';
+  const progFill = document.createElement('div');
+  progFill.id = 'teamProgBarFill';
+  progFill.className = 'h-full bg-gradient-to-r from-copaBlue via-copaGreen to-copaYellow rounded-full transition-all duration-300';
+  progFill.style.width = `${percent}%`;
+  
+  progBg.appendChild(progFill);
+  progressWrapper.appendChild(progLabel);
+  progressWrapper.appendChild(progBg);
+  headerPanel.appendChild(progressWrapper);
+
+  // Injeta o check verde de 100% completo
+  if (stats.owned === 20) {
+    const check = document.createElement('span');
+    check.className = 'check-mark text-copaGreen font-black text-lg ml-2 animate-bounce inline-block drop-shadow-[0_0_8px_#00e676]';
+    check.textContent = '✓';
+    teamTitle.appendChild(check);
+  }
+
   rootTeam.appendChild(headerPanel);
 
   // Grade responsiva de figurinhas (20 cromos)
   const grid = document.createElement('div');
   grid.className = 'grid-fifa';
+
+  // Nomes de elenco e posições oficiais/fictícias da Panini
+  const playerNames = {
+    1: "ESCUDO OFICIAL",
+    2: "SELEÇÃO POSADA",
+    3: "GOLEIRO TITULAR",
+    4: "LATERAL DIREITO",
+    5: "ZAGUEIRO CENTRAL",
+    6: "ZAGUEIRO LÍBERO",
+    7: "LATERAL ESQUERDO",
+    8: "VOLANTE MARCAÇÃO",
+    9: "MEIA ARMADOR",
+    10: "PONTA DIREITA",
+    11: "CENTROAVANTE",
+    12: "PONTA ESQUERDA",
+    13: "GOLEIRO RESERVA",
+    14: "ZAGUEIRO RESERVA",
+    15: "LATERAL RESERVA",
+    16: "MEIO-CAMPISTA",
+    17: "VOLANTE RESERVA",
+    18: "MEIA ATACANTE",
+    19: "PONTA RESERVA",
+    20: "ATACANTE RESERVA"
+  };
 
   for (let i = 1; i <= 20; i++) {
     const key = `${code}-${i}`;
@@ -661,7 +724,7 @@ function renderTeamPage(code, container) {
     const inner = document.createElement('div');
     inner.className = 'card-inner';
 
-    // 1. Verso (Não Possuído)
+    // 1. Verso (Não Possuído - FUT Card fechado)
     const cardBack = document.createElement('div');
     cardBack.className = 'card-back';
     
@@ -676,36 +739,59 @@ function renderTeamPage(code, container) {
     cardBack.appendChild(backNum);
     inner.appendChild(cardBack);
 
-    // 2. Frente (Possuído)
+    // 2. Frente (Possuído - Panini Cromo Estilizado)
     const cardFront = document.createElement('div');
-    cardFront.className = `card-front ${isSpecial ? 'special shiny-effect' : ''}`;
-    
-    const frontHeader = document.createElement('div');
-    frontHeader.className = 'flex justify-between items-center w-full';
-    
-    const miniFlag = document.createElement('img');
-    miniFlag.src = `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
-    miniFlag.className = 'w-5 h-3.5 object-cover rounded border border-white/10';
-    frontHeader.appendChild(miniFlag);
+    cardFront.className = `card-front panini-sticker ${isSpecial ? 'special shiny-effect' : ''} relative flex flex-col justify-between p-2 overflow-hidden`;
 
+    // Silhueta do atleta de fundo
+    const silhouette = document.createElement('div');
+    silhouette.className = 'absolute inset-0 flex items-center justify-center opacity-[0.08] pointer-events-none z-0';
+    silhouette.innerHTML = `
+      <svg class="w-full h-24 text-white" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 10.2v3.8c0 .6.4 1 1 1s1-.4 1-1v-2.8l1.8-.8c.4-.2.6-.5.7-.9l.8-2.6 1.7 1.7v5.8h-2c-.6 0-1 .4-1 1s.4 1 1 1h5v-8.2l-2.1-2.1c-.4-.4-1-.5-1.5-.3l-3.3 1.5c-.7.3-1.1 1-1 1.7.1.5.5.9 1 1zM20 22h-1.5l-3-6.5h-1L16 22h-2l-1.6-7.5c-.1-.5-.5-.9-1-.9h-.9L9 22H7l1.7-9.5c.1-.5.5-.9 1-.9h3.6c.8 0 1.5.5 1.7 1.2L16.5 18h1L19 14.5c.2-.5.7-.9 1.3-.9h1.7v2H20l-1.5 3.5h1.5v3z"/>
+      </svg>
+    `;
+    cardFront.appendChild(silhouette);
+
+    // Frente superior (Código e mini escudo redondo da federação)
+    const frontHeader = document.createElement('div');
+    frontHeader.className = 'flex justify-between items-center w-full z-10';
+    
     const teamTag = document.createElement('span');
-    teamTag.className = `text-[9px] font-black uppercase tracking-wider ${isSpecial ? 'text-copaYellow' : 'text-copaGreen'}`;
+    teamTag.className = 'text-[9px] font-black uppercase tracking-wider text-white';
     teamTag.textContent = code;
     frontHeader.appendChild(teamTag);
+
+    const miniCrest = document.createElement('img');
+    miniCrest.src = crestsMap[code] || `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
+    miniCrest.alt = 'Escudo';
+    miniCrest.className = 'w-5 h-5 object-contain rounded-full border border-white/20 bg-white/10';
+    miniCrest.onerror = function() {
+      this.src = `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
+      this.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
+    };
+    frontHeader.appendChild(miniCrest);
     cardFront.appendChild(frontHeader);
 
-    // Frente centro (Número do cromo)
+    // Frente centro (Número/Tipo de cromo)
     const frontNum = document.createElement('div');
-    frontNum.className = 'text-center font-black text-xl py-1 my-auto tracking-tighter text-white';
+    frontNum.className = 'text-center font-black text-2xl py-1 my-auto tracking-tighter text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
     frontNum.textContent = isSpecial ? (i === 1 ? '★ ESC' : '★ TIM') : i;
     cardFront.appendChild(frontNum);
 
+    // Rodapé Laranja/Coral da figurinha Panini contendo o número e nome do atleta
+    const playerFooter = document.createElement('div');
+    playerFooter.className = 'bg-[#ff5e62] text-white text-[7.5px] font-black py-0.5 px-1.5 rounded flex justify-between items-center w-full z-10 border border-white/10 tracking-wide';
+    playerFooter.innerHTML = `<span>Nº ${i}</span> <span class="truncate uppercase max-w-[65px]">${playerNames[i]}</span>`;
+    cardFront.appendChild(playerFooter);
+
     // Frente inferior (Ações)
     const frontActions = document.createElement('div');
-    frontActions.className = 'card-actions';
-
+    frontActions.className = 'card-actions z-10';
     cardFront.appendChild(frontActions);
+
     inner.appendChild(cardFront);
+    inner.appendChild(cardBack); // garante o preserve-3d
     card.appendChild(inner);
 
     // Clique no card
@@ -731,12 +817,39 @@ function renderTeamPage(code, container) {
   container.appendChild(rootTeam);
 }
 
-// Contador de progresso da seleção
+// Contador e atualizador de progresso da seleção dinâmico
 function updateTeamProgressLabel(code) {
+  const stats = getTeamProgress(code);
+  
+  // 1. Atualiza o texto descritivo
   const label = document.getElementById('teamProgressLabel');
   if (label) {
-    const stats = getTeamProgress(code);
     label.textContent = `${stats.owned} de 20 figurinhas coladas`;
+  }
+  
+  // 2. Atualiza a barra de progresso
+  const progText = document.getElementById('teamProgText');
+  const progBar = document.getElementById('teamProgBarFill');
+  if (progText && progBar) {
+    const percent = Math.round((stats.owned / 20) * 100);
+    progText.textContent = `${stats.owned}/20 (${percent}%)`;
+    progBar.style.width = `${percent}%`;
+  }
+  
+  // 3. Adiciona ou remove o ícone de Check (✓) verde no título
+  const teamTitle = document.getElementById('teamTitleText');
+  if (teamTitle) {
+    if (stats.owned === 20) {
+      if (!teamTitle.querySelector('.check-mark')) {
+        const check = document.createElement('span');
+        check.className = 'check-mark text-copaGreen font-black text-lg ml-2 animate-bounce inline-block drop-shadow-[0_0_8px_#00e676]';
+        check.textContent = '✓';
+        teamTitle.appendChild(check);
+      }
+    } else {
+      const check = teamTitle.querySelector('.check-mark');
+      if (check) check.remove();
+    }
   }
 }
 

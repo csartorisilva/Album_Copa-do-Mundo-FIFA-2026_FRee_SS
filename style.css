@@ -333,3 +333,24 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.15);
 }
+
+/* Panini Sticker Styling (Rectangular, solid white borders, cyan/gold gradient bg) */
+.panini-sticker {
+  clip-path: none !important;
+  border-radius: 8px !important;
+  background: linear-gradient(135deg, #00d2ff 0%, #0066eb 100%) !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 6px 16px rgba(0, 102, 235, 0.3) !important;
+}
+
+/* Panini Shiny Gold Special cards styling */
+.panini-sticker.special {
+  background: linear-gradient(135deg, #ffe066 0%, #f5a623 50%, #f39c12 100%) !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 6px 16px rgba(245, 166, 35, 0.4) !important;
+}
+
+.panini-sticker.special::before {
+  clip-path: none !important;
+  border-radius: 6px !important;
+}
