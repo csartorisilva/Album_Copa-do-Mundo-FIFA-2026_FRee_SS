@@ -119,9 +119,7 @@ function route() {
   
   root.innerHTML = '';
   
-  if (hash.startsWith('#login')) {
-    renderLogin();
-  } else if (hash.startsWith('#home')) {
+  if (hash.startsWith('#home')) {
     renderHome();
   } else if (hash.startsWith('#import')) {
     renderImport();
@@ -130,6 +128,8 @@ function route() {
     renderTeamPage(code);
   } else if (hash.startsWith('#trades')) {
     renderTrades();
+  } else if (hash.startsWith('#login')) {
+    renderLogin();
   } else {
     location.hash = '#home';
   }
