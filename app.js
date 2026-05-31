@@ -1332,15 +1332,10 @@ function renderHome(container) {
   `;
   progressSection.appendChild(textStats);
 
-  // Bloco de Compartilhamento (exibido acima das estatísticas em flex-col)
+  // Bloco de Compartilhamento (exibido abaixo das estatísticas sem o rótulo)
   const shareBlock = document.createElement('div');
   shareBlock.className = 'flex flex-col gap-2 mt-2 pt-3.5 border-t border-white/5 w-full';
   
-  const shareLabel = document.createElement('span');
-  shareLabel.className = 'text-[9px] font-black uppercase text-gray-400 tracking-wider text-left';
-  shareLabel.textContent = 'Compartilhar:';
-  shareBlock.appendChild(shareLabel);
-
   const shareButtonsContainer = document.createElement('div');
   shareButtonsContainer.className = 'grid grid-cols-3 gap-2 w-full';
 
@@ -1384,8 +1379,9 @@ function renderHome(container) {
   shareButtonsContainer.appendChild(btnShareDuplicates);
 
   shareBlock.appendChild(shareButtonsContainer);
-  statsPanel.appendChild(shareBlock);
+  
   statsPanel.appendChild(progressSection);
+  statsPanel.appendChild(shareBlock);
 
   rootHome.appendChild(statsPanel);
 
