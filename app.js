@@ -813,15 +813,21 @@ function renderImport(container) {
   const btnHave = document.createElement('button');
   btnHave.className = 'w-full px-4 py-2.5 bg-copaGreen hover:opacity-90 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition';
   btnHave.textContent = "Importar como 'Tenho'";
-  btnHave.onclick = () => processImport(false);
+  btnHave.onclick = () => processImport('owned');
 
   const btnDup = document.createElement('button');
   btnDup.className = 'w-full px-4 py-2.5 bg-copaYellow hover:opacity-90 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition';
   btnDup.textContent = "Importar como 'Repetidas'";
-  btnDup.onclick = () => processImport(true);
+  btnDup.onclick = () => processImport('duplicate');
+
+  const btnMissing = document.createElement('button');
+  btnMissing.className = 'w-full px-4 py-2.5 bg-red-600 hover:opacity-90 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition';
+  btnMissing.textContent = "Importar como 'Faltantes'";
+  btnMissing.onclick = () => processImport('missing');
 
   btnContainer.appendChild(btnHave);
   btnContainer.appendChild(btnDup);
+  btnContainer.appendChild(btnMissing);
   wrapper.appendChild(btnContainer);
 
   const back = document.createElement('button');
@@ -833,7 +839,7 @@ function renderImport(container) {
   container.appendChild(wrapper);
 }
 
-function processImport(asDuplicate) {
+function processImport(mode) {
   const text = document.getElementById('importArea').value.trim();
   if (!text) return alert('Insira códigos para importar.');
 
@@ -842,7 +848,8 @@ function processImport(asDuplicate) {
   const albums = storage.getAlbums();
   const album = albums[albumId];
 
-  let importCount = 0;
+  // Coleta as chaves informadas no input
+  const parsedKeys = new Set();
 
   lines.forEach(line => {
     // 1. Tenta casar primeiro por Nome Completo de Legend
@@ -854,8 +861,7 @@ function processImport(asDuplicate) {
       }
     }
     if (foundLegendIndex !== -1) {
-      addSticker(album, `EXTRAS-${foundLegendIndex + 1}`, asDuplicate);
-      importCount++;
+      parsedKeys.add(`EXTRAS-${foundLegendIndex + 1}`);
       return;
     }
 
@@ -867,8 +873,7 @@ function processImport(asDuplicate) {
       nums.forEach(n => {
         const numVal = parseInt(n, 10);
         if (numVal >= 1 && numVal <= 20) {
-          addSticker(album, `${code}-${numVal}`, asDuplicate);
-          importCount++;
+          parsedKeys.add(`${code}-${numVal}`);
         }
       });
     } else {
@@ -877,15 +882,50 @@ function processImport(asDuplicate) {
         const code = m2[1].toUpperCase();
         const numVal = parseInt(m2[2], 10);
         if (numVal >= 1 && numVal <= 20) {
-          addSticker(album, `${code}-${numVal}`, asDuplicate);
-          importCount++;
+          parsedKeys.add(`${code}-${numVal}`);
         }
       }
     }
   });
 
-  storage.setAlbums(albums);
-  alert(`Sucesso! ${importCount} figurinhas adicionadas.`);
+  if (mode === 'missing') {
+    // Modo Faltantes: define as informadas como não possuídas (faltantes), e todas as outras como possuídas (coladas)
+    const allStickerKeys = [];
+    groupsData.forEach(g => {
+      g.teams.forEach(t => {
+        for (let i = 1; i <= 20; i++) {
+          allStickerKeys.push(`${t.code}-${i}`);
+        }
+      });
+    });
+    const specials = ['FWFIFA', 'ESCUDOS', 'EXTRAS'];
+    specials.forEach(code => {
+      for (let i = 1; i <= 20; i++) {
+        allStickerKeys.push(`${code}-${i}`);
+      }
+    });
+
+    allStickerKeys.forEach(key => {
+      if (parsedKeys.has(key)) {
+        album.stickers[key] = { owned: false, duplicate: 0 };
+      } else {
+        album.stickers[key] = { owned: true, duplicate: 0 };
+      }
+    });
+
+    storage.setAlbums(albums);
+    alert(`Sucesso! Álbum atualizado: as ${parsedKeys.size} figurinhas informadas foram marcadas como FALTANTES, e todas as demais do álbum foram marcadas como COLADAS.`);
+  } else {
+    // Modos "Tenho" ou "Repetidas" padrão
+    let importCount = 0;
+    parsedKeys.forEach(key => {
+      addSticker(album, key, mode === 'duplicate');
+      importCount++;
+    });
+    storage.setAlbums(albums);
+    alert(`Sucesso! ${importCount} figurinhas adicionadas.`);
+  }
+
   location.hash = '#home';
 }
 
