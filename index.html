@@ -5,10 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Álbum de Figurinhas FIFA 2026</title>
   <meta name="description" content="Gerencie álbuns de figurinhas da Copa do Mundo FIFA 2026 – totalmente gratuito, mobile‑first, sem servidor." />
+  
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Configuração da paleta oficial da Copa 2026 (cores base)
     tailwind.config = {
       theme: {
         extend: {
@@ -16,7 +21,8 @@
             copaBlue: '#0033A0',   // azul escuro oficial
             copaGreen: '#009639',  // verde floresta oficial
             copaYellow: '#FFC726', // amarelo dourado oficial
-            copaGray: '#F2F2F2',   // cinza neutro
+            darkBg: '#050814',
+            panelBg: 'rgba(13, 20, 41, 0.6)',
           },
         },
       },
@@ -24,22 +30,81 @@
   </script>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-copaGray text-gray-900 font-sans min-h-screen flex flex-col">
-  <!-- Header com seletor de álbum -->
-  <header class="bg-copaBlue text-white p-4 flex justify-between items-center">
-    <h1 class="text-xl font-bold">Álbum FIFA 2026</h1>
-    <select id="albumSelector" class="bg-white text-gray-800 p-2 rounded" onchange="app.switchAlbum(this.value)"></select>
+<body class="bg-[#050814] text-gray-100 font-sans min-h-screen flex flex-col">
+  <!-- Header com seletor de álbum e links rápidos -->
+  <header class="bg-[#070d1e]/90 border-b border-white/10 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-3 justify-between items-center">
+      <!-- Título principal -->
+      <div class="flex items-center gap-3">
+        <div class="bg-gradient-to-r from-copaBlue via-copaGreen to-copaYellow p-[2px] rounded-lg">
+          <div class="bg-darkBg px-3 py-1 rounded-[6px] font-black text-sm tracking-wider uppercase">
+            FIFA 26
+          </div>
+        </div>
+        <h1 class="text-lg font-black tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+          Álbum FIFA 2026
+        </h1>
+      </div>
+
+      <!-- Links adicionais requeridos -->
+      <nav class="flex items-center gap-4 text-xs font-semibold text-gray-400">
+        <a href="https://www.fifa.com/fifaplus/pt/tournaments/mens/worldcup/canadamexicousa2026" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="hover:text-copaYellow transition-colors flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          FIFA Plus
+        </a>
+        <span class="text-white/10">|</span>
+        <a href="https://panini.com.br" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="hover:text-copaGreen transition-colors flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          Panini
+        </a>
+      </nav>
+
+      <!-- Seletor de Álbum -->
+      <div class="flex items-center gap-2">
+        <label for="albumSelector" class="text-xs text-gray-400 font-bold uppercase tracking-wider hidden sm:inline">Álbum:</label>
+        <select id="albumSelector" 
+                class="bg-white/5 border border-white/10 text-white text-sm px-3 py-1.5 rounded-lg focus:outline-none focus:border-copaYellow cursor-pointer hover:bg-white/10 transition-colors"
+                onchange="switchAlbum(this.value)">
+        </select>
+      </div>
+    </div>
   </header>
 
   <!-- Main container -->
-  <main id="appRoot" class="flex-1 p-4"></main>
+  <main id="appRoot" class="flex-1 p-4 max-w-7xl mx-auto w-full"></main>
 
   <!-- Footer -->
-  <footer class="bg-copaBlue text-white p-2 text-center flex items-center justify-center gap-2">
-    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M224.1 141c-63.6 0-115 51.4-115 115 0 55.5 38.3 102.1 89.3 111.9v73.4h51.4v-73.4c51-9.8 89.3-56.4 89.3-111.9 0-63.6-51.4-115-115-115zm0 180c-35.9 0-65-29.1-65-65s29.1-65 65-65 65 29.1 65 65-29.1 65-65 65z"/></svg>
-    Produzido por <a href="https://instagram.com/free_ss" target="_blank" class="underline">@free_ss</a>
+  <footer class="bg-[#050814] border-t border-white/5 py-4 text-center text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p>© 2026 - Controle de figurinhas Copa do Mundo.</p>
+      
+      <!-- Instagram e Produzido por com ícone colorido -->
+      <a href="https://instagram.com/free_ss" 
+         target="_blank" 
+         rel="noopener noreferrer" 
+         class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/5">
+        <span>Produzido por</span>
+        <!-- Ícone do Instagram colorido usando gradiente de cores do Insta no próprio SVG/path ou via Tailwind -->
+        <span class="inline-flex items-center justify-center p-1 rounded-md bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+          </svg>
+        </span>
+        <strong class="text-white font-bold">@free_ss</strong>
+      </a>
+    </div>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app.js" defer></script>
 </body>
 </html>
