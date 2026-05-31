@@ -1909,15 +1909,20 @@ function updateCard(card, key) {
     card.classList.remove('is-flipped');
   }
 
-  // 2. Alerta de Troca Qualificada (Yellow Blinking + ⚠️)
-  const isTrade = isOwned && hasQualifiedTrade(key);
+  // 2. Alerta de Troca Qualificada (Yellow Balloon + ⇄ SVG)
+  const isTrade = hasQualifiedTrade(key);
   let alertIcon = card.querySelector('.trade-alert-icon');
   if (isTrade) {
     card.classList.add('qualified-trade');
     if (!alertIcon) {
       alertIcon = document.createElement('span');
       alertIcon.className = 'trade-alert-icon';
-      alertIcon.textContent = '⚠️';
+      alertIcon.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width: 10px; height: 10px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 12L3 16.5m0 0L7.5 21M3 16.5h13.5" />
+        </svg>
+      `;
       card.appendChild(alertIcon);
     }
   } else {
@@ -1978,7 +1983,12 @@ function updateCard(card, key) {
 
       const btnCam = document.createElement('button');
       btnCam.className = 'action-btn btn-camera';
-      btnCam.innerHTML = '📷';
+      btnCam.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169a47.859 47.859 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+        </svg>
+      `;
       btnCam.title = 'Fotografar (Câmera)';
       btnCam.onclick = (e) => {
         e.stopPropagation();
@@ -1989,7 +1999,12 @@ function updateCard(card, key) {
 
       const btnEye = document.createElement('button');
       btnEye.className = 'action-btn btn-eye';
-      btnEye.innerHTML = '👁️';
+      btnEye.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      `;
       btnEye.title = 'Visualizar em Tela Cheia';
       btnEye.onclick = (e) => {
         e.stopPropagation();
