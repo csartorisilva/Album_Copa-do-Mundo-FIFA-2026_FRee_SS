@@ -1215,11 +1215,11 @@ function renderHome(container) {
       crestImg.alt = team.name;
       crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]';
       
-      // Fallback robusto se a imagem do brasão falhar (converte em bandeira média e esconde a sobreposta)
+      // Fallback robusto se a imagem do brasão falhar (converte em logo 2026 cinza e mantém a bandeirinha)
       crestImg.onerror = function() {
-        this.src = `https://flagcdn.com/w80/${flagCode}.png`;
-        this.className = 'w-10 h-7 object-cover rounded shadow border border-white/10 mt-2.5';
-        flagImg.style.display = 'none';
+        this.src = './logo2026.png';
+        this.className = 'max-w-full max-h-full object-contain grayscale opacity-60';
+        flagImg.style.display = 'block'; // mantém a bandeira no canto
       };
 
       crestWrapper.appendChild(crestImg);
@@ -1567,6 +1567,18 @@ function renderTeamPage(code, container) {
   const infoSide = document.createElement('div');
   infoSide.className = 'flex items-center gap-3.5';
   
+  // Cabeçalho da página de seleção: Brasão ou fallback do logo cinza com bandeirinha
+  const crestWrapper = document.createElement('div');
+  crestWrapper.className = 'relative w-10 h-10 flex items-center justify-center';
+
+  const flagCode = (flagMap[code] || 'us').toLowerCase();
+  
+  // Bandeira de canto (mostrada se o brasão falhar e exibir o logo cinza)
+  const flagBadge = document.createElement('img');
+  flagBadge.src = `https://flagcdn.com/w40/${flagCode}.png`;
+  flagBadge.className = 'absolute bottom-0 right-0 w-5.5 h-3.5 object-cover border border-white/20 rounded shadow-md z-10';
+  flagBadge.style.display = 'none'; // oculta por padrão, mostra só se falhar
+
   const crest = document.createElement('img');
   if (code === 'FWC') {
     crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
@@ -1578,12 +1590,24 @@ function renderTeamPage(code, container) {
     crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/100px-Golden_Ball.svg.png';
     crest.className = 'w-10 h-10 object-contain';
   } else {
-    const flagCode = (flagMap[code] || 'us').toLowerCase();
-    crest.src = crestsMap[code] || `https://flagcdn.com/w80/${flagCode}.png`;
+    crest.src = crestsMap[code] || `./logo2026.png`;
     crest.className = 'w-10 h-10 object-contain filter drop-shadow-[0_2px_8px_rgba(255,255,255,0.05)]';
+    
+    crest.onerror = function() {
+      this.src = './logo2026.png';
+      this.className = 'w-10 h-10 object-contain grayscale opacity-60'; // Tom cinza/grayscale
+      flagBadge.style.display = 'block'; // mostra a bandeira no canto
+    };
   }
   crest.alt = teamName;
-  infoSide.appendChild(crest);
+  crest.style.width = '40px';
+  crest.style.height = '40px';
+  
+  crestWrapper.appendChild(crest);
+  if (code !== 'FWC' && code !== 'CC' && code !== 'EXTRAS') {
+    crestWrapper.appendChild(flagBadge);
+  }
+  infoSide.appendChild(crestWrapper);
 
   const textBlock = document.createElement('div');
   
