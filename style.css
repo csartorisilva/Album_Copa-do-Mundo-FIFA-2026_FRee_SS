@@ -49,33 +49,77 @@ body {
 
 /* 3D Perspective Container for page flips */
 #appRoot {
-  perspective: 1500px;
+  perspective: 2000px;
+  transform-style: preserve-3d;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* 3D Page Flip transition classes */
 .page-transition-container {
   width: 100%;
+  position: relative;
   transform-origin: left center;
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
+/* Efeito de curvatura/dobra da página com gradiente deslizante */
+.page-transition-container::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(105deg, 
+    transparent 35%, 
+    rgba(0, 0, 0, 0.4) 47%, 
+    rgba(255, 255, 255, 0.08) 50%, 
+    rgba(0, 0, 0, 0.45) 53%, 
+    transparent 65%
+  );
+  background-size: 300% 100%;
+  background-position: 150% 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease, background-position 0.5s ease;
+  z-index: 50;
+  border-radius: inherit;
+}
+
+/* Estado de Entrada (Vem da direita virando e levantando pelo canto inferior direito) */
 .page-enter {
-  transform: rotateY(75deg);
+  transform: rotateY(85deg) rotateZ(5deg) translateY(12px) scale(0.96);
   opacity: 0;
+  box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.6);
 }
 
-.page-active {
-  transform: rotateY(0deg);
+.page-enter::after {
   opacity: 1;
+  background-position: -100% 0;
 }
 
-.page-exit {
-  transform: rotateY(-75deg);
+/* Estado Ativo (Página aberta) */
+.page-active {
+  transform: rotateY(0deg) rotateZ(0deg) translateY(0px) scale(1);
+  opacity: 1;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.page-active::after {
   opacity: 0;
+  background-position: 150% 0;
+}
+
+/* Estado de Saída (Vira para a esquerda e levanta a ponta inferior direita) */
+.page-exit {
+  transform: rotateY(-85deg) rotateZ(-5deg) translateY(-12px) scale(0.96);
+  opacity: 0;
+  box-shadow: 15px 15px 30px rgba(0, 0, 0, 0.6);
+}
+
+.page-exit::after {
+  opacity: 1;
+  background-position: -50% 0;
 }
 
 /* Base Sticker Card for 3D flip */

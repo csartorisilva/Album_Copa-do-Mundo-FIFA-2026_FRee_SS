@@ -183,10 +183,10 @@ function route() {
     currentContainer.classList.remove('page-active');
     currentContainer.classList.add('page-exit');
     
-    // 2. Aguarda a finalização do CSS Page-Exit (400ms)
+    // 2. Aguarda a finalização parcial do CSS Page-Exit (450ms)
     setTimeout(() => {
       renderNewPage(hash, root);
-    }, 380);
+    }, 450);
   } else {
     // Carregamento inicial limpo
     renderNewPage(hash, root);
