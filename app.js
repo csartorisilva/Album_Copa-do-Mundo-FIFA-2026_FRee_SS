@@ -67,7 +67,22 @@ const crestsMap = {
   SWE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Swedish_Football_Association_logo.svg/120px-Swedish_Football_Association_logo.svg.png',
   NZL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/New_Zealand_Football_logo.svg/120px-New_Zealand_Football_logo.svg.png',
   FWC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png',
-  CC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png'
+  CC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png',
+  // Enriquecidos com Wikimedia Commons estáveis
+  RSA: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/South_African_Football_Association_logo.svg/120px-South_African_Football_Association_logo.svg.png',
+  CZE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Logo_FA%C4%8CR.svg/120px-Logo_FA%C4%8CR.svg.png',
+  BIH: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/NFSBiH_logo.svg/120px-NFSBiH_logo.svg.png',
+  QAT: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Qatar_Football_Association_logo.svg/120px-Qatar_Football_Association_logo.svg.png',
+  HAI: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Logo_F%C3%A9d%C3%A9ration_Ha%C3%AFtienne_de_Football_2021.png/120px-Logo_F%C3%A9d%C3%A9ration_Ha%C3%AFtienne_de_Football_2021.png',
+  CUW: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/FFK_Logo.png/120px-FFK_Logo.png',
+  CIV: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Logo_F%C3%A9d%C3%A9ration_Ivoirienne_de_Football.png/120px-Logo_F%C3%A9d%C3%A9ration_Ivoirienne_de_Football.png',
+  CPV: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/36/Cape_Verde_football_association_crest.png/120px-Cape_Verde_football_association_crest.png',
+  IRQ: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Iraq_FA_logo.svg/120px-Iraq_FA_logo.svg.png',
+  NOR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Norway_national_football_team_crest.svg/120px-Norway_national_football_team_crest.svg.png',
+  JOR: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Jordan_Football_Association_logo.svg/120px-Jordan_Football_Association_logo.svg.png',
+  COD: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Logo_Fecofa.png/120px-Logo_Fecofa.png',
+  UZB: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Uzbekistan_Football_Association_logo.svg/120px-Uzbekistan_Football_Association_logo.svg.png',
+  EXTRAS: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/120px-Golden_Ball.svg.png'
 };
 
 // Tradutor de sigla de 3 letras para código de 2 letras do FlagCDN
@@ -87,6 +102,29 @@ const flagMap = {
   ARG: 'ar', ALG: 'dz', AUT: 'at', JOR: 'jo',
   POR: 'pt', COD: 'cd', UZB: 'uz', COL: 'co',
   ENG: 'gb-eng', CRO: 'hr', GHA: 'gh', PAN: 'pa'
+};
+
+// Emojis de bandeira por sigla de país
+const flagEmojis = {
+  USA: '🇺🇸', MEX: '🇲🇽', CAN: '🇨🇦', BRA: '🇧🇷', COL: '🇨🇴', PAR: '🇵🇾', ARG: '🇦🇷', URU: '🇺🇾',
+  KSA: '🇸🇦', FRA: '🇫🇷', MAR: '🇲🇦', AUT: '🇦🇹', ESP: '🇪🇸', JPN: '🇯🇵', ECU: '🇪🇨', EGY: '🇪🇬',
+  GER: '🇩🇪', BEL: '🇧🇪', KOR: '🇰🇷', TUN: '🇹🇳', ENG: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', SEN: '🇸🇳', IRN: '🇮🇷', POR: '🇵🇹',
+  GHA: '🇬🇭', TUR: '🇹🇷', AUS: '🇦🇺', ALG: '🇩🇿', NED: '🇳🇱', CRO: '🇭🇷', SUI: '🇨🇭', PAN: '🇵🇦',
+  SWE: '🇸🇪', NZL: '🇳🇿', RSA: '🇿🇦', CZE: '🇨🇿', BIH: '🇧🇦', QAT: '🇶🇦', HAI: '🇭🇹', SCO: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  CUW: '🇨🇼', CIV: '🇨🇮', CPV: '🇨🇻', IRQ: '🇮🇶', NOR: '🇳🇴', JOR: '🇯🇴', COD: '🇨🇩', UZB: '🇺🇿',
+  FWC: '🏆', CC: '🥤', EXTRAS: '✨'
+};
+
+// Histórico de títulos mundiais das seleções
+const worldCupTitles = {
+  BRA: { count: 5, years: '1958, 1962, 1970, 1994, 2002' },
+  ITA: { count: 4, years: '1934, 1938, 1982, 2006' },
+  GER: { count: 4, years: '1954, 1974, 1990, 2014' },
+  ARG: { count: 3, years: '1978, 1986, 2022' },
+  URU: { count: 2, years: '1930, 1950' },
+  FRA: { count: 2, years: '1998, 2018' },
+  ENG: { count: 1, years: '1966' },
+  ESP: { count: 1, years: '2010' }
 };
 
 // Dados estruturados das seleções e grupos da Copa 2026 (48 seleções)
@@ -1461,42 +1499,52 @@ function renderTeamPage(code, container) {
   const infoSide = document.createElement('div');
   infoSide.className = 'flex items-center gap-3.5';
   
-  const flag = document.createElement('img');
+  const crest = document.createElement('img');
   if (code === 'FWC') {
-    flag.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
-    flag.className = 'w-12 h-8 object-contain rounded bg-white/5 p-1 border border-white/10';
+    crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
+    crest.className = 'w-10 h-10 object-contain rounded bg-white/5 p-1 border border-white/10';
   } else if (code === 'CC') {
-    flag.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png';
-    flag.className = 'w-12 h-8 object-contain rounded bg-white/5 p-1 border border-white/10';
+    crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png';
+    crest.className = 'w-10 h-10 object-contain rounded bg-white/5 p-1 border border-white/10';
   } else if (code === 'EXTRAS') {
-    flag.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/100px-Golden_Ball.svg.png';
-    flag.className = 'w-8 h-8 object-contain';
+    crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/100px-Golden_Ball.svg.png';
+    crest.className = 'w-10 h-10 object-contain';
   } else {
     const flagCode = (flagMap[code] || 'us').toLowerCase();
-    flag.src = `https://flagcdn.com/w80/${flagCode}.png`;
-    flag.className = 'w-12 h-8 object-cover rounded shadow border border-white/10';
+    crest.src = crestsMap[code] || `https://flagcdn.com/w80/${flagCode}.png`;
+    crest.className = 'w-10 h-10 object-contain filter drop-shadow-[0_2px_8px_rgba(255,255,255,0.05)]';
   }
-  flag.alt = teamName;
-  infoSide.appendChild(flag);
+  crest.alt = teamName;
+  infoSide.appendChild(crest);
 
   const textBlock = document.createElement('div');
   
   const teamTitle = document.createElement('h2');
   teamTitle.id = 'teamTitleText';
-  teamTitle.className = 'text-lg font-black uppercase tracking-wide flex items-center';
-  teamTitle.textContent = teamName;
+  teamTitle.className = 'text-sm font-black uppercase tracking-wide flex items-center gap-1.5 flex-wrap';
+  
+  const flagEmoji = flagEmojis[code] || '';
+  const titleInfo = worldCupTitles[code];
+  const stars = titleInfo ? ' ⭐'.repeat(titleInfo.count) : '';
+  teamTitle.textContent = `${flagEmoji} ${teamName}${stars}`;
   
   const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
-
-  const countSub = document.createElement('p');
-  countSub.className = 'text-[10px] text-gray-400';
-  countSub.id = 'teamProgressLabel';
-  
   const stats = getTeamProgress(code);
-  countSub.textContent = `${stats.owned} de ${limit} figurinhas coladas`;
+
+  const titlesSub = document.createElement('p');
+  titlesSub.className = 'text-[9px] text-gray-400 font-bold tracking-tight mt-0.5';
+  if (titleInfo) {
+    titlesSub.innerHTML = `<span class="text-copaYellow font-black">Títulos Mundiais:</span> ${titleInfo.years}`;
+  } else {
+    if (code === 'FWC' || code === 'CC' || code === 'EXTRAS') {
+      titlesSub.textContent = '';
+    } else {
+      titlesSub.textContent = 'Sem títulos mundiais';
+    }
+  }
   
   textBlock.appendChild(teamTitle);
-  textBlock.appendChild(countSub);
+  textBlock.appendChild(titlesSub);
   infoSide.appendChild(textBlock);
   topRow.appendChild(infoSide);
 
@@ -1530,6 +1578,14 @@ function renderTeamPage(code, container) {
   progBg.appendChild(progFill);
   progressWrapper.appendChild(progLabel);
   progressWrapper.appendChild(progBg);
+
+  // Adiciona o countSub debaixo do progBg
+  const countSub = document.createElement('p');
+  countSub.className = 'text-[9px] text-gray-400 text-right mt-1 font-bold';
+  countSub.id = 'teamProgressLabel';
+  countSub.textContent = `${stats.owned} de ${limit} figurinhas coladas`;
+  progressWrapper.appendChild(countSub);
+
   headerPanel.appendChild(progressWrapper);
 
   // Injeta o check verde de 100% completo
