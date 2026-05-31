@@ -371,10 +371,24 @@ function getTeamPhase(team, standings) {
   }
 }
 
+// Mapa de fase para descrição amigável em português
+const PHASE_DESCRIPTIONS = {
+  'FG':    'Fase de Grupos',
+  'R16':   'Oitavas de Final (16 avos)',
+  'OF':    'Oitavas de Final',
+  'QF':    'Quartas de Final',
+  'SF':    'Semifinal',
+  '3rd':   '3º Lugar',
+  '3º':    '3º Lugar',
+  'F':     'Final',
+  '🏆':    'Campeão'
+};
+
 // Calcula e formata a fase e a cor do balãozinho da Copa 2026 de forma dinâmica
 function getPhaseInfo(team, standings) {
   let phaseText = 'FG';
-  let colorClass = 'bg-[#FFC726]/10 text-[#FFC726] border-[#FFC726]/30'; // amarelo (não começou)
+  // Cinza padrão: campeonato ainda não começou (início 11/06/2026)
+  let colorClass = 'bg-white/5 text-gray-400 border-white/10';
 
   const stats = (standings && standings[team.code]) ? standings[team.code] : null;
   const isEliminated = stats ? stats.eliminated : (team.eliminated || false);
@@ -414,8 +428,8 @@ function getPhaseInfo(team, standings) {
       else if (maxElimStage === 'Final') phaseText = '🏆'; // Campeão
     }
 
-    // Cor do balão: se tiver pontos (campeonato começou) fica verde, senão amarelo
-    if (points > 0 || (stats && stats.rank !== undefined)) {
+    // Cor: se tiver pontos (campeonato em andamento) fica verde, senão cinza (ainda não começou)
+    if (points > 0 || (stats && stats.rank !== undefined && phaseText !== 'FG')) {
       colorClass = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25'; // verde (em andamento)
     }
   }
@@ -435,6 +449,8 @@ function getPhaseInfo(team, standings) {
 
   return {
     label: friendlyMap[phaseText] || friendlyMap[phaseText.toUpperCase()] || phaseText,
+    phaseKey: phaseText,
+    description: PHASE_DESCRIPTIONS[phaseText] || phaseText,
     color: colorClass
   };
 }
@@ -1142,17 +1158,29 @@ function renderLogin(container) {
     grid.className = 'flex flex-col gap-3';
 
     const methods = [
-      { id: 'google', label: 'Acesso via Google Account', color: 'hover:border-red-500/30' },
-      { id: 'apple', label: 'Acesso via Apple ID', color: 'hover:border-gray-300/30' },
-      { id: 'android', label: 'Acesso via Android Device', color: 'hover:border-copaGreen/30' }
+      { 
+        id: 'google', 
+        color: 'hover:border-red-500/30',
+        logo: `<svg viewBox="0 0 24 24" class="w-6 h-6"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`
+      },
+      { 
+        id: 'apple', 
+        color: 'hover:border-gray-300/30',
+        logo: `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="white"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701z"/></svg>`
+      },
+      { 
+        id: 'android', 
+        color: 'hover:border-copaGreen/30',
+        logo: `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="#3DDC84"><path d="M17.523 15.341a.617.617 0 01-.633-.63.617.617 0 01.633-.63.617.617 0 01.633.63.617.617 0 01-.633.63m-11.046 0a.617.617 0 01-.633-.63.617.617 0 01.633-.63.617.617 0 01.633.63.617.617 0 01-.633.63M17.8 10.5l1.24-2.148a.258.258 0 00-.094-.353.258.258 0 00-.353.094L17.34 10.26A7.755 7.755 0 0012 8.864c-1.887 0-3.614.677-4.97 1.783l-1.254-2.17a.258.258 0 00-.353-.094.258.258 0 00-.094.353L6.574 10.87C4.44 12.183 3 14.489 3 17.127h18c0-2.638-1.44-4.944-3.2-6.627"/></svg>`
+      }
     ];
 
     methods.forEach(m => {
       const btn = document.createElement('button');
-      btn.className = `flex items-center justify-between text-left p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition duration-200 group ${m.color}`;
+      btn.className = `flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition duration-200 group w-full ${m.color}`;
       btn.onclick = async () => {
         const username = nameInput ? nameInput.value.trim() : "";
-        btn.innerHTML = '<span class="text-xs font-bold text-gray-400">Autenticando...</span>';
+        btn.innerHTML = '<span class="text-xs font-bold text-gray-400 mx-auto">Autenticando...</span>';
         
         try {
           const user = await authDb.login(m.id, username);
@@ -1186,9 +1214,15 @@ function renderLogin(container) {
         }
       };
 
+      const logoEl = document.createElement('span');
+      logoEl.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg';
+      logoEl.innerHTML = m.logo;
+      btn.appendChild(logoEl);
+
+      const providerNames = { google: 'Google Account', apple: 'Apple ID', android: 'Android Device' };
       const label = document.createElement('span');
-      label.className = 'font-bold text-sm text-gray-200 group-hover:text-white';
-      label.textContent = m.label;
+      label.className = 'font-bold text-sm text-gray-200 group-hover:text-white flex-1 text-left';
+      label.textContent = providerNames[m.id];
       btn.appendChild(label);
 
       const arrow = document.createElement('span');
@@ -1199,10 +1233,10 @@ function renderLogin(container) {
       grid.appendChild(btn);
     });
 
-    // Botão Fazer Depois (Voltar ao Álbum)
+    // Botão Fazer Depois (Pular / Ir para o Álbum)
     const btnLater = document.createElement('button');
-    btnLater.className = 'w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-copaYellow/40 text-gray-400 hover:text-white font-bold text-xs transition duration-200 mt-2 flex items-center justify-center gap-1.5';
-    btnLater.innerHTML = 'Fazer Depois (Ir para o Álbum) ➔';
+    btnLater.className = 'w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaYellow/40 text-gray-500 hover:text-gray-300 font-bold text-xs transition duration-200 mt-3 flex items-center justify-center gap-1.5';
+    btnLater.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Pular por agora (continuar sem login)`;
     btnLater.onclick = () => {
       location.hash = '#home';
     };
@@ -1463,16 +1497,16 @@ function renderHome(container) {
       name.textContent = team.name;
       card.appendChild(name);
 
-      // Progresso numérico e checkmark
+      // Progresso numérico e checkmark (sem fundo/borda)
       const limit = (team.code === 'FWC') ? 19 : (team.code === 'CC') ? 14 : 20;
       const teamStats = getTeamProgress(team.code);
       const progSpan = document.createElement('span');
-      progSpan.className = 'text-[8px] font-black text-copaGreen bg-copaGreen/10 px-1.5 py-0.5 rounded-full';
-      progSpan.textContent = `${teamStats.owned}/${limit}`;
-      
       if (teamStats.owned === limit) {
-        progSpan.className = 'text-[8px] font-black text-copaYellow bg-copaYellow/20 px-1.5 py-0.5 rounded-full border border-copaYellow/20';
-        progSpan.textContent = '✓';
+        progSpan.className = 'text-[8px] font-black text-copaYellow';
+        progSpan.textContent = '✓ Completa';
+      } else {
+        progSpan.className = 'text-[8px] font-semibold text-gray-500';
+        progSpan.textContent = `${teamStats.owned}/${limit}`;
       }
       card.appendChild(progSpan);
 
@@ -1860,6 +1894,20 @@ function renderTeamPage(code, container) {
     const starsSpan = document.createElement('span');
     starsSpan.textContent = ' ' + '⭐'.repeat(titleInfo.count);
     teamTitle.appendChild(starsSpan);
+  }
+
+  // Badge de fase ao lado do nome (ex: Fase de Grupos)
+  if (code !== 'FWC' && code !== 'CC' && code !== 'EXTRAS') {
+    const cachedStandingsData = localStorage.getItem(STANDINGS_CACHE_KEY);
+    const standingsForTeam = cachedStandingsData ? JSON.parse(cachedStandingsData) : null;
+    const teamObj = groupsData.flatMap(g => g.teams).find(t => t.code === code);
+    if (teamObj) {
+      const pi = getPhaseInfo(teamObj, standingsForTeam);
+      const phaseBadge = document.createElement('span');
+      phaseBadge.className = `text-[8px] font-black px-1.5 py-0.5 rounded border ${pi.color} ml-1`;
+      phaseBadge.textContent = pi.description;
+      teamTitle.appendChild(phaseBadge);
+    }
   }
   
   const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
