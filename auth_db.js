@@ -270,6 +270,9 @@
         } else if (provider === "android") {
           name = username || "André Android";
           photo = "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&h=80&q=80";
+        } else if (provider === "email") {
+          name = username.split('@')[0] || "Colecionador";
+          photo = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00e676&color=000`;
         }
 
         currentUser = {
@@ -296,21 +299,32 @@
         localStorage.setItem(sessionKey, JSON.stringify(currentUser));
         return currentUser;
       } else {
-        // Fluxo Real Supabase (Chamada de Autenticação OAuth)
+        // Fluxo Real Supabase (Chamada de Autenticação)
         try {
           // Salva dados de idade localmente para recuperar pós-redirect
           if (birthdate) {
             localStorage.setItem("temp_birthdate", birthdate);
           }
           
-          const { data, error } = await supabaseClient.auth.signInWithOAuth({
-            provider: provider,
-            options: {
-              redirectTo: window.location.origin + window.location.pathname
-            }
-          });
-          if (error) throw error;
-          return data;
+          if (provider === "email") {
+            const { data, error } = await supabaseClient.auth.signInWithOtp({
+              email: username,
+              options: {
+                emailRedirectTo: window.location.origin + window.location.pathname
+              }
+            });
+            if (error) throw error;
+            return data;
+          } else {
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+              provider: provider,
+              options: {
+                redirectTo: window.location.origin + window.location.pathname
+              }
+            });
+            if (error) throw error;
+            return data;
+          }
         } catch (e) {
           console.error("Erro no login Supabase:", e);
           throw e;

@@ -1206,6 +1206,72 @@ function renderLogin(container) {
     const grid = document.createElement('div');
     grid.className = 'flex flex-col gap-3';
 
+    // Seção de Login por E-mail (Magic Link)
+    const emailSection = document.createElement('div');
+    emailSection.className = 'space-y-2 border-b border-white/5 pb-4 mb-2';
+
+    const emailLabel = document.createElement('label');
+    emailLabel.className = 'text-[9px] font-black text-gray-400 uppercase tracking-widest block text-left';
+    emailLabel.textContent = 'Acesso por E-mail (Sem Senha)';
+    emailSection.appendChild(emailLabel);
+
+    const emailRow = document.createElement('div');
+    emailRow.className = 'flex gap-2';
+
+    const emailInput = document.createElement('input');
+    emailInput.type = 'email';
+    emailInput.id = 'emailLoginInput';
+    emailInput.placeholder = 'seu-email@exemplo.com';
+    emailInput.className = 'flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-copaGreen transition';
+    emailRow.appendChild(emailInput);
+
+    const btnEmail = document.createElement('button');
+    btnEmail.className = 'px-4 bg-copaGreen hover:bg-opacity-90 text-black font-black text-xs uppercase tracking-wide rounded-xl transition active:scale-95 flex items-center justify-center';
+    btnEmail.textContent = 'Entrar';
+    btnEmail.onclick = async () => {
+      const email = emailInput.value.trim();
+      if (!email || !email.includes('@')) {
+        alert('Por favor, insira um e-mail válido!');
+        return;
+      }
+      btnEmail.textContent = 'Enviando...';
+      btnEmail.disabled = true;
+      try {
+        await authDb.login('email', email);
+        if (authDb.isDemoMode()) {
+          renderHeader();
+          location.hash = '#home';
+        } else {
+          alert('Magic Link enviado! Verifique a sua caixa de entrada e clique no link para entrar.');
+          btnEmail.textContent = 'Entrar';
+          btnEmail.disabled = false;
+        }
+      } catch (err) {
+        alert('Erro ao enviar Magic Link: ' + err.message);
+        btnEmail.textContent = 'Entrar';
+        btnEmail.disabled = false;
+      }
+    };
+    emailRow.appendChild(btnEmail);
+    emailSection.appendChild(emailRow);
+
+    const emailDesc = document.createElement('p');
+    emailDesc.className = 'text-[9px] text-gray-500 text-left';
+    emailDesc.textContent = 'Enviaremos um link de acesso direto para o seu e-mail.';
+    emailSection.appendChild(emailDesc);
+
+    grid.appendChild(emailSection);
+
+    // Divisor para Redes Sociais
+    const divider = document.createElement('div');
+    divider.className = 'flex items-center gap-2 my-1';
+    divider.innerHTML = `
+      <div class="flex-1 h-px bg-white/5"></div>
+      <span class="text-[8px] font-black text-gray-500 uppercase tracking-widest">ou provedores</span>
+      <div class="flex-1 h-px bg-white/5"></div>
+    `;
+    grid.appendChild(divider);
+
     const methods = [
       { 
         id: 'google', 
