@@ -941,7 +941,7 @@ function renderHeader() {
     const opt = document.createElement('option');
     opt.value = id;
     opt.textContent = data.name;
-    opt.className = 'bg-[#131735] text-white'; // Estilo escuro explícito para o dropdown
+    opt.className = 'bg-[#131735] text-white';
     if (id === storage.getCurrentAlbumId()) opt.selected = true;
     selector.appendChild(opt);
   });
@@ -950,11 +950,23 @@ function renderHeader() {
   if (authBtn) {
     const user = authDb.getCurrentUser();
     if (user) {
-      authBtn.innerHTML = `<img src="${user.photo_url}" class="w-full h-full object-cover" alt="Perfil">`;
-      authBtn.title = `Logado como ${user.name} (Clique para Sair)`;
+      // Avatar com badge verde de online
+      authBtn.innerHTML = `
+        <img src="${user.photo_url}" class="w-full h-full object-cover" alt="Perfil" onerror="this.style.display='none';this.parentElement.innerHTML='\uD83D\uDC64'">
+        <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-copaGreen rounded-full border-2 border-[#070d1e] block"></span>
+      `;
+      authBtn.style.position = 'relative';
+      authBtn.title = `Logado como ${user.name}`;
+      authBtn.className = 'w-7 h-7 rounded-full border-2 border-copaGreen/60 hover:border-copaGreen bg-white/5 flex items-center justify-center text-xs overflow-visible transition-all duration-200 relative';
     } else {
-      authBtn.innerHTML = '👤';
-      authBtn.title = "Minha Conta / Login";
+      authBtn.innerHTML = `
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      `;
+      authBtn.style.position = '';
+      authBtn.title = 'Fazer Login';
+      authBtn.className = 'w-7 h-7 rounded-full border border-white/10 hover:border-copaYellow/40 bg-white/5 flex items-center justify-center text-xs overflow-hidden transition-all duration-200';
     }
   }
 }
@@ -3381,20 +3393,116 @@ function renderCollectorProfile(uid, container) {
 
 function handleAuthHeaderClick() {
   const user = authDb.getCurrentUser();
+
+  // Remove painel anterior se existir
+  document.getElementById('auth-profile-panel')?.remove();
+
+  const panel = document.createElement('div');
+  panel.id = 'auth-profile-panel';
+  panel.className = 'fixed inset-0 z-[9999] flex items-end justify-center';
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'absolute inset-0 bg-black/60 backdrop-blur-sm';
+  backdrop.onclick = () => panel.remove();
+  panel.appendChild(backdrop);
+
+  const sheet = document.createElement('div');
+  sheet.className = 'relative w-full max-w-[480px] bg-[#07091c] border border-white/10 rounded-t-2xl shadow-2xl p-5 space-y-4 animate-fade-in';
+
   if (user) {
-    const logout = confirm(`Olá, ${user.name}!\n\nDeseja deslogar (sair) da sua conta?\n\n- Clique em OK para DESLOGAR (sair).\n- Clique em Cancelar para ver seu PERFIL.`);
-    if (logout) {
+    // --- Painel do usuário logado ---
+    const stats = getAlbumStats();
+
+    sheet.innerHTML = `
+      <div class="flex items-center gap-4">
+        <img src="${user.photo_url}" class="w-14 h-14 rounded-full object-cover border-2 border-copaGreen shadow-lg" alt="Avatar"
+             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0033A0&color=fff'">
+        <div class="flex-1 min-w-0">
+          <p class="font-black text-white text-sm truncate">${user.name}</p>
+          <p class="text-[10px] text-copaGreen font-bold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 bg-copaGreen rounded-full inline-block"></span>
+            Online agora • ${authDb.isDemoMode() ? 'Modo Demo' : 'Conta Real'}
+          </p>
+          <p class="text-[10px] text-gray-500 mt-0.5">via ${user.provider || 'demo'} • UID: ${(user.uid || '').substring(0, 12)}...</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 border-y border-white/5 py-3">
+        <div class="text-center">
+          <p class="text-base font-black text-white">${stats.owned}</p>
+          <p class="text-[9px] text-gray-400 uppercase tracking-wide">Coladas</p>
+        </div>
+        <div class="text-center border-x border-white/5">
+          <p class="text-base font-black text-copaYellow">${stats.percent}%</p>
+          <p class="text-[9px] text-gray-400 uppercase tracking-wide">Progresso</p>
+        </div>
+        <div class="text-center">
+          <p class="text-base font-black text-white">${stats.duplicates}</p>
+          <p class="text-[9px] text-gray-400 uppercase tracking-wide">Repetidas</p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <button onclick="document.getElementById('auth-profile-panel').remove(); location.hash='#community';"
+          class="w-full py-2.5 px-4 rounded-xl bg-copaBlue/20 hover:bg-copaBlue/30 border border-copaBlue/30 text-[#6699ff] font-bold text-xs flex items-center gap-2 transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm7.5-3.12C17.91 11.96 19 10.74 19 9c0-1.74-1.09-2.96-2.5-3.88.58-.77 1.5-1.12 2.5-1.12 2.21 0 4 1.79 4 4s-1.79 4-4 4c-.34 0-.67-.04-1-.12zm.5 3.12c1.94 1.15 4 2.44 4 4.5v2h-6.5v-1.75c0-1.38-.85-2.73-2-3.48 2.01-.65 3.8-1.15 4.5-1.27z"/>
+          </svg>
+          Abrir Comunidade
+        </button>
+        <button onclick="document.getElementById('auth-profile-panel').remove(); location.hash='#trades';"
+          class="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/8 border border-white/10 text-gray-300 font-bold text-xs flex items-center gap-2 transition">
+          <svg class="w-4 h-4 text-copaYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3L21 7.5m0 0L16.5 12M21 7.5H7.5M7.5 12L3 16.5m0 0L7.5 21M3 16.5h13.5" />
+          </svg>
+          Minhas Repetidas
+        </button>
+        <button id="btnLogoutPanel"
+          class="w-full py-2.5 px-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 font-bold text-xs flex items-center gap-2 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+          </svg>
+          Sair da Conta
+        </button>
+      </div>
+    `;
+
+    sheet.querySelector('#btnLogoutPanel').onclick = () => {
+      panel.remove();
       authDb.logout().then(() => {
         renderHeader();
         location.hash = '#home';
         route();
       });
-    } else {
-      location.hash = '#login';
-    }
+    };
+
   } else {
-    location.hash = '#login';
+    // --- Painel de convite ao login ---
+    sheet.innerHTML = `
+      <div class="text-center space-y-3 py-2">
+        <div class="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-3xl mx-auto">
+          <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-black text-white text-sm">Entrar na sua Conta</h3>
+          <p class="text-[10px] text-gray-400 mt-1">Sincronize seu álbum e participe da comunidade de colecionadores</p>
+        </div>
+        <button onclick="document.getElementById('auth-profile-panel').remove(); location.hash='#login';"
+          class="w-full py-3 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 text-black font-black text-xs uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition">
+          Fazer Login / Criar Conta
+        </button>
+        <button onclick="document.getElementById('auth-profile-panel').remove();"
+          class="w-full py-2 text-xs text-gray-500 hover:text-gray-300 transition">
+          Continuar sem conta
+        </button>
+      </div>
+    `;
   }
+
+  panel.appendChild(sheet);
+  document.body.appendChild(panel);
 }
 
 // Vincula funções utilitárias ao escopo global window para acesso no HTML
