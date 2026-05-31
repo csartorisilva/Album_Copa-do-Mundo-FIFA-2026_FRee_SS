@@ -721,21 +721,23 @@ function renderHome(container) {
       const crestWrapper = document.createElement('div');
       crestWrapper.className = 'relative w-12 h-12 flex items-center justify-center';
 
+      const flagCode = (flagMap[team.code] || 'us').toLowerCase();
+
       // Bandeira compacta no canto inferior direito do escudo
       const flagImg = document.createElement('img');
-      flagImg.src = `https://flagcdn.com/w40/${team.code.toLowerCase()}.png`;
+      flagImg.src = `https://flagcdn.com/w40/${flagCode}.png`;
       flagImg.alt = 'Bandeira';
       flagImg.className = 'absolute bottom-0 right-0 w-5.5 h-3.5 object-cover border border-white/10 rounded shadow-md pointer-events-none z-10';
 
       // Escudo real do Wikimedia
       const crestImg = document.createElement('img');
-      crestImg.src = crestsMap[team.code] || `https://flagcdn.com/w80/${team.code.toLowerCase()}.png`; // fallback
+      crestImg.src = crestsMap[team.code] || `https://flagcdn.com/w80/${flagCode}.png`; // fallback
       crestImg.alt = team.name;
       crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]';
       
       // Fallback robusto se a imagem do brasão falhar (converte em bandeira média e esconde a sobreposta)
       crestImg.onerror = function() {
-        this.src = `https://flagcdn.com/w80/${team.code.toLowerCase()}.png`;
+        this.src = `https://flagcdn.com/w80/${flagCode}.png`;
         this.className = 'w-10 h-7 object-cover rounded shadow border border-white/10 mt-2.5';
         flagImg.style.display = 'none';
       };
@@ -1083,7 +1085,8 @@ function renderTeamPage(code, container) {
   infoSide.className = 'flex items-center gap-3.5';
   
   const flag = document.createElement('img');
-  flag.src = `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
+  const flagCode = (flagMap[code] || 'us').toLowerCase();
+  flag.src = `https://flagcdn.com/w80/${flagCode}.png`;
   flag.alt = teamName;
   flag.className = 'w-12 h-8 object-cover rounded shadow border border-white/10';
   infoSide.appendChild(flag);
@@ -1196,11 +1199,12 @@ function renderTeamPage(code, container) {
     frontHeader.appendChild(teamTag);
 
     const miniCrest = document.createElement('img');
-    miniCrest.src = crestsMap[stickerCountry] || `https://flagcdn.com/w40/${stickerCountry.toLowerCase()}.png`;
+    const flagCode = (flagMap[stickerCountry] || 'us').toLowerCase();
+    miniCrest.src = crestsMap[stickerCountry] || `https://flagcdn.com/w40/${flagCode}.png`;
     miniCrest.alt = 'Escudo';
     miniCrest.className = 'w-5 h-5 object-contain rounded-full border border-white/20 bg-white/10';
     miniCrest.onerror = function() {
-      this.src = `https://flagcdn.com/w40/${stickerCountry.toLowerCase()}.png`;
+      this.src = `https://flagcdn.com/w40/${flagCode}.png`;
       this.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
     };
     frontHeader.appendChild(miniCrest);
@@ -1209,7 +1213,13 @@ function renderTeamPage(code, container) {
     // Nome/Posição do atleta centralizado no rodapé
     const playerName = document.createElement('div');
     playerName.className = 'player-name-label';
-    playerName.textContent = isExtras ? 'LENDA' : playerNames[i];
+    let nameText = playerNames[i];
+    if (isExtras) {
+      nameText = legendsData[i - 1].name;
+    } else if (typeof playersDatabase !== 'undefined' && playersDatabase[code] && playersDatabase[code][i - 3]) {
+      nameText = playersDatabase[code][i - 3];
+    }
+    playerName.textContent = nameText;
     cardFront.appendChild(playerName);
 
     // Frente inferior (Ações discretas nos cantos inferiores)
