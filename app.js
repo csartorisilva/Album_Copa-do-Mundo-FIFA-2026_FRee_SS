@@ -716,12 +716,16 @@ function openFullscreenCard(key) {
   
   const logo = document.createElement('img');
   logo.src = './logo2026.png';
+  logo.loading = 'lazy';
+  logo.decoding = 'async';
   logo.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-auto opacity-20 pointer-events-none';
   bigCard.appendChild(logo);
 
   if (playerPhotoSrc) {
     const img = document.createElement('img');
     img.src = playerPhotoSrc;
+    img.loading = 'lazy';
+    img.decoding = 'async';
     img.className = 'absolute inset-0 w-full h-full object-cover opacity-80';
     bigCard.appendChild(img);
   }
@@ -762,6 +766,7 @@ function openFullscreenCard(key) {
 }
 
 function applyStandingsData(standings) {
+  if (!standings) return;
   groupsData.forEach(g => {
     g.teams.forEach(team => {
       const stats = standings[team.code];
@@ -788,17 +793,38 @@ async function initApp() {
     } else if (!storage.getCurrentAlbumId()) {
       storage.setCurrentAlbumId(Object.keys(albums)[0]);
     }
-    
+  } catch (e) {
+    console.error('Erro ao inicializar álbuns:', e);
+  }
+
+  try {
     // Executa a rotina de sincronização de dados do torneio
     await syncStandings();
-    
+  } catch (e) {
+    console.error('Erro na sincronização de classificação:', e);
+  }
+
+  try {
     // Exibe pop-up informando o álbum atual
     checkAlbumEntryPopup();
-    
+  } catch (e) {
+    console.error('Erro ao processar popup de boas-vindas:', e);
+  }
+
+  try {
     renderHeader();
+  } catch (e) {
+    console.error('Erro ao renderizar o cabeçalho:', e);
+  }
+
+  try {
     route();
   } catch (e) {
-    console.error('Erro na inicialização do aplicativo:', e);
+    console.error('Erro crítico ao carregar rota inicial:', e);
+    const root = document.getElementById('appRoot');
+    if (root) {
+      root.innerHTML = '<div class="p-6 text-center text-red-500 font-semibold text-xs bg-red-500/10 rounded-xl border border-red-500/25">Falha ao inicializar o aplicativo. Por favor, recarregue a página.</div>';
+    }
   }
 }
 
@@ -1270,6 +1296,8 @@ function renderHome(container) {
     if (sec.logo) {
       const bgLogo = document.createElement('img');
       bgLogo.src = sec.logo;
+      bgLogo.loading = 'lazy';
+      bgLogo.decoding = 'async';
       bgLogo.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-auto opacity-10 pointer-events-none group-hover:scale-110 transition';
       box.appendChild(bgLogo);
     }
@@ -1361,12 +1389,16 @@ function renderHome(container) {
       const flagImg = document.createElement('img');
       flagImg.src = `https://flagcdn.com/w40/${flagCode}.png`;
       flagImg.alt = 'Bandeira';
+      flagImg.loading = 'lazy';
+      flagImg.decoding = 'async';
       flagImg.className = 'absolute bottom-0 right-0 w-5.5 h-3.5 object-cover border border-white/10 rounded shadow-md pointer-events-none z-10';
 
       // Escudo real do Wikimedia
       const crestImg = document.createElement('img');
       crestImg.src = crestsMap[team.code] || `https://flagcdn.com/w80/${flagCode}.png`; // fallback
       crestImg.alt = team.name;
+      crestImg.loading = 'lazy';
+      crestImg.decoding = 'async';
       crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]';
       
       // Fallback robusto se a imagem do brasão falhar (converte em logo 2026 cinza e mantém a bandeirinha)
@@ -1688,6 +1720,8 @@ function createLogoComposition(stickerCode, isExtras = false) {
 
   const logoImg = document.createElement('img');
   logoImg.src = './logo2026.png';
+  logoImg.loading = 'lazy';
+  logoImg.decoding = 'async';
   logoImg.className = 'card-logo-image';
   logoImg.alt = 'FIFA Logo';
   container.appendChild(logoImg);
@@ -1726,6 +1760,8 @@ function renderTeamPage(code, container) {
   crestWrapper.className = 'w-10 h-10 flex items-center justify-center';
 
   const crest = document.createElement('img');
+  crest.loading = 'lazy';
+  crest.decoding = 'async';
   if (code === 'FWC') {
     crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
     crest.className = 'w-10 h-10 object-contain rounded bg-white/5 p-1 border border-white/10';
@@ -1762,6 +1798,8 @@ function renderTeamPage(code, container) {
     const flagImg = document.createElement('img');
     const flagCode = (flagMap[code] || 'us').toLowerCase();
     flagImg.src = `https://flagcdn.com/w40/${flagCode}.png`;
+    flagImg.loading = 'lazy';
+    flagImg.decoding = 'async';
     flagImg.className = 'w-5.5 h-3.5 object-cover border border-white/20 rounded shadow-sm inline-block mr-1 align-middle';
     teamTitle.appendChild(flagImg);
   }
@@ -1899,6 +1937,8 @@ function renderTeamPage(code, container) {
     const flagCode = (flagMap[stickerCountry] || 'us').toLowerCase();
     miniCrest.src = crestsMap[stickerCountry] || `https://flagcdn.com/w40/${flagCode}.png`;
     miniCrest.alt = 'Escudo';
+    miniCrest.loading = 'lazy';
+    miniCrest.decoding = 'async';
     miniCrest.className = 'w-5 h-5 object-contain rounded-full border border-white/20 bg-white/10';
     miniCrest.onerror = function() {
       this.src = `https://flagcdn.com/w40/${flagCode}.png`;
@@ -2096,6 +2136,8 @@ function updateCard(card, key) {
       if (!photoImg) {
         photoImg = document.createElement('img');
         photoImg.className = 'player-card-photo';
+        photoImg.loading = 'lazy';
+        photoImg.decoding = 'async';
         cardFront.prepend(photoImg); // insere no fundo
       }
       photoImg.src = sticker.photo;
@@ -2738,6 +2780,8 @@ function renderCommunity(container) {
 
         const avatar = document.createElement('img');
         avatar.src = c.photo_url;
+        avatar.loading = 'lazy';
+        avatar.decoding = 'async';
         avatar.className = 'w-10 h-10 rounded-full object-cover border border-white/10';
         card.appendChild(avatar);
 
@@ -2876,6 +2920,8 @@ function renderCollectorProfile(uid, container) {
 
     const avatar = document.createElement('img');
     avatar.src = collector.photo_url;
+    avatar.loading = 'lazy';
+    avatar.decoding = 'async';
     avatar.className = 'w-14 h-14 rounded-full object-cover border-2 border-copaYellow shadow-lg';
     userProfileRow.appendChild(avatar);
 
@@ -3110,7 +3156,16 @@ function renderCollectorProfile(uid, container) {
       const el = document.createElement('div');
       el.className = `text-[9px] font-black px-2 py-1 rounded border tracking-wide uppercase transition-all duration-150 select-none ${isSpecial ? 'bg-copaYellow/10 text-copaYellow border-copaYellow/20 hover:bg-copaYellow/20' : 'bg-copaGreen/10 text-copaGreen border-copaGreen/20 hover:bg-copaGreen/20'}`;
       el.textContent = key;
-      el.title = (code === 'EXTRAS') ? legendsData[i - 1].name : playerNames[i] || key;
+      
+      let pName = key;
+      if (isSpecial) {
+        pName = legendsData[i - 1] ? legendsData[i - 1].name : key;
+      } else if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][i - 1]) {
+        pName = albumData[code][i - 1].nome;
+      } else {
+        pName = playerNames[i] || key;
+      }
+      el.title = pName;
       return el;
     }
 
