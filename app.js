@@ -376,6 +376,61 @@ function renderHome(container) {
   `;
   progressSection.appendChild(textStats);
   statsPanel.appendChild(progressSection);
+
+  // Bloco de Compartilhamento (abaixo do progresso geral)
+  const shareBlock = document.createElement('div');
+  shareBlock.className = 'flex items-center justify-between gap-2.5 mt-2 pt-3.5 border-t border-white/5 w-full';
+  
+  const shareLabel = document.createElement('span');
+  shareLabel.className = 'text-[9px] font-black uppercase text-gray-400 tracking-wider';
+  shareLabel.textContent = 'Compartilhar:';
+  shareBlock.appendChild(shareLabel);
+
+  const shareButtonsContainer = document.createElement('div');
+  shareButtonsContainer.className = 'flex items-center gap-2';
+
+  // 1. Possuo (Owned)
+  const btnShareOwned = document.createElement('button');
+  btnShareOwned.className = 'px-2 py-1 bg-white/5 hover:bg-copaGreen/10 border border-white/10 hover:border-copaGreen/30 rounded-lg text-white hover:text-copaGreen transition text-[9px] font-bold uppercase tracking-wider flex items-center gap-1';
+  btnShareOwned.title = 'Compartilhar figurinhas coladas';
+  btnShareOwned.innerHTML = `
+    <svg class="w-3 h-3 text-copaGreen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+    </svg>
+    Coladas
+  `;
+  btnShareOwned.onclick = () => shareOwnedList();
+  shareButtonsContainer.appendChild(btnShareOwned);
+
+  // 2. Faltam (Missing)
+  const btnShareMissing = document.createElement('button');
+  btnShareMissing.className = 'px-2 py-1 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 rounded-lg text-white hover:text-red-400 transition text-[9px] font-bold uppercase tracking-wider flex items-center gap-1';
+  btnShareMissing.title = 'Compartilhar figurinhas faltantes';
+  btnShareMissing.innerHTML = `
+    <svg class="w-3 h-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+    Faltam
+  `;
+  btnShareMissing.onclick = () => shareMissingList();
+  shareButtonsContainer.appendChild(btnShareMissing);
+
+  // 3. Repetidas (Duplicates)
+  const btnShareDuplicates = document.createElement('button');
+  btnShareDuplicates.className = 'px-2 py-1 bg-white/5 hover:bg-copaYellow/10 border border-white/10 hover:border-copaYellow/30 rounded-lg text-white hover:text-copaYellow transition text-[9px] font-bold uppercase tracking-wider flex items-center gap-1';
+  btnShareDuplicates.title = 'Compartilhar repetidas para troca';
+  btnShareDuplicates.innerHTML = `
+    <svg class="w-3 h-3 text-copaYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4" />
+    </svg>
+    Repetidas
+  `;
+  btnShareDuplicates.onclick = () => shareDuplicatesList();
+  shareButtonsContainer.appendChild(btnShareDuplicates);
+
+  shareBlock.appendChild(shareButtonsContainer);
+  statsPanel.appendChild(shareBlock);
+
   rootHome.appendChild(statsPanel);
 
   // 2. Banner de Troca Qualificada (Simulado)
@@ -1046,9 +1101,189 @@ function renderTrades(container) {
   container.appendChild(wrapper);
 }
 
+// Funções utilitárias de compartilhamento de listas
+function formatStickerNumber(num) {
+  return num < 10 ? '0' + num : num;
+}
+
+function shareText(title, text) {
+  if (navigator.share) {
+    navigator.share({
+      title: title,
+      text: text
+    }).catch(err => {
+      console.log('Error sharing:', err);
+    });
+  } else {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Texto de compartilhamento copiado para a área de transferência!');
+    }).catch(err => {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        alert('Texto de compartilhamento copiado para a área de transferência!');
+      } catch (e) {
+        alert('Erro ao copiar texto. Por favor, copie manualmente:\n\n' + text);
+      }
+      document.body.removeChild(textArea);
+    });
+  }
+}
+
+function shareOwnedList() {
+  const albumId = storage.getCurrentAlbumId();
+  const albums = storage.getAlbums();
+  const album = albums[albumId];
+  if (!album) return;
+
+  let text = 'Eu tenho essas figurinhas da Copa do Mundo da FIFA 2026:\n';
+  
+  const grouped = {};
+  groupsData.forEach(g => {
+    g.teams.forEach(t => {
+      grouped[t.code] = [];
+    });
+  });
+  grouped['FWFIFA'] = [];
+  grouped['ESCUDOS'] = [];
+  grouped['EXTRAS'] = [];
+
+  Object.entries(album.stickers).forEach(([key, val]) => {
+    if (val && val.owned) {
+      const parts = key.split('-');
+      const code = parts[0];
+      const num = parseInt(parts[1], 10);
+      if (grouped[code]) {
+        grouped[code].push(num);
+      } else {
+        grouped[code] = [num];
+      }
+    }
+  });
+
+  let hasStickers = false;
+  Object.keys(grouped).forEach(code => {
+    const nums = grouped[code].sort((a, b) => a - b);
+    if (nums.length > 0) {
+      hasStickers = true;
+      const formattedList = nums.map(n => `${code} ${formatStickerNumber(n)}`).join(', ');
+      text += `${code}: ${formattedList}\n`;
+    }
+  });
+
+  if (!hasStickers) {
+    alert('Você ainda não tem nenhuma figurinha colada neste álbum.');
+    return;
+  }
+
+  shareText('Figurinhas Copa 2026 - Adquiridas', text.trim());
+}
+
+function shareMissingList() {
+  const albumId = storage.getCurrentAlbumId();
+  const albums = storage.getAlbums();
+  const album = albums[albumId];
+  if (!album) return;
+
+  let text = 'Faltam essas figurinhas para eu completar o meu álbum da Copa do Mundo da FIFA 2026:\n';
+  
+  const grouped = {};
+  const allCodes = [];
+  groupsData.forEach(g => {
+    g.teams.forEach(t => {
+      allCodes.push(t.code);
+    });
+  });
+  allCodes.push('FWFIFA', 'ESCUDOS', 'EXTRAS');
+
+  allCodes.forEach(code => {
+    grouped[code] = [];
+    for (let i = 1; i <= 20; i++) {
+      const key = `${code}-${i}`;
+      const sticker = album.stickers[key];
+      const isOwned = sticker && sticker.owned;
+      if (!isOwned) {
+        grouped[code].push(i);
+      }
+    }
+  });
+
+  let hasMissing = false;
+  allCodes.forEach(code => {
+    const nums = grouped[code];
+    if (nums.length > 0) {
+      hasMissing = true;
+      const formattedList = nums.map(n => `${code} ${formatStickerNumber(n)}`).join(', ');
+      text += `${code}: ${formattedList}\n`;
+    }
+  });
+
+  if (!hasMissing) {
+    alert('Parabéns! Você completou o álbum e não falta nenhuma figurinha!');
+    return;
+  }
+
+  shareText('Figurinhas Copa 2026 - Faltantes', text.trim());
+}
+
+function shareDuplicatesList() {
+  const albumId = storage.getCurrentAlbumId();
+  const albums = storage.getAlbums();
+  const album = albums[albumId];
+  if (!album) return;
+
+  let text = 'Eu tenho essas figurinhas repetidas da Copa do Mundo da FIFA 2026 para troca:\n';
+  
+  const grouped = {};
+  groupsData.forEach(g => {
+    g.teams.forEach(t => {
+      grouped[t.code] = [];
+    });
+  });
+  grouped['FWFIFA'] = [];
+  grouped['ESCUDOS'] = [];
+  grouped['EXTRAS'] = [];
+
+  Object.entries(album.stickers).forEach(([key, val]) => {
+    if (val && val.owned && val.duplicate > 0) {
+      const parts = key.split('-');
+      const code = parts[0];
+      const num = parseInt(parts[1], 10);
+      if (grouped[code]) {
+        grouped[code].push({ num: num, count: val.duplicate });
+      } else {
+        grouped[code] = [{ num: num, count: val.duplicate }];
+      }
+    }
+  });
+
+  let hasDuplicates = false;
+  Object.keys(grouped).forEach(code => {
+    const list = grouped[code].sort((a, b) => a.num - b.num);
+    if (list.length > 0) {
+      hasDuplicates = true;
+      const formattedList = list.map(item => `${code} ${formatStickerNumber(item.num)} (x${item.count})`).join(', ');
+      text += `${code}: ${formattedList}\n`;
+    }
+  });
+
+  if (!hasDuplicates) {
+    alert('Você não tem nenhuma figurinha repetida para troca ainda.');
+    return;
+  }
+
+  shareText('Figurinhas Copa 2026 - Repetidas', text.trim());
+}
+
 // Vincula funções utilitárias ao escopo global window para acesso no HTML
 window.switchAlbum = switchAlbum;
 window.createNewAlbum = createNewAlbum;
+window.shareOwnedList = shareOwnedList;
+window.shareMissingList = shareMissingList;
+window.shareDuplicatesList = shareDuplicatesList;
 
 // Inicialização por DOMContentLoaded
 window.addEventListener('DOMContentLoaded', initApp);
