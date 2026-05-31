@@ -65,7 +65,9 @@ const crestsMap = {
   SUI: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Swiss_Football_Association_logo.svg/120px-Swiss_Football_Association_logo.svg.png',
   PAN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Federacion_Panamena_de_Futbol.svg/120px-Federacion_Panamena_de_Futbol.svg.png',
   SWE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Swedish_Football_Association_logo.svg/120px-Swedish_Football_Association_logo.svg.png',
-  NZL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/New_Zealand_Football_logo.svg/120px-New_Zealand_Football_logo.svg.png'
+  NZL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/New_Zealand_Football_logo.svg/120px-New_Zealand_Football_logo.svg.png',
+  FWC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png',
+  CC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png'
 };
 
 // Tradutor de sigla de 3 letras para código de 2 letras do FlagCDN
@@ -297,6 +299,286 @@ async function syncStandings() {
   }
 }
 
+// Calcula a fase da seleção de forma dinâmica no mata-mata
+function getTeamPhase(team, standings) {
+  if (!standings || !standings[team.code]) return null;
+  const stats = standings[team.code];
+  if (stats.eliminated) {
+    const stage = stats.eliminatedStage;
+    if (stage === '16 avos') return 'R16';
+    if (stage === 'Oitavas') return 'OF';
+    if (stage === 'Quartas') return 'QF';
+    if (stage === 'Semi-final') return 'SF';
+    if (stage === 'Final') return 'F';
+    return null; // Fase de Grupos
+  } else {
+    // Para seleções ativas, identifica dinamicamente qual é a fase atual baseada em quem já foi eliminado
+    let maxElimStage = 'Fase de Grupos';
+    Object.values(standings).forEach(s => {
+      if (s.eliminated && s.eliminatedStage) {
+        const estages = ['Fase de Grupos', '16 avos', 'Oitavas', 'Quartas', 'Semi-final', 'Final'];
+        if (estages.indexOf(s.eliminatedStage) > estages.indexOf(maxElimStage)) {
+          maxElimStage = s.eliminatedStage;
+        }
+      }
+    });
+
+    if (maxElimStage === 'Fase de Grupos') return 'R16';
+    if (maxElimStage === '16 avos') return 'OF';
+    if (maxElimStage === 'Oitavas') return 'QF';
+    if (maxElimStage === 'Quartas') return 'SF';
+    if (maxElimStage === 'Semi-final') return 'F';
+    if (maxElimStage === 'Final') return '🏆'; // Campeão
+    return null;
+  }
+}
+
+// Animação de Goal!!! em tela cheia ao completar uma seleção
+function triggerGoalAnimation(onComplete) {
+  const overlay = document.createElement('div');
+  overlay.className = 'fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md transition-opacity duration-500 opacity-0';
+  
+  const text = document.createElement('div');
+  text.className = 'text-copaYellow font-black text-6xl md:text-8xl tracking-widest uppercase animate-bounce drop-shadow-[0_0_20px_#FFC726]';
+  text.textContent = 'GOAL!!!';
+  overlay.appendChild(text);
+
+  const subtext = document.createElement('div');
+  subtext.className = 'text-white text-xs font-bold uppercase tracking-wider mt-4 animate-pulse';
+  subtext.textContent = 'Seleção Completada!';
+  overlay.appendChild(subtext);
+  
+  document.body.appendChild(overlay);
+  
+  overlay.offsetHeight; // force reflow
+  overlay.classList.remove('opacity-0');
+  overlay.classList.add('opacity-100');
+  
+  setTimeout(() => {
+    overlay.classList.remove('opacity-100');
+    overlay.classList.add('opacity-0');
+    setTimeout(() => {
+      overlay.remove();
+      if (onComplete) onComplete();
+    }, 500);
+  }, 2200);
+}
+
+// Pop-up de boas-vindas exibido uma vez por sessão
+function checkAlbumEntryPopup() {
+  if (sessionStorage.getItem('album_entry_popup_shown')) return;
+  
+  const albumId = storage.getCurrentAlbumId();
+  const albums = storage.getAlbums();
+  const album = albums[albumId];
+  if (!album) return;
+
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 z-[10000] flex items-center justify-center bg-black/75 p-4';
+  
+  const content = document.createElement('div');
+  content.className = 'glass-panel p-6 rounded-2xl border-white/5 max-w-sm w-full text-center space-y-4';
+  
+  const title = document.createElement('h3');
+  title.className = 'text-copaYellow font-black text-sm uppercase tracking-wider';
+  title.textContent = 'Álbum Ativo';
+  content.appendChild(title);
+
+  const desc = document.createElement('p');
+  desc.className = 'text-xs text-gray-300';
+  desc.innerHTML = `Você está visualizando a coleção:<br><strong class="text-white text-sm">${album.name}</strong>`;
+  content.appendChild(desc);
+
+  const btnRow = document.createElement('div');
+  btnRow.className = 'flex gap-3 pt-2';
+
+  const btnOk = document.createElement('button');
+  btnOk.className = 'flex-1 px-4 py-2 bg-copaGreen hover:bg-opacity-90 text-black text-xs font-black uppercase tracking-wider rounded-xl transition';
+  btnOk.textContent = 'OK';
+  btnOk.onclick = () => {
+    sessionStorage.setItem('album_entry_popup_shown', 'true');
+    modal.remove();
+  };
+  btnRow.appendChild(btnOk);
+
+  const btnChange = document.createElement('button');
+  btnChange.className = 'flex-1 px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-xs font-black uppercase tracking-wider rounded-xl transition';
+  btnChange.textContent = 'Mudar';
+  btnChange.onclick = () => {
+    modal.remove();
+    sessionStorage.setItem('album_entry_popup_shown', 'true');
+    const selector = document.getElementById('albumSelector');
+    if (selector) {
+      selector.focus();
+    }
+  };
+  btnRow.appendChild(btnChange);
+
+  content.appendChild(btnRow);
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+}
+
+// Compartilhamento geral do aplicativo
+function shareApp() {
+  const title = 'Ultimate Cromos FIFA 2026';
+  const link = window.location.origin + window.location.pathname;
+  const text = `Eu uso o app-web (${link}) para o controle do meu álbum, ele tem um excelente layout e a funcionalidade de Trocas Qualificadas, onde o próprio app encontra as figurinhas faltantes para trocar.`;
+  shareText(title, text);
+}
+
+// Verifica se um card tem troca qualificada com outra coleção
+function hasQualifiedTrade(key) {
+  const currentAlbumId = storage.getCurrentAlbumId();
+  const albums = storage.getAlbums();
+  const currentAlbum = albums[currentAlbumId];
+  if (!currentAlbum) return false;
+  
+  const currentSticker = currentAlbum.stickers[key];
+  const currentOwned = currentSticker ? currentSticker.owned : false;
+  const currentDup = currentSticker ? (currentSticker.duplicate || 0) : 0;
+  
+  let matchFound = false;
+  
+  // Se houver mais de um álbum, faz a validação real entre eles
+  if (Object.keys(albums).length > 1) {
+    Object.entries(albums).forEach(([id, alb]) => {
+      if (id === currentAlbumId) return;
+      
+      const otherSticker = alb.stickers[key];
+      const otherOwned = otherSticker ? otherSticker.owned : false;
+      const otherDup = otherSticker ? (otherSticker.duplicate || 0) : 0;
+      
+      if (!currentOwned && otherDup > 0) {
+        matchFound = true;
+      }
+      if (currentDup > 0 && !otherOwned) {
+        matchFound = true;
+      }
+    });
+  } else {
+    // Se houver apenas 1 álbum, simula uma troca qualificada para alguns cards com duplicatas para fins de demonstração
+    if (currentDup > 0) {
+      const charCodeSum = key.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      if (charCodeSum % 3 === 0) {
+        matchFound = true;
+      }
+    }
+  }
+  return matchFound;
+}
+
+// Captura de foto nativa usando base64
+function triggerCameraCapture(key, onComplete) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const base64 = evt.target.result;
+      
+      const albumId = storage.getCurrentAlbumId();
+      const albums = storage.getAlbums();
+      const album = albums[albumId];
+      if (album && album.stickers[key]) {
+        album.stickers[key].photo = base64;
+        storage.setAlbums(albums);
+        
+        console.log(`Cloud Sync: Photo for ${key} uploaded to global database.`);
+        if (onComplete) onComplete();
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+// Modal de visualização ampliada do card
+function openFullscreenCard(key) {
+  const albumId = storage.getCurrentAlbumId();
+  const albums = storage.getAlbums();
+  const album = albums[albumId];
+  if (!album) return;
+
+  const sticker = album.stickers[key];
+  const parts = key.split('-');
+  const code = parts[0];
+  const num = parseInt(parts[1], 10);
+  
+  const isExtras = (code === 'EXTRAS');
+  const stickerName = isExtras ? legendsData[num - 1].name : `${code} ${num}`;
+  
+  let playerPhotoSrc = null;
+  if (sticker && sticker.photo) {
+    playerPhotoSrc = sticker.photo;
+  }
+
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black/95 p-4';
+  
+  const title = document.createElement('h3');
+  title.className = 'text-white text-base font-black uppercase tracking-wider mb-6';
+  title.textContent = stickerName;
+  modal.appendChild(title);
+
+  const bigCard = document.createElement('div');
+  bigCard.className = 'w-64 h-96 relative rounded-2xl overflow-hidden shadow-2xl transition-all duration-300';
+  bigCard.style.background = 'var(--fut-dark-gradient)';
+  bigCard.style.boxShadow = isExtras ? 'inset 0 0 0 2px var(--copa-yellow), var(--gold-glow)' : 'inset 0 0 0 2px var(--copa-green), var(--green-glow)';
+  
+  const logo = document.createElement('img');
+  logo.src = './logo2026.png';
+  logo.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-auto opacity-20 pointer-events-none';
+  bigCard.appendChild(logo);
+
+  if (playerPhotoSrc) {
+    const img = document.createElement('img');
+    img.src = playerPhotoSrc;
+    img.className = 'absolute inset-0 w-full h-full object-cover opacity-80';
+    bigCard.appendChild(img);
+  }
+
+  const nameLabel = document.createElement('div');
+  nameLabel.className = 'absolute bottom-16 left-4 right-4 text-center text-white font-black text-lg uppercase tracking-wide drop-shadow-md';
+  let nameText = playerNames[num] || 'ATLETA';
+  if (isExtras) {
+    nameText = legendsData[num - 1].name;
+  } else if (typeof playersDatabase !== 'undefined' && playersDatabase[code] && playersDatabase[code][num - 3]) {
+    nameText = playersDatabase[code][num - 3];
+  }
+  nameLabel.textContent = nameText;
+  bigCard.appendChild(nameLabel);
+
+  modal.appendChild(bigCard);
+
+  const btnRow = document.createElement('div');
+  btnRow.className = 'flex gap-4 mt-8 w-full max-w-xs';
+  
+  const btnShare = document.createElement('button');
+  btnShare.className = 'flex-1 px-4 py-2.5 bg-copaYellow hover:bg-opacity-90 text-black text-xs font-black uppercase tracking-wider rounded-xl transition';
+  btnShare.textContent = 'Compartilhar Cromo';
+  btnShare.onclick = () => {
+    const textShare = `Olha o meu card de ${stickerName} colado no app Ultimate Cromos FIFA 2026!`;
+    shareText(stickerName, textShare);
+  };
+  btnRow.appendChild(btnShare);
+
+  const btnClose = document.createElement('button');
+  btnClose.className = 'flex-1 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-black uppercase tracking-wider rounded-xl transition border border-white/10';
+  btnClose.textContent = 'Fechar';
+  btnClose.onclick = () => modal.remove();
+  btnRow.appendChild(btnClose);
+
+  modal.appendChild(btnRow);
+  document.body.appendChild(modal);
+}
+
 function applyStandingsData(standings) {
   groupsData.forEach(g => {
     g.teams.forEach(team => {
@@ -327,6 +609,9 @@ async function initApp() {
     
     // Executa a rotina de sincronização de dados do torneio
     await syncStandings();
+    
+    // Exibe pop-up informando o álbum atual
+    checkAlbumEntryPopup();
     
     renderHeader();
     route();
@@ -438,16 +723,23 @@ function getAlbumStats() {
   const album = albums[albumId];
   if (!album) return { total: 0, owned: 0, duplicates: 0, percent: 0 };
   
-  // Total de figurinhas: 48 seleções * 20 figurinhas cada = 960 figurinhas
-  const totalStickers = Object.keys(teamsMap).length * 20;
+  // Total de figurinhas: 48 seleções * 20 + 19 (FWC) + 14 (CC) = 993 (Exclui EXTRAS)
+  const totalStickers = (48 * 20) + 19 + 14;
   let ownedCount = 0;
   let dupCount = 0;
   
   Object.entries(album.stickers).forEach(([key, val]) => {
     const parts = key.split('-');
-    if (teamsMap[parts[0]]) {
-      if (val.owned) ownedCount++;
-      dupCount += (val.duplicate || 0);
+    const code = parts[0];
+    const num = parseInt(parts[1], 10);
+    
+    // Exclui EXTRAS da contagem geral de coladas e repetidas
+    if (code !== 'EXTRAS') {
+      const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
+      if (num >= 1 && num <= limit) {
+        if (val.owned) ownedCount++;
+        dupCount += (val.duplicate || 0);
+      }
     }
   });
   
@@ -483,9 +775,9 @@ function renderLogin(container) {
   grid.className = 'flex flex-col gap-3';
 
   const methods = [
-    { id: 'sms', label: 'SMS de 6 Dígitos' },
-    { id: 'google', label: 'Google Account' },
-    { id: 'apple', label: 'Apple ID' }
+    { id: 'google', label: 'Acesso via Gmail' },
+    { id: 'apple', label: 'Acesso via Apple ID' },
+    { id: 'android', label: 'Acesso via Android/Google' }
   ];
 
   methods.forEach(m => {
@@ -556,19 +848,18 @@ function renderHome(container) {
     <div><span class="text-base font-black text-copaYellow">${stats.duplicates}</span> Repetidas</div>
   `;
   progressSection.appendChild(textStats);
-  statsPanel.appendChild(progressSection);
 
-  // Bloco de Compartilhamento (abaixo do progresso geral)
+  // Bloco de Compartilhamento (exibido acima das estatísticas em flex-col)
   const shareBlock = document.createElement('div');
-  shareBlock.className = 'flex items-center justify-between gap-2.5 mt-2 pt-3.5 border-t border-white/5 w-full';
+  shareBlock.className = 'flex flex-col gap-2 mt-2 pt-3.5 border-t border-white/5 w-full';
   
   const shareLabel = document.createElement('span');
-  shareLabel.className = 'text-[9px] font-black uppercase text-gray-400 tracking-wider';
+  shareLabel.className = 'text-[9px] font-black uppercase text-gray-400 tracking-wider text-left';
   shareLabel.textContent = 'Compartilhar:';
   shareBlock.appendChild(shareLabel);
 
   const shareButtonsContainer = document.createElement('div');
-  shareButtonsContainer.className = 'flex items-center gap-2';
+  shareButtonsContainer.className = 'grid grid-cols-3 gap-2 w-full';
 
   // 1. Possuo (Owned)
   const btnShareOwned = document.createElement('button');
@@ -611,6 +902,7 @@ function renderHome(container) {
 
   shareBlock.appendChild(shareButtonsContainer);
   statsPanel.appendChild(shareBlock);
+  statsPanel.appendChild(progressSection);
 
   rootHome.appendChild(statsPanel);
 
@@ -632,22 +924,29 @@ function renderHome(container) {
   specialGrid.className = 'grid grid-cols-3 gap-2.5';
   
   const specialSections = [
-    { title: 'FW FIFA', desc: 'Especial Copa', hash: '#team-FWFIFA' },
-    { title: 'Escudos', desc: 'Metálicos', hash: '#team-ESCUDOS' },
-    { title: 'Premium', desc: 'Fig. Extras', hash: '#team-EXTRAS' }
+    { title: 'FIFA', desc: 'Especial Copa', hash: '#team-FWC', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/200px-FIFA_logo_without_slogan.svg.png' },
+    { title: 'Coca-Cola', desc: 'Metálicos', hash: '#team-CC', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/200px-Coca-Cola_logo.svg.png' },
+    { title: 'Premium', desc: 'Fig. Extras', hash: '#team-EXTRAS', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/100px-Golden_Ball.svg.png' }
   ];
 
   specialSections.forEach(sec => {
     const box = document.createElement('div');
-    box.className = 'glass-panel p-3 rounded-xl border-white/5 hover:border-copaYellow/30 cursor-pointer flex flex-col justify-center items-center text-center transition group relative overflow-hidden';
+    box.className = 'glass-panel p-3 rounded-xl border-white/5 hover:border-copaYellow/30 cursor-pointer flex flex-col justify-center items-center text-center transition group relative overflow-hidden h-16';
     box.onclick = () => location.hash = sec.hash;
 
+    if (sec.logo) {
+      const bgLogo = document.createElement('img');
+      bgLogo.src = sec.logo;
+      bgLogo.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-auto opacity-10 pointer-events-none group-hover:scale-110 transition';
+      box.appendChild(bgLogo);
+    }
+
     const title = document.createElement('h4');
-    title.className = 'font-black text-xs text-copaYellow uppercase tracking-wider group-hover:scale-105 transition';
+    title.className = 'font-black text-xs text-copaYellow uppercase tracking-wider group-hover:scale-105 transition z-10';
     title.textContent = sec.title;
     
     const desc = document.createElement('p');
-    desc.className = 'text-[9px] text-gray-500 font-semibold';
+    desc.className = 'text-[9px] text-gray-500 font-semibold z-10';
     desc.textContent = sec.desc;
 
     box.appendChild(title);
@@ -686,7 +985,7 @@ function renderHome(container) {
     tableLink.rel = 'noopener noreferrer';
     tableLink.className = 'text-[8px] font-black text-copaGreen hover:text-white transition flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-0.5 rounded border border-white/5';
     tableLink.innerHTML = `
-      <span>Tabela FIFA</span>
+      <span>Classificação Geral</span>
       <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
       </svg>
@@ -702,20 +1001,19 @@ function renderHome(container) {
     const sortedTeams = [...g.teams].sort((a, b) => a.rank - b.rank);
     sortedTeams.forEach(team => {
       const card = document.createElement('div');
-      card.className = 'cursor-pointer transition flex flex-col items-center justify-start gap-1 group relative py-1.5 px-0.5 hover:scale-105';
+      card.className = 'cursor-pointer transition flex flex-col items-center justify-center gap-1 group relative py-1.5 px-0.5 hover:scale-105 mt-2 h-20';
       card.onclick = () => location.hash = `#team-${team.code}`;
 
-      // Texto de classificação ou eliminação acima do brasão
-      const statusText = document.createElement('span');
-      if (team.eliminated) {
-        statusText.className = 'text-[5.5px] xs:text-[6px] font-black uppercase text-red-500 tracking-tighter text-center leading-none max-w-[78px] bg-red-500/10 px-0.5 py-0.5 rounded border border-red-500/10 mb-0.5 h-[18px] flex items-center justify-center';
-        const prep = team.eliminatedStage.startsWith('Fase') ? 'na' : 'nas';
-        statusText.textContent = `Eliminado ${prep} ${team.eliminatedStage}`;
-      } else {
-        statusText.className = 'text-[7px] font-bold text-gray-400 tracking-wider text-center mb-0.5 h-[18px] flex items-center justify-center';
-        statusText.textContent = `${team.rank}º • ${team.points}pts`;
+      // Injeta o Balãozinho de Fase se estiver no mata-mata
+      const cachedData = localStorage.getItem(STANDINGS_CACHE_KEY);
+      const standings = cachedData ? JSON.parse(cachedData) : null;
+      const phase = getTeamPhase(team, standings);
+      if (phase) {
+        const balloon = document.createElement('span');
+        balloon.className = 'phase-balloon';
+        balloon.textContent = phase;
+        card.appendChild(balloon);
       }
-      card.appendChild(statusText);
 
       // FUT Layout: Escudo de tamanho w-12 h-12 com a bandeira no canto inferior direito
       const crestWrapper = document.createElement('div');
@@ -752,14 +1050,16 @@ function renderHome(container) {
       name.textContent = team.name;
       card.appendChild(name);
 
-      // Progresso numérico
+      // Progresso numérico e checkmark
+      const limit = (team.code === 'FWC') ? 19 : (team.code === 'CC') ? 14 : 20;
       const teamStats = getTeamProgress(team.code);
       const progSpan = document.createElement('span');
       progSpan.className = 'text-[8px] font-black text-copaGreen bg-copaGreen/10 px-1.5 py-0.5 rounded-full';
-      progSpan.textContent = `${teamStats.owned}/20`;
+      progSpan.textContent = `${teamStats.owned}/${limit}`;
       
-      if (teamStats.owned === 20) {
+      if (teamStats.owned === limit) {
         progSpan.className = 'text-[8px] font-black text-copaYellow bg-copaYellow/20 px-1.5 py-0.5 rounded-full border border-copaYellow/20';
+        progSpan.textContent = '✓';
       }
       card.appendChild(progSpan);
 
@@ -782,7 +1082,8 @@ function getTeamProgress(teamCode) {
   if (!album) return { owned: 0 };
   
   let owned = 0;
-  for (let i = 1; i <= 20; i++) {
+  const limit = (teamCode === 'FWC') ? 19 : (teamCode === 'CC') ? 14 : 20;
+  for (let i = 1; i <= limit; i++) {
     const key = `${teamCode}-${i}`;
     if (album.stickers[key] && album.stickers[key].owned) {
       owned++;
@@ -1001,7 +1302,7 @@ function processImport(mode) {
         }
       });
     });
-    const specials = ['FWFIFA', 'ESCUDOS', 'EXTRAS'];
+    const specials = ['FWC', 'CC', 'EXTRAS'];
     specials.forEach(code => {
       for (let i = 1; i <= 20; i++) {
         allStickerKeys.push(`${code}-${i}`);
@@ -1085,10 +1386,21 @@ function renderTeamPage(code, container) {
   infoSide.className = 'flex items-center gap-3.5';
   
   const flag = document.createElement('img');
-  const flagCode = (flagMap[code] || 'us').toLowerCase();
-  flag.src = `https://flagcdn.com/w80/${flagCode}.png`;
+  if (code === 'FWC') {
+    flag.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
+    flag.className = 'w-12 h-8 object-contain rounded bg-white/5 p-1 border border-white/10';
+  } else if (code === 'CC') {
+    flag.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png';
+    flag.className = 'w-12 h-8 object-contain rounded bg-white/5 p-1 border border-white/10';
+  } else if (code === 'EXTRAS') {
+    flag.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/100px-Golden_Ball.svg.png';
+    flag.className = 'w-8 h-8 object-contain';
+  } else {
+    const flagCode = (flagMap[code] || 'us').toLowerCase();
+    flag.src = `https://flagcdn.com/w80/${flagCode}.png`;
+    flag.className = 'w-12 h-8 object-cover rounded shadow border border-white/10';
+  }
   flag.alt = teamName;
-  flag.className = 'w-12 h-8 object-cover rounded shadow border border-white/10';
   infoSide.appendChild(flag);
 
   const textBlock = document.createElement('div');
@@ -1098,12 +1410,14 @@ function renderTeamPage(code, container) {
   teamTitle.className = 'text-lg font-black uppercase tracking-wide flex items-center';
   teamTitle.textContent = teamName;
   
+  const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
+
   const countSub = document.createElement('p');
   countSub.className = 'text-[10px] text-gray-400';
   countSub.id = 'teamProgressLabel';
   
   const stats = getTeamProgress(code);
-  countSub.textContent = `${stats.owned} de 20 figurinhas coladas`;
+  countSub.textContent = `${stats.owned} de ${limit} figurinhas coladas`;
   
   textBlock.appendChild(teamTitle);
   textBlock.appendChild(countSub);
@@ -1127,8 +1441,8 @@ function renderTeamPage(code, container) {
   
   const progLabel = document.createElement('div');
   progLabel.className = 'flex justify-between items-center text-[9px] text-gray-400 font-bold uppercase';
-  const percent = Math.round((stats.owned / 20) * 100);
-  progLabel.innerHTML = `<span>Progresso de Conclusão</span> <span id="teamProgText" class="text-copaGreen font-bold">${stats.owned}/20 (${percent}%)</span>`;
+  const percent = Math.round((stats.owned / limit) * 100);
+  progLabel.innerHTML = `<span>Progresso de Conclusão</span> <span id="teamProgText" class="text-copaGreen font-bold">${stats.owned}/${limit} (${percent}%)</span>`;
   
   const progBg = document.createElement('div');
   progBg.className = 'h-2 bg-white/5 border border-white/10 rounded-full overflow-hidden';
@@ -1143,7 +1457,7 @@ function renderTeamPage(code, container) {
   headerPanel.appendChild(progressWrapper);
 
   // Injeta o check verde de 100% completo
-  if (stats.owned === 20) {
+  if (stats.owned === limit) {
     const check = document.createElement('span');
     check.className = 'check-mark text-copaGreen font-black text-lg ml-2 animate-bounce inline-block drop-shadow-[0_0_8px_#00e676]';
     check.textContent = '✓';
@@ -1156,7 +1470,7 @@ function renderTeamPage(code, container) {
   const grid = document.createElement('div');
   grid.className = 'grid-fifa';
 
-  for (let i = 1; i <= 20; i++) {
+  for (let i = 1; i <= limit; i++) {
     const key = `${code}-${i}`;
     const isSpecial = (code === 'EXTRAS' || i === 1 || i === 2); // Escudo, Time e Legends Premium
 
@@ -1220,6 +1534,11 @@ function renderTeamPage(code, container) {
       nameText = playersDatabase[code][i - 3];
     }
     playerName.textContent = nameText;
+    if (nameText.length > 20) {
+      playerName.classList.add('name-very-long');
+    } else if (nameText.length > 13) {
+      playerName.classList.add('name-long');
+    }
     cardFront.appendChild(playerName);
 
     // Frente inferior (Ações discretas nos cantos inferiores)
@@ -1235,9 +1554,24 @@ function renderTeamPage(code, container) {
     card.onclick = (e) => {
       if (e.target.closest('.action-btn')) return;
       
+      const albumId = storage.getCurrentAlbumId();
+      const albums = storage.getAlbums();
+      const album = albums[albumId];
+      const wasOwned = album && album.stickers[key] && album.stickers[key].owned;
+      
       toggleOwned(key);
       updateCard(card, key);
-      updateTeamProgressLabel(code);
+      
+      const stats = getTeamProgress(code);
+      if (!wasOwned && stats.owned === limit) {
+        // Completou a seleção! Animação Goal e delay checkmark
+        updateTeamProgressLabel(code, true);
+        triggerGoalAnimation(() => {
+          updateTeamProgressLabel(code, false);
+        });
+      } else {
+        updateTeamProgressLabel(code, false);
+      }
     };
 
     updateCard(card, key);
@@ -1249,36 +1583,37 @@ function renderTeamPage(code, container) {
 }
 
 // Contador e atualizador de progresso da seleção dinâmico
-function updateTeamProgressLabel(code) {
+function updateTeamProgressLabel(code, delayCheckmark = false) {
   const stats = getTeamProgress(code);
+  const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
   
   // 1. Atualiza o texto descritivo
   const label = document.getElementById('teamProgressLabel');
   if (label) {
-    label.textContent = `${stats.owned} de 20 figurinhas coladas`;
+    label.textContent = `${stats.owned} de ${limit} figurinhas coladas`;
   }
   
   // 2. Atualiza a barra de progresso
   const progText = document.getElementById('teamProgText');
   const progBar = document.getElementById('teamProgBarFill');
   if (progText && progBar) {
-    const percent = Math.round((stats.owned / 20) * 100);
-    progText.textContent = `${stats.owned}/20 (${percent}%)`;
+    const percent = Math.round((stats.owned / limit) * 100);
+    progText.textContent = `${stats.owned}/${limit} (${percent}%)`;
     progBar.style.width = `${percent}%`;
   }
   
   // 3. Adiciona ou remove o ícone de Check (✓) verde no título
   const teamTitle = document.getElementById('teamTitleText');
   if (teamTitle) {
-    if (stats.owned === 20) {
-      if (!teamTitle.querySelector('.check-mark')) {
-        const check = document.createElement('span');
-        check.className = 'check-mark text-copaGreen font-black text-lg ml-2 animate-bounce inline-block drop-shadow-[0_0_8px_#00e676]';
-        check.textContent = '✓';
-        teamTitle.appendChild(check);
+    const check = teamTitle.querySelector('.check-mark');
+    if (stats.owned === limit && !delayCheckmark) {
+      if (!check) {
+        const checkEl = document.createElement('span');
+        checkEl.className = 'check-mark text-copaGreen font-black text-lg ml-2 animate-bounce inline-block drop-shadow-[0_0_8px_#00e676]';
+        checkEl.textContent = '✓';
+        teamTitle.appendChild(checkEl);
       }
     } else {
-      const check = teamTitle.querySelector('.check-mark');
       if (check) check.remove();
     }
   }
@@ -1336,6 +1671,7 @@ function updateCard(card, key) {
   const sticker = album.stickers[key];
   const isOwned = sticker && sticker.owned;
   const duplicates = sticker ? (sticker.duplicate || 0) : 0;
+  const code = key.split('-')[0];
 
   // 1. Aplica o Flip 3D
   if (isOwned) {
@@ -1344,7 +1680,40 @@ function updateCard(card, key) {
     card.classList.remove('is-flipped');
   }
 
-  // 2. Badge de repetida (FUT style)
+  // 2. Alerta de Troca Qualificada (Yellow Blinking + ⚠️)
+  const isTrade = hasQualifiedTrade(key);
+  let alertIcon = card.querySelector('.trade-alert-icon');
+  if (isTrade) {
+    card.classList.add('qualified-trade');
+    if (!alertIcon) {
+      alertIcon = document.createElement('span');
+      alertIcon.className = 'trade-alert-icon';
+      alertIcon.textContent = '⚠️';
+      card.appendChild(alertIcon);
+    }
+  } else {
+    card.classList.remove('qualified-trade');
+    if (alertIcon) alertIcon.remove();
+  }
+
+  // 3. Renderiza foto customizada no fundo do cardFront
+  const cardFront = card.querySelector('.card-front');
+  if (cardFront) {
+    let photoImg = cardFront.querySelector('.player-card-photo');
+    if (sticker && sticker.photo) {
+      if (!photoImg) {
+        photoImg = document.createElement('img');
+        photoImg.className = 'player-card-photo';
+        cardFront.prepend(photoImg); // insere no fundo
+      }
+      photoImg.src = sticker.photo;
+      photoImg.style.display = 'block';
+    } else if (photoImg) {
+      photoImg.style.display = 'none';
+    }
+  }
+
+  // 4. Badge de repetida (FUT style)
   let badge = card.querySelector('.rep-badge');
   if (isOwned && duplicates > 0) {
     if (!badge) {
@@ -1357,38 +1726,62 @@ function updateCard(card, key) {
     badge.remove();
   }
 
-  // 3. Botões de ação
+  // 5. Botões de ação
   const actionsContainer = card.querySelector('.card-actions');
   if (actionsContainer) {
     actionsContainer.innerHTML = '';
 
-    const btnLeft = document.createElement('button');
-    btnLeft.className = `action-btn ${duplicates > 0 ? 'btn-minus' : 'btn-remove'}`;
-    btnLeft.innerHTML = duplicates > 0 ? '–' : '×';
-    btnLeft.title = duplicates > 0 ? 'Remover 1 repetida' : 'Remover do álbum';
-    btnLeft.onclick = (e) => {
-      e.stopPropagation();
-      if (duplicates > 0) {
-        toggleDuplicate(key, false);
-      } else {
-        toggleOwned(key);
-      }
-      updateCard(card, key);
-      updateTeamProgressLabel(key.split('-')[0]);
-    };
+    if (isOwned) {
+      const btnLeft = document.createElement('button');
+      btnLeft.className = `action-btn ${duplicates > 0 ? 'btn-minus' : 'btn-remove'}`;
+      btnLeft.innerHTML = duplicates > 0 ? '–' : '×';
+      btnLeft.title = duplicates > 0 ? 'Remover 1 repetida' : 'Remover do álbum';
+      btnLeft.onclick = (e) => {
+        e.stopPropagation();
+        if (duplicates > 0) {
+          toggleDuplicate(key, false);
+        } else {
+          toggleOwned(key);
+        }
+        updateCard(card, key);
+        updateTeamProgressLabel(code);
+      };
 
-    const btnRight = document.createElement('button');
-    btnRight.className = 'action-btn btn-add';
-    btnRight.innerHTML = '+';
-    btnRight.title = 'Adicionar repetida';
-    btnRight.onclick = (e) => {
-      e.stopPropagation();
-      toggleDuplicate(key, true);
-      updateCard(card, key);
-    };
+      const btnCam = document.createElement('button');
+      btnCam.className = 'action-btn btn-camera';
+      btnCam.innerHTML = '📷';
+      btnCam.title = 'Fotografar (Câmera)';
+      btnCam.onclick = (e) => {
+        e.stopPropagation();
+        triggerCameraCapture(key, () => {
+          updateCard(card, key);
+        });
+      };
 
-    actionsContainer.appendChild(btnLeft);
-    actionsContainer.appendChild(btnRight);
+      const btnEye = document.createElement('button');
+      btnEye.className = 'action-btn btn-eye';
+      btnEye.innerHTML = '👁️';
+      btnEye.title = 'Visualizar em Tela Cheia';
+      btnEye.onclick = (e) => {
+        e.stopPropagation();
+        openFullscreenCard(key);
+      };
+
+      const btnRight = document.createElement('button');
+      btnRight.className = 'action-btn btn-add';
+      btnRight.innerHTML = '+';
+      btnRight.title = 'Adicionar repetida';
+      btnRight.onclick = (e) => {
+        e.stopPropagation();
+        toggleDuplicate(key, true);
+        updateCard(card, key);
+      };
+
+      actionsContainer.appendChild(btnLeft);
+      actionsContainer.appendChild(btnCam);
+      actionsContainer.appendChild(btnEye);
+      actionsContainer.appendChild(btnRight);
+    }
   }
 }
 
@@ -1401,6 +1794,18 @@ function renderTrades(container) {
   title.className = 'text-base font-black uppercase tracking-wider text-copaYellow';
   title.textContent = 'Figurinhas Repetidas';
   wrapper.appendChild(title);
+
+  // Alerta de Segurança Infantil
+  const safetyBanner = document.createElement('div');
+  safetyBanner.className = 'bg-red-950/45 border border-red-500/30 p-3 rounded-xl flex items-start gap-2.5 text-[10px] text-red-200 leading-normal shadow-lg';
+  safetyBanner.innerHTML = `
+    <span class="text-sm">⚠️</span>
+    <div>
+      <strong class="text-red-400 font-bold block mb-0.5">Alerta de Segurança Infantil</strong>
+      Não troque figurinha com desconhecido, sem a presença de um adulto de sua confiança, de preferência fazer trocas somente com amigos próximos.
+    </div>
+  `;
+  wrapper.appendChild(safetyBanner);
 
   const albumId = storage.getCurrentAlbumId();
   const albums = storage.getAlbums();
@@ -1421,13 +1826,13 @@ function renderTrades(container) {
     if (val.owned && val.duplicate > 0) {
       const parts = key.split('-');
       const code = parts[0];
-      const teamName = teamsMap[code] || (code === 'FWFIFA' ? 'FW FIFA' : code === 'ESCUDOS' ? 'Escudos' : code === 'EXTRAS' ? 'Premium' : null);
+      const teamName = teamsMap[code] || (code === 'FWC' ? 'FIFA' : code === 'CC' ? 'Coca-Cola' : code === 'EXTRAS' ? 'Premium' : null);
       if (teamName) {
         duplicates.push({
           key: key,
           team: teamName,
           code: code,
-          number: parseInt(parts[1], 10),
+          number: parts[1],
           count: val.duplicate
         });
       }
@@ -1443,29 +1848,50 @@ function renderTrades(container) {
       </div>
     `;
   } else {
+    // Botão de Negociação via WhatsApp
+    const btnNegotiate = document.createElement('button');
+    btnNegotiate.className = 'w-full px-4 py-3 bg-copaGreen hover:opacity-90 text-black text-xs font-black uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2 mb-4';
+    btnNegotiate.innerHTML = `
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.574 1.97 14.101.947 11.487.947c-5.441 0-9.866 4.372-9.87 9.802 0 1.772.465 3.508 1.346 5.042L1.99 21.53l5.83-1.517zM17.75 14.61c-.347-.174-2.057-1.014-2.375-1.13-.318-.116-.549-.174-.78.174-.23.348-.895 1.13-1.097 1.362-.202.23-.404.26-.75.087-.348-.174-1.468-.541-2.796-1.728-1.034-.922-1.731-2.06-1.933-2.408-.202-.348-.022-.536.151-.708.156-.154.348-.406.52-.609.174-.203.23-.348.348-.58.116-.232.058-.435-.029-.609-.087-.174-.78-1.884-1.068-2.58-.28-.677-.566-.584-.78-.596-.202-.01-.433-.01-.664-.01-.23 0-.606.087-.923.435-.317.348-1.213 1.188-1.213 2.898 0 1.71 1.243 3.361 1.417 3.593.173.232 2.447 3.738 5.928 5.24 2.85 1.228 3.525.986 4.774.87.535-.05 2.058-.84 2.346-1.652.289-.812.289-1.507.202-1.652-.086-.145-.318-.232-.664-.406z"/>
+      </svg>
+      Gerar Mensagem de Negociação
+    `;
+    listDiv.appendChild(btnNegotiate);
+
     const grid = document.createElement('div');
     grid.className = 'grid grid-cols-2 gap-3';
     
     duplicates.forEach(item => {
-      const itemCard = document.createElement('div');
-      itemCard.className = 'bg-white/5 border border-white/5 p-3 rounded-xl flex items-center justify-between gap-2';
+      const itemCard = document.createElement('label');
+      itemCard.className = 'bg-white/5 border border-white/5 p-3 rounded-xl flex items-center justify-between gap-2 cursor-pointer hover:bg-white/10 transition';
       
+      const leftSide = document.createElement('div');
+      leftSide.className = 'flex items-center gap-2.5';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'w-4 h-4 rounded border-white/10 text-copaYellow bg-[#131735] focus:ring-0 cursor-pointer';
+      
+      let stickerName = `${item.code} ${item.number}`;
+      if (item.code === 'EXTRAS') {
+        stickerName = legendsData[parseInt(item.number, 10) - 1].name;
+      }
+      checkbox.dataset.stickerName = stickerName;
+      leftSide.appendChild(checkbox);
+
       const info = document.createElement('div');
       const teamLabel = document.createElement('div');
       teamLabel.className = 'text-[9px] font-black uppercase tracking-wider text-copaYellow';
       teamLabel.textContent = item.team;
       const numLabel = document.createElement('div');
       numLabel.className = 'text-xs font-black text-white';
-      
-      if (item.code === 'EXTRAS') {
-        numLabel.textContent = legendsData[item.number - 1].name;
-      } else {
-        numLabel.textContent = `${item.code} ${item.number}`;
-      }
+      numLabel.textContent = stickerName;
       
       info.appendChild(teamLabel);
       info.appendChild(numLabel);
-      itemCard.appendChild(info);
+      leftSide.appendChild(info);
+      itemCard.appendChild(leftSide);
 
       const qty = document.createElement('div');
       qty.className = 'bg-copaYellow text-black font-black text-xs px-2 py-1 rounded-lg';
@@ -1475,6 +1901,18 @@ function renderTrades(container) {
       grid.appendChild(itemCard);
     });
     listDiv.appendChild(grid);
+
+    // Click handler para gerar mensagem
+    btnNegotiate.onclick = () => {
+      const checked = Array.from(grid.querySelectorAll('input[type="checkbox"]:checked'));
+      if (checked.length === 0) {
+        alert('Por favor, selecione pelo menos uma figurinha repetida para negociar.');
+        return;
+      }
+      const selectedNames = checked.map(cb => cb.dataset.stickerName).join(', ');
+      const textMessage = `Oi, vi no app Ultimate Cromos FIFA/Panini 2026 que você tem essas figurinhas que eu estou precisando: ${selectedNames}. Eu tenho essas disponíveis. Vamos fazer trocá-las?`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textMessage)}`, '_blank');
+    };
   }
 
   wrapper.appendChild(listDiv);
@@ -1534,8 +1972,8 @@ function shareOwnedList() {
       grouped[t.code] = [];
     });
   });
-  grouped['FWFIFA'] = [];
-  grouped['ESCUDOS'] = [];
+  grouped['FWC'] = [];
+  grouped['CC'] = [];
   grouped['EXTRAS'] = [];
 
   Object.entries(album.stickers).forEach(([key, val]) => {
@@ -1589,11 +2027,12 @@ function shareMissingList() {
       allCodes.push(t.code);
     });
   });
-  allCodes.push('FWFIFA', 'ESCUDOS', 'EXTRAS');
+  allCodes.push('FWC', 'CC', 'EXTRAS');
 
   allCodes.forEach(code => {
     grouped[code] = [];
-    for (let i = 1; i <= 20; i++) {
+    const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
+    for (let i = 1; i <= limit; i++) {
       const key = `${code}-${i}`;
       const sticker = album.stickers[key];
       const isOwned = sticker && sticker.owned;
@@ -1640,8 +2079,8 @@ function shareDuplicatesList() {
       grouped[t.code] = [];
     });
   });
-  grouped['FWFIFA'] = [];
-  grouped['ESCUDOS'] = [];
+  grouped['FWC'] = [];
+  grouped['CC'] = [];
   grouped['EXTRAS'] = [];
 
   Object.entries(album.stickers).forEach(([key, val]) => {
