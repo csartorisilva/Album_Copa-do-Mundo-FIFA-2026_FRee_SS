@@ -801,16 +801,13 @@ function renderImport(container) {
 
   const hint = document.createElement('p');
   hint.className = 'text-[10px] text-gray-400 leading-relaxed';
-  hint.innerHTML = `
-    Insira seus códigos de cromos. Formatos aceitos: 
-    <br><strong>BR 1, BR 2, BR 15</strong> ou <strong>AR 1 2 5 10</strong>.
-  `;
+  hint.textContent = 'Insira os números dos cromos.';
   wrapper.appendChild(hint);
 
   const textarea = document.createElement('textarea');
   textarea.id = 'importArea';
   textarea.className = 'w-full h-36 p-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-copaYellow text-xs text-white placeholder-gray-600';
-  textarea.placeholder = 'Exemplo:\nBR 1, BR 2, BR 5\nAR 3 4 8 9';
+  textarea.placeholder = 'Exemplo: BRA 1, BRA4, BRA7 ou BRA 1 4 7 ou  BRA 1, 4, 7 ou ainda 500, 503, 506';
   wrapper.appendChild(textarea);
 
   const btnContainer = document.createElement('div');
@@ -882,13 +879,37 @@ function processImport(mode) {
   const text = document.getElementById('importArea').value.trim();
   if (!text) return alert('Insira códigos para importar.');
 
-  const lines = text.split(/\n|,|;/).map(s => s.trim()).filter(Boolean);
   const albumId = storage.getCurrentAlbumId();
   const albums = storage.getAlbums();
   const album = albums[albumId];
 
   // Coleta as chaves informadas no input
   const parsedKeys = new Set();
+
+  const allTeams = [];
+  groupsData.forEach(g => {
+    g.teams.forEach(t => {
+      allTeams.push(t.code);
+    });
+  });
+
+  const twoToThreeMap = {
+    'MX': 'MEX', 'ZA': 'RSA', 'KR': 'KOR', 'CZ': 'CZE',
+    'CA': 'CAN', 'BA': 'BIH', 'QA': 'QAT', 'CH': 'SUI',
+    'BR': 'BRA', 'MA': 'MAR', 'HT': 'HAI', 'US': 'USA',
+    'PY': 'PAR', 'AU': 'AUS', 'TR': 'TUR', 'DE': 'GER',
+    'CW': 'CUW', 'CI': 'CIV', 'EC': 'ECU', 'NL': 'NED',
+    'JP': 'JPN', 'SE': 'SWE', 'TN': 'TUN', 'BE': 'BEL',
+    'EG': 'EGY', 'IR': 'IRN', 'NZ': 'NZL', 'ES': 'ESP',
+    'CV': 'CPV', 'SA': 'KSA', 'UY': 'URU', 'FR': 'FRA',
+    'SN': 'SEN', 'IQ': 'IRQ', 'NO': 'NOR', 'AR': 'ARG',
+    'DZ': 'ALG', 'AT': 'AUT', 'JO': 'JOR', 'PT': 'POR',
+    'CD': 'COD', 'UZ': 'UZB', 'CO': 'COL', 'HR': 'CRO',
+    'GH': 'GHA', 'PA': 'PAN'
+  };
+
+  let currentCode = null;
+  const lines = text.split(/\n|;/).map(s => s.trim()).filter(Boolean);
 
   lines.forEach(line => {
     // 1. Tenta casar primeiro por Nome Completo de Legend
@@ -904,27 +925,68 @@ function processImport(mode) {
       return;
     }
 
-    // 2. Se não casou com Legend, tenta o formato "CODIGO NUMERO" ou "CODIGO-NUMERO"
-    const m1 = line.match(/^([A-Z]{2,10}(?:-[A-Z]+)?)\s+([0-9\s,]+)$/i);
-    if (m1) {
-      const code = m1[1].toUpperCase();
-      const nums = m1[2].split(/[\s,]+/).filter(Boolean);
-      nums.forEach(n => {
-        const numVal = parseInt(n, 10);
-        if (numVal >= 1 && numVal <= 20) {
-          parsedKeys.add(`${code}-${numVal}`);
-        }
-      });
-    } else {
-      const m2 = line.match(/^([A-Z]{2,10}(?:-[A-Z]+)?)-([0-9]+)$/i);
-      if (m2) {
-        const code = m2[1].toUpperCase();
-        const numVal = parseInt(m2[2], 10);
-        if (numVal >= 1 && numVal <= 20) {
-          parsedKeys.add(`${code}-${numVal}`);
+    // 2. Se não casou com a linha inteira, processa por itens separados por vírgula
+    const items = line.split(',').map(s => s.trim()).filter(Boolean);
+    items.forEach(item => {
+      // Verifica se o item é o nome completo de um Legend
+      let itemLegendIndex = -1;
+      for (let idx = 0; idx < legendsData.length; idx++) {
+        if (item.toLowerCase() === legendsData[idx].name.toLowerCase()) {
+          itemLegendIndex = idx;
+          break;
         }
       }
-    }
+      if (itemLegendIndex !== -1) {
+        parsedKeys.add(`EXTRAS-${itemLegendIndex + 1}`);
+        return;
+      }
+
+      // Tenta casar formato Código + Números (ex: "BRA 1", "BRA4", "BRA 1 4 7")
+      const mCodeNums = item.match(/^([A-Z]{2,10}(?:-[A-Z]+)?)\s*(-)?\s*([0-9\s]+)$/i);
+      if (mCodeNums) {
+        let code = mCodeNums[1].toUpperCase();
+        if (twoToThreeMap[code]) {
+          code = twoToThreeMap[code];
+        }
+        currentCode = code;
+
+        const nums = mCodeNums[3].split(/\s+/).filter(Boolean);
+        nums.forEach(n => {
+          const numVal = parseInt(n, 10);
+          if (numVal >= 1 && numVal <= 20) {
+            parsedKeys.add(`${code}-${numVal}`);
+          }
+        });
+      } else if (/^[0-9\s]+$/.test(item)) {
+        // Apenas números
+        const nums = item.split(/\s+/).filter(Boolean);
+        nums.forEach(n => {
+          const numVal = parseInt(n, 10);
+          if (numVal > 20) {
+            // Número sequencial cru (1 a 960)
+            const idx = numVal - 1;
+            const teamIdx = Math.floor(idx / 20);
+            const stickerIdx = (idx % 20) + 1;
+            if (teamIdx >= 0 && teamIdx < 48) {
+              const teamCode = allTeams[teamIdx];
+              parsedKeys.add(`${teamCode}-${stickerIdx}`);
+            }
+          } else if (numVal >= 1 && numVal <= 20) {
+            if (currentCode) {
+              parsedKeys.add(`${currentCode}-${numVal}`);
+            } else {
+              const idx = numVal - 1;
+              const teamIdx = Math.floor(idx / 20);
+              const stickerIdx = (idx % 20) + 1;
+              if (teamIdx >= 0 && teamIdx < 48) {
+                const teamCode = allTeams[teamIdx];
+                parsedKeys.add(`${teamCode}-${stickerIdx}`);
+              }
+            }
+          }
+        });
+      }
+    });
   });
 
   if (mode === 'missing') {
