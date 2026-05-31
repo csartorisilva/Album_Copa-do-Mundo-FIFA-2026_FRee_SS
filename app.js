@@ -158,6 +158,7 @@ function renderHeader() {
     const opt = document.createElement('option');
     opt.value = id;
     opt.textContent = data.name;
+    opt.className = 'bg-[#131735] text-white'; // Estilo escuro explícito para o dropdown
     if (id === storage.getCurrentAlbumId()) opt.selected = true;
     selector.appendChild(opt);
   });
