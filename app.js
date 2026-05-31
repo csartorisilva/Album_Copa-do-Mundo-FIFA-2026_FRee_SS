@@ -29,55 +29,56 @@ const storage = {
 };
 
 // Mapeamento de URLs estáveis e públicas de brasões/logos das federações de futebol reais (Wikimedia Commons)
+// Mapeamento de URLs estáveis e públicas de brasões/logos das federações de futebol reais (Wikimedia Commons Thumbnails PNG)
 const crestsMap = {
-  US: 'https://upload.wikimedia.org/wikipedia/commons/8/82/US_Soccer_Federation_logo.svg',
-  MX: 'https://upload.wikimedia.org/wikipedia/commons/6/64/Federacion_Mexicana_de_Futbol_Asociacion.svg',
-  CA: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/Canada_Soccer_logo.svg',
-  CR: 'https://upload.wikimedia.org/wikipedia/commons/d/da/Costa_Rica_Football_Federation_logo.svg',
-  BR: 'https://upload.wikimedia.org/wikipedia/commons/9/99/Brazilian_Football_Confederation_logo.svg',
-  CO: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Federacion_Colombiana_de_Futbol_logo.svg',
-  PY: 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Asociacion_Paraguaya_de_Futbol_logo.svg',
-  CM: 'https://upload.wikimedia.org/wikipedia/commons/0/07/F%C3%A9d%C3%A9ration_Camerounaise_de_Football_logo.svg',
-  AR: 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Asociaci%C3%B3n_del_F%C3%BAtbol_Argentino_logo.svg',
-  CL: 'https://upload.wikimedia.org/wikipedia/commons/8/83/Federaci%C3%B3n_de_F%C3%BAtbol_de_Chile_logo.svg',
-  UY: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg',
-  SA: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Saudi_Arabia_Football_Federation_logo.svg',
-  FR: 'https://upload.wikimedia.org/wikipedia/commons/d/df/Logo_F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football.svg',
-  MA: 'https://upload.wikimedia.org/wikipedia/commons/7/75/F%C3%A9d%C3%A9ration_royale_marocaine_de_football.svg',
-  AT: 'https://upload.wikimedia.org/wikipedia/commons/d/df/Austrian_Football_Association_logo.svg',
-  NG: 'https://upload.wikimedia.org/wikipedia/commons/7/74/Nigeria_Football_Federation_logo.svg',
-  ES: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Real_Federaci%C3%B3n_Espa%C3%B1ola_de_F%C3%BAtbol_logo.svg',
-  JP: 'https://upload.wikimedia.org/wikipedia/commons/8/87/Japan_Football_Association_logo.svg',
-  EC: 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Federacion_Ecuatoriana_de_Futbol.svg',
-  EG: 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Egyptian_Football_Association_logo.svg',
-  DE: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Deutscher_Fu%C3%9Fball-Bund_logo.svg',
-  BE: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Royal_Belgian_FA_logo.svg',
-  KR: 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Korea_Football_Association_logo.svg',
-  TN: 'https://upload.wikimedia.org/wikipedia/commons/c/cf/Tunisian_Football_Federation_logo.svg',
-  'GB-ENG': 'https://upload.wikimedia.org/wikipedia/en/3/38/England_crest_2009.svg',
-  SN: 'https://upload.wikimedia.org/wikipedia/commons/5/52/F%C3%A9d%C3%A9ration_S%C3%A9n%C3%A9galaise_de_Football.svg',
-  IR: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Football_Federation_Islamic_Republic_of_Iran_logo.svg',
-  HN: 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Federaci%C3%B3n_Nacional_Aut%C3%B3noma_de_Honduras_logo.svg',
-  PT: 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Federa%C3%A7%C3%A3o_Portuguesa_de_Futebol_logo.svg',
-  GH: 'https://upload.wikimedia.org/wikipedia/commons/3/33/Ghana_Football_Association_logo.svg',
-  TR: 'https://upload.wikimedia.org/wikipedia/commons/4/43/Turkish_Football_Federation_logo.svg',
-  PE: 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Federaci%C3%B3n_Peruana_de_F%C3%BAtbol_logo.svg',
-  IT: 'https://upload.wikimedia.org/wikipedia/commons/f/f6/Italy_national_football_team_logo_%282023%29.svg',
-  AU: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Football_Australia_logo.svg',
-  DZ: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Algerian_Football_Federation_logo.svg',
-  JM: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Jamaica_Football_Federation_logo.svg',
-  NL: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Knvb_logo.svg',
-  HR: 'https://upload.wikimedia.org/wikipedia/commons/2/25/Croatian_Football_Federation_logo.svg',
-  'GB-SCT': 'https://upload.wikimedia.org/wikipedia/en/6/65/Scottish_Football_Association_crest.svg',
-  ML: 'https://upload.wikimedia.org/wikipedia/commons/8/87/F%C3%A9d%C3%A9ration_Malienne_de_Football.svg',
-  DK: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Dansk_Boldspil-Union_logo.svg',
-  CH: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Swiss_Football_Association_logo.svg',
-  RS: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Football_Association_of_Serbia_logo.svg',
-  PA: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Federacion_Panamena_de_Futbol.svg',
-  UA: 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Ukrainian_Association_of_Football_logo.svg',
-  SE: 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Swedish_Football_Association_logo.svg',
-  PL: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Polish_Football_Association_logo.svg',
-  NZ: 'https://upload.wikimedia.org/wikipedia/commons/2/2d/New_Zealand_Football_logo.svg'
+  US: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/US_Soccer_Federation_logo.svg/120px-US_Soccer_Federation_logo.svg.png',
+  MX: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Federacion_Mexicana_de_Futbol_Asociacion.svg/120px-Federacion_Mexicana_de_Futbol_Asociacion.svg.png',
+  CA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Canada_Soccer_logo.svg/120px-Canada_Soccer_logo.svg.png',
+  CR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Costa_Rica_Football_Federation_logo.svg/120px-Costa_Rica_Football_Federation_logo.svg.png',
+  BR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Brazilian_Football_Confederation_logo.svg/120px-Brazilian_Football_Confederation_logo.svg.png',
+  CO: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Federacion_Colombiana_de_Futbol_logo.svg/120px-Federacion_Colombiana_de_Futbol_logo.svg.png',
+  PY: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Asociacion_Paraguaya_de_Futbol_logo.svg/120px-Asociacion_Paraguaya_de_Futbol_logo.svg.png',
+  CM: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/F%C3%A9d%C3%A9ration_Camerounaise_de_Football_logo.svg/120px-F%C3%A9d%C3%A9ration_Camerounaise_de_Football_logo.svg.png',
+  AR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Asociaci%C3%B3n_del_F%C3%BAtbol_Argentino_logo.svg/120px-Asociaci%C3%B3n_del_F%C3%BAtbol_Argentino_logo.svg.png',
+  CL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Federaci%C3%B3n_de_F%C3%BAtbol_de_Chile_logo.svg/120px-Federaci%C3%B3n_de_F%C3%BAtbol_de_Chile_logo.svg.png',
+  UY: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg/120px-Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg.png',
+  SA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Saudi_Arabia_Football_Federation_logo.svg/120px-Saudi_Arabia_Football_Federation_logo.svg.png',
+  FR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Logo_F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football.svg/120px-Logo_F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football.svg.png',
+  MA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/F%C3%A9d%C3%A9ration_royale_marocaine_de_football.svg/120px-F%C3%A9d%C3%A9ration_royale_marocaine_de_football.svg.png',
+  AT: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Austrian_Football_Association_logo.svg/120px-Austrian_Football_Association_logo.svg.png',
+  NG: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Nigeria_Football_Federation_logo.svg/120px-Nigeria_Football_Federation_logo.svg.png',
+  ES: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Real_Federaci%C3%B3n_Espa%C3%B1ola_de_F%C3%BAtbol_logo.svg/120px-Real_Federaci%C3%B3n_Espa%C3%B1ola_de_F%C3%BAtbol_logo.svg.png',
+  JP: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Japan_Football_Association_logo.svg/120px-Japan_Football_Association_logo.svg.png',
+  EC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Federacion_Ecuatoriana_de_Futbol.svg/120px-Federacion_Ecuatoriana_de_Futbol.svg.png',
+  EG: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Egyptian_Football_Association_logo.svg/120px-Egyptian_Football_Association_logo.svg.png',
+  DE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Deutscher_Fu%C3%9Fball-Bund_logo.svg/120px-Deutscher_Fu%C3%9Fball-Bund_logo.svg.png',
+  BE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Royal_Belgian_FA_logo.svg/120px-Royal_Belgian_FA_logo.svg.png',
+  KR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Korea_Football_Association_logo.svg/120px-Korea_Football_Association_logo.svg.png',
+  TN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Tunisian_Football_Federation_logo.svg/120px-Tunisian_Football_Federation_logo.svg.png',
+  'GB-ENG': 'https://upload.wikimedia.org/wikipedia/en/thumb/3/38/England_crest_2009.svg/120px-England_crest_2009.svg.png',
+  SN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/F%C3%A9d%C3%A9ration_S%C3%A9n%C3%A9galaise_de_Football.svg/120px-F%C3%A9d%C3%A9ration_S%C3%A9n%C3%A9galaise_de_Football.svg.png',
+  IR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Football_Federation_Islamic_Republic_of_Iran_logo.svg/120px-Football_Federation_Islamic_Republic_of_Iran_logo.svg.png',
+  HN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Federaci%C3%B3n_Nacional_Aut%C3%B3noma_de_Honduras_logo.svg/120px-Federaci%C3%B3n_Nacional_Aut%C3%B3noma_de_Honduras_logo.svg.png',
+  PT: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Federa%C3%A7%C3%A3o_Portuguesa_de_Futebol_logo.svg/120px-Federa%C3%A7%C3%A3o_Portuguesa_de_Futebol_logo.svg.png',
+  GH: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Ghana_Football_Association_logo.svg/120px-Ghana_Football_Association_logo.svg.png',
+  TR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Turkish_Football_Federation_logo.svg/120px-Turkish_Football_Federation_logo.svg.png',
+  PE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Federaci%C3%B3n_Peruana_de_F%C3%BAtbol_logo.svg/120px-Federaci%C3%B3n_Peruana_de_F%C3%BAtbol_logo.svg.png',
+  IT: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Italy_national_football_team_logo_%282023%29.svg/120px-Italy_national_football_team_logo_%282023%29.svg.png',
+  AU: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Football_Australia_logo.svg/120px-Football_Australia_logo.svg.png',
+  DZ: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Algerian_Football_Federation_logo.svg/120px-Algerian_Football_Federation_logo.svg.png',
+  JM: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Jamaica_Football_Federation_logo.svg/120px-Jamaica_Football_Federation_logo.svg.png',
+  NL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Knvb_logo.svg/120px-Knvb_logo.svg.png',
+  HR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Croatian_Football_Federation_logo.svg/120px-Croatian_Football_Federation_logo.svg.png',
+  'GB-SCT': 'https://upload.wikimedia.org/wikipedia/en/thumb/6/65/Scottish_Football_Association_crest.svg/120px-Scottish_Football_Association_crest.svg.png',
+  ML: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/F%C3%A9d%C3%A9ration_Malienne_de_Football.svg/120px-F%C3%A9d%C3%A9ration_Malienne_de_Football.svg.png',
+  DK: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Dansk_Boldspil-Union_logo.svg/120px-Dansk_Boldspil-Union_logo.svg.png',
+  CH: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Swiss_Football_Association_logo.svg/120px-Swiss_Football_Association_logo.svg.png',
+  RS: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Football_Association_of_Serbia_logo.svg/120px-Football_Association_of_Serbia_logo.svg.png',
+  PA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Federacion_Panamena_de_Futbol.svg/120px-Federacion_Panamena_de_Futbol.svg.png',
+  UA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Ukrainian_Association_of_Football_logo.svg/120px-Ukrainian_Association_of_Football_logo.svg.png',
+  SE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Swedish_Football_Association_logo.svg/120px-Swedish_Football_Association_logo.svg.png',
+  PL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Polish_Football_Association_logo.svg/120px-Polish_Football_Association_logo.svg.png',
+  NZ: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/New_Zealand_Football_logo.svg/120px-New_Zealand_Football_logo.svg.png'
 };
 
 // Dados estruturados das seleções e grupos da Copa 2026 (48 seleções)
@@ -413,48 +414,57 @@ function renderHome(container) {
     gTitle.textContent = g.name;
     groupCard.appendChild(gTitle);
 
-    // Grid de 2 colunas para caber perfeitamente no container de 480px com visual FUT
+    // Grid de 4 colunas para caber as 4 seleções na mesma linha horizontal
     const grid = document.createElement('div');
-    grid.className = 'grid grid-cols-2 gap-2.5';
+    grid.className = 'grid grid-cols-4 gap-1';
 
     g.teams.forEach(team => {
       const card = document.createElement('div');
-      card.className = 'bg-white/5 border border-white/5 hover:border-copaYellow/30 p-3 rounded-xl cursor-pointer transition flex flex-col items-center justify-between gap-1 group relative overflow-hidden';
+      // SEM QUADRANTE: apenas padding, cursor, flex e hover scale
+      card.className = 'cursor-pointer transition flex flex-col items-center justify-start gap-1 group relative py-1.5 px-0.5 hover:scale-105';
       card.onclick = () => location.hash = `#team-${team.code}`;
 
-      // FUT Layout: Escudo grande destacado no centro com a bandeira no canto inferior direito
+      // FUT Layout: Escudo de tamanho w-12 h-12 com a bandeira no canto inferior direito
       const crestWrapper = document.createElement('div');
-      crestWrapper.className = 'relative w-14 h-14 flex items-center justify-center mt-1';
-
-      // Escudo real do Wikimedia
-      const crestImg = document.createElement('img');
-      crestImg.src = crestsMap[team.code] || `https://flagcdn.com/w80/${team.code.toLowerCase()}.png`; // fallback
-      crestImg.alt = team.name;
-      crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_2px_5px_rgba(0,0,0,0.5)] group-hover:scale-105 transition duration-200';
-      crestWrapper.appendChild(crestImg);
+      crestWrapper.className = 'relative w-12 h-12 flex items-center justify-center';
 
       // Bandeira compacta no canto inferior direito do escudo
       const flagImg = document.createElement('img');
       flagImg.src = `https://flagcdn.com/w40/${team.code.toLowerCase()}.png`;
       flagImg.alt = 'Bandeira';
-      flagImg.className = 'absolute bottom-0 right-0 w-6 h-4 object-cover border border-white/10 rounded shadow-md pointer-events-none';
+      flagImg.className = 'absolute bottom-0 right-0 w-5.5 h-3.5 object-cover border border-white/10 rounded shadow-md pointer-events-none z-10';
+
+      // Escudo real do Wikimedia
+      const crestImg = document.createElement('img');
+      crestImg.src = crestsMap[team.code] || `https://flagcdn.com/w80/${team.code.toLowerCase()}.png`; // fallback
+      crestImg.alt = team.name;
+      crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]';
+      
+      // Fallback robusto se a imagem do brasão falhar (converte em bandeira média e esconde a sobreposta)
+      crestImg.onerror = function() {
+        this.src = `https://flagcdn.com/w80/${team.code.toLowerCase()}.png`;
+        this.className = 'w-10 h-7 object-cover rounded shadow border border-white/10 mt-2.5';
+        flagImg.style.display = 'none';
+      };
+
+      crestWrapper.appendChild(crestImg);
       crestWrapper.appendChild(flagImg);
       card.appendChild(crestWrapper);
 
       // Nome do país centralizado abaixo do escudo
       const name = document.createElement('div');
-      name.className = 'text-[10px] font-black uppercase tracking-wider text-gray-300 group-hover:text-white mt-1.5 text-center';
+      name.className = 'text-[9px] font-black uppercase tracking-wider text-gray-300 group-hover:text-white mt-1 text-center truncate w-full';
       name.textContent = team.name;
       card.appendChild(name);
 
       // Progresso numérico
       const teamStats = getTeamProgress(team.code);
       const progSpan = document.createElement('span');
-      progSpan.className = 'text-[9px] font-black text-copaGreen bg-copaGreen/10 px-2 py-0.5 rounded-full';
+      progSpan.className = 'text-[8px] font-black text-copaGreen bg-copaGreen/10 px-1.5 py-0.5 rounded-full';
       progSpan.textContent = `${teamStats.owned}/20`;
       
       if (teamStats.owned === 20) {
-        progSpan.className = 'text-[9px] font-black text-copaYellow bg-copaYellow/20 px-2 py-0.5 rounded-full border border-copaYellow/20 animate-bounce';
+        progSpan.className = 'text-[8px] font-black text-copaYellow bg-copaYellow/20 px-1.5 py-0.5 rounded-full border border-copaYellow/20';
       }
       card.appendChild(progSpan);
 
