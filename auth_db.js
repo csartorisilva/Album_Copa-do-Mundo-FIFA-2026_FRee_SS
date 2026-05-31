@@ -147,6 +147,40 @@
       return currentUser;
     },
 
+    // Busca coordenadas geográficas aproximadas através de APIs de IP gratuitas
+    async fetchLocationByIp() {
+      // 1. Tenta ipapi.co
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+            return { lat: data.latitude, lng: data.longitude };
+          }
+        }
+      } catch (e) {
+        console.warn("Erro ao buscar coordenadas por IP via ipapi.co:", e);
+      }
+      // 2. Fallback ipinfo.io
+      try {
+        const res = await fetch("https://ipinfo.io/json");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.loc) {
+            const parts = data.loc.split(',');
+            const lat = parseFloat(parts[0]);
+            const lng = parseFloat(parts[1]);
+            if (!isNaN(lat) && !isNaN(lng)) {
+              return { lat, lng };
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Erro ao buscar coordenadas por IP via ipinfo.io:", e);
+      }
+      return null;
+    },
+
     // Login Simulado ou Real
     async login(provider, username = "") {
       if (isDemoMode) {
@@ -175,6 +209,17 @@
           longitude: null,
           last_seen: new Date().toISOString()
         };
+
+        // Tenta buscar geolocalização automática por IP no momento do login simulado
+        try {
+          const loc = await this.fetchLocationByIp();
+          if (loc) {
+            currentUser.latitude = loc.lat;
+            currentUser.longitude = loc.lng;
+          }
+        } catch (e) {
+          console.warn("Erro ao associar geolocalização de IP durante o login:", e);
+        }
 
         localStorage.setItem(sessionKey, JSON.stringify(currentUser));
         return currentUser;

@@ -817,6 +817,42 @@ async function initApp() {
     console.error('Erro ao renderizar o cabeçalho:', e);
   }
 
+  // Sincroniza informações de geolocalização com base no IP do usuário
+  try {
+    const user = authDb.getCurrentUser();
+    if (user) {
+      // Sempre atualiza as coordenadas do usuário pelo IP no banco ao iniciar se estiver sem GPS
+      if (!user.latitude || !user.longitude) {
+        authDb.fetchLocationByIp().then(loc => {
+          if (loc) {
+            authDb.updateLocation(loc.lat, loc.lng).then(() => {
+              renderHeader();
+              if (location.hash === '#community') {
+                route(); // recarrega a comunidade se estiver nela
+              }
+            });
+          }
+        });
+      }
+      // Sincroniza figurinhas
+      const activeAlbumId = storage.getCurrentAlbumId();
+      const albums = storage.getAlbums();
+      if (activeAlbumId && albums[activeAlbumId]) {
+        authDb.syncStickers(albums[activeAlbumId].stickers);
+      }
+    } else {
+      // Se não está logado, busca o IP para geolocalização temporária
+      authDb.fetchLocationByIp().then(loc => {
+        if (loc) {
+          sessionStorage.setItem('temp_latitude', loc.lat);
+          sessionStorage.setItem('temp_longitude', loc.lng);
+        }
+      });
+    }
+  } catch (e) {
+    console.error('Erro na sincronização automática por IP no startup:', e);
+  }
+
   try {
     route();
   } catch (e) {
@@ -1136,7 +1172,7 @@ function renderLogin(container) {
                 location.hash = '#home';
               },
               (err) => {
-                console.warn("GPS negado durante o login", err);
+                console.warn("GPS negado durante o login, utilizando IP como localização padrão", err);
                 location.hash = '#home';
               }
             );
@@ -1162,6 +1198,15 @@ function renderLogin(container) {
 
       grid.appendChild(btn);
     });
+
+    // Botão Fazer Depois (Voltar ao Álbum)
+    const btnLater = document.createElement('button');
+    btnLater.className = 'w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-copaYellow/40 text-gray-400 hover:text-white font-bold text-xs transition duration-200 mt-2 flex items-center justify-center gap-1.5';
+    btnLater.innerHTML = 'Fazer Depois (Ir para o Álbum) ➔';
+    btnLater.onclick = () => {
+      location.hash = '#home';
+    };
+    grid.appendChild(btnLater);
 
     wrapper.appendChild(grid);
   }
@@ -2589,7 +2634,39 @@ function renderCommunity(container) {
   }
 
   if (!user.latitude || !user.longitude) {
-    // Caso logado, mas sem GPS ativado
+    // Tenta primeiro obter por IP de forma silenciosa e rápida
+    const tempLat = sessionStorage.getItem('temp_latitude');
+    const tempLng = sessionStorage.getItem('temp_longitude');
+    if (tempLat && tempLng) {
+      user.latitude = parseFloat(tempLat);
+      user.longitude = parseFloat(tempLng);
+      // E atualiza silenciosamente no perfil do banco
+      authDb.updateLocation(user.latitude, user.longitude).then(() => {
+        renderHeader();
+      });
+    } else {
+      // Faz uma busca ativa por IP rápida para salvar o usuário
+      authDb.fetchLocationByIp().then(loc => {
+        if (loc) {
+          user.latitude = loc.lat;
+          user.longitude = loc.lng;
+          authDb.updateLocation(loc.lat, loc.lng).then(() => {
+            renderHeader();
+            route();
+          });
+        } else {
+          // Fallback: Caso o IP falhe também, exibe a tela de solicitação de GPS
+          showGPSRequestScreen(container);
+        }
+      }).catch(() => {
+        showGPSRequestScreen(container);
+      });
+      return;
+    }
+  }
+
+  // Auxiliar para exibição de solicitação de GPS se o IP também falhar
+  function showGPSRequestScreen(container) {
     const gpsBox = document.createElement('div');
     gpsBox.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 text-center space-y-6 animate-fade-in';
     
@@ -2626,7 +2703,6 @@ function renderCommunity(container) {
     };
 
     container.appendChild(gpsBox);
-    return;
   }
 
   // Página da Comunidade Principal
@@ -3173,12 +3249,31 @@ function renderCollectorProfile(uid, container) {
   });
 }
 
+function handleAuthHeaderClick() {
+  const user = authDb.getCurrentUser();
+  if (user) {
+    const logout = confirm(`Olá, ${user.name}!\n\nDeseja deslogar (sair) da sua conta?\n\n- Clique em OK para DESLOGAR (sair).\n- Clique em Cancelar para ver seu PERFIL.`);
+    if (logout) {
+      authDb.logout().then(() => {
+        renderHeader();
+        location.hash = '#home';
+        route();
+      });
+    } else {
+      location.hash = '#login';
+    }
+  } else {
+    location.hash = '#login';
+  }
+}
+
 // Vincula funções utilitárias ao escopo global window para acesso no HTML
 window.switchAlbum = switchAlbum;
 window.createNewAlbum = createNewAlbum;
 window.shareOwnedList = shareOwnedList;
 window.shareMissingList = shareMissingList;
 window.shareDuplicatesList = shareDuplicatesList;
+window.handleAuthHeaderClick = handleAuthHeaderClick;
 
 // Inicialização por DOMContentLoaded
 window.addEventListener('DOMContentLoaded', initApp);
