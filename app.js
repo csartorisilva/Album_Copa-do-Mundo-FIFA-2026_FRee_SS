@@ -371,6 +371,74 @@ function getTeamPhase(team, standings) {
   }
 }
 
+// Calcula e formata a fase e a cor do balãozinho da Copa 2026 de forma dinâmica
+function getPhaseInfo(team, standings) {
+  let phaseText = 'FG';
+  let colorClass = 'bg-[#FFC726]/10 text-[#FFC726] border-[#FFC726]/30'; // amarelo (não começou)
+
+  const stats = (standings && standings[team.code]) ? standings[team.code] : null;
+  const isEliminated = stats ? stats.eliminated : (team.eliminated || false);
+  const eliminatedStage = stats ? stats.eliminatedStage : null;
+  const points = stats ? (stats.points || 0) : (team.points || 0);
+
+  if (isEliminated) {
+    colorClass = 'bg-red-500/15 text-red-400 border-red-500/25'; // vermelho (eliminado)
+    if (eliminatedStage) {
+      if (eliminatedStage.includes('Grupos') || eliminatedStage === 'FG') phaseText = 'FG';
+      else if (eliminatedStage.includes('16') || eliminatedStage === 'R16') phaseText = 'R16';
+      else if (eliminatedStage.includes('Oitavas') || eliminatedStage === 'OF') phaseText = 'OF';
+      else if (eliminatedStage.includes('Quartas') || eliminatedStage === 'QF') phaseText = 'QF';
+      else if (eliminatedStage.includes('Semi') || eliminatedStage === 'SF') phaseText = 'SF';
+      else if (eliminatedStage.includes('3') || eliminatedStage === '3rd') phaseText = '3º';
+      else if (eliminatedStage.includes('Final') || eliminatedStage === 'F') phaseText = 'F';
+      else phaseText = eliminatedStage;
+    }
+  } else {
+    // Se não está eliminado, descobre a fase atual
+    if (stats) {
+      let maxElimStage = 'Fase de Grupos';
+      Object.values(standings).forEach(s => {
+        if (s.eliminated && s.eliminatedStage) {
+          const stages = ['Fase de Grupos', '16 avos', 'Oitavas', 'Quartas', 'Semi-final', 'Final'];
+          if (stages.indexOf(s.eliminatedStage) > stages.indexOf(maxElimStage)) {
+            maxElimStage = s.eliminatedStage;
+          }
+        }
+      });
+
+      if (maxElimStage === 'Fase de Grupos') phaseText = 'R16';
+      else if (maxElimStage === '16 avos') phaseText = 'OF';
+      else if (maxElimStage === 'Oitavas') phaseText = 'QF';
+      else if (maxElimStage === 'Quartas') phaseText = 'SF';
+      else if (maxElimStage === 'Semi-final') phaseText = 'F';
+      else if (maxElimStage === 'Final') phaseText = '🏆'; // Campeão
+    }
+
+    // Cor do balão: se tiver pontos (campeonato começou) fica verde, senão amarelo
+    if (points > 0 || (stats && stats.rank !== undefined)) {
+      colorClass = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25'; // verde (em andamento)
+    }
+  }
+
+  // Mapeamento de siglas curtas amigáveis
+  const friendlyMap = {
+    'FG': 'FG',
+    'R16': '16avos',
+    'OF': 'OF',
+    'QF': 'QF',
+    'SF': 'SF',
+    '3rd': '3º',
+    '3º': '3º',
+    'F': 'F',
+    '🏆': '🏆'
+  };
+
+  return {
+    label: friendlyMap[phaseText] || friendlyMap[phaseText.toUpperCase()] || phaseText,
+    color: colorClass
+  };
+}
+
 // Animação de Goal!!! em tela cheia ao completar uma seleção
 function triggerGoalAnimation(onComplete) {
   const overlay = document.createElement('div');
@@ -1627,7 +1695,7 @@ function renderTeamPage(code, container) {
 
     // 2. Frente (Possuído - FUT Card aberto com marca d'água da Copa 2026 e dados do atleta)
     const cardFront = document.createElement('div');
-    cardFront.className = `card-front ${isSpecial ? 'special shiny-effect' : ''} relative flex flex-col justify-between p-2 overflow-hidden`;
+    cardFront.className = `card-front ${isSpecial ? 'special shiny-effect' : ''} relative flex flex-col justify-between p-2 overflow-visible`;
 
     const frontLogoComp = createLogoComposition(stickerCode, isExtras);
     cardFront.appendChild(frontLogoComp);
@@ -1813,7 +1881,7 @@ function updateCard(card, key) {
   }
 
   // 2. Alerta de Troca Qualificada (Yellow Blinking + ⚠️)
-  const isTrade = hasQualifiedTrade(key);
+  const isTrade = isOwned && hasQualifiedTrade(key);
   let alertIcon = card.querySelector('.trade-alert-icon');
   if (isTrade) {
     card.classList.add('qualified-trade');

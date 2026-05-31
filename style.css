@@ -37,13 +37,17 @@ body {
 .grid-fifa {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-auto-rows: 180px; /* Linhas fixas para travar a grade no desktop */
   gap: 1.25rem;
+  margin-top: 1.5rem; /* mt-6 para desgrudar do cabeçalho da seleção */
 }
 
 @media (max-width: 640px) {
   .grid-fifa {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 145px; /* Linhas fixas para travar a grade no celular */
     gap: 0.75rem;
+    margin-top: 1rem; /* mt-4 no celular */
   }
 }
 
@@ -63,7 +67,7 @@ body {
   transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  padding-bottom: 6rem; /* Corrige rolagem dos cards de baixo (pb-24) */
+  padding-bottom: 10rem; /* Corrige rolagem total dos cards de baixo (garante pb-40) */
 }
 
 /* Efeito de curvatura/dobra da página com gradiente deslizante */
@@ -123,8 +127,6 @@ body {
   background-position: -50% 0;
 }
 
-/* Base Sticker Card for 3D flip */
-/* Base Sticker Card for 3D flip */
 .sticker-card {
   perspective: 1000px;
   background: transparent;
@@ -132,8 +134,12 @@ body {
   cursor: pointer;
   height: 180px;
   width: 100%;
+  max-height: 180px;
+  max-width: 100%;
+  box-sizing: border-box;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   transform: scale(0.95); /* Menor e compacto por padrão (não colado) */
+  overflow: visible; /* Garante que badges e alertas flutuantes apareçam */
 }
 
 .sticker-card.is-flipped {
@@ -148,12 +154,20 @@ body {
   transform: scale(1.03) translateY(-2px);
 }
 
+@media (max-width: 640px) {
+  .sticker-card {
+    height: 145px !important;
+    max-height: 145px !important;
+  }
+}
+
 .card-inner {
   position: relative;
   width: 100%;
   height: 100%;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
+  overflow: visible;
 }
 
 /* Flip trigger class */
@@ -313,6 +327,21 @@ body {
   align-items: center;
   z-index: 10;
   pointer-events: auto;
+  overflow: visible; /* Garante que elementos flutuantes/micro-animações não quebrem o contorno */
+}
+
+@media (max-width: 640px) {
+  .card-actions {
+    bottom: 4px !important;
+    left: 4px !important;
+    right: 4px !important;
+  }
+  .action-btn {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 0.6rem !important;
+    border-radius: 4px !important;
+  }
 }
 
 .action-btn {
