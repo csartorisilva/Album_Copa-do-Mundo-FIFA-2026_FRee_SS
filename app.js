@@ -3211,9 +3211,9 @@ function renderCollectorProfile(uid, container) {
 
     mainDiv.innerHTML = '';
 
-    // Header Card do Perfil do Colecionador
+    // Header Card do Perfil do Colecionador (Mais Compacto)
     const headerCard = document.createElement('div');
-    headerCard.className = 'glass-panel p-5 rounded-2xl border-white/5 relative overflow-hidden flex flex-col gap-4';
+    headerCard.className = 'glass-panel p-3.5 rounded-2xl border-white/5 relative overflow-hidden flex flex-col gap-2.5';
 
     const backRow = document.createElement('div');
     backRow.className = 'flex justify-between items-center w-full';
@@ -3241,19 +3241,19 @@ function renderCollectorProfile(uid, container) {
     headerCard.appendChild(backRow);
 
     const userProfileRow = document.createElement('div');
-    userProfileRow.className = 'flex items-center gap-4';
+    userProfileRow.className = 'flex items-center gap-3.5';
 
     const avatar = document.createElement('img');
     avatar.src = collector.photo_url;
     avatar.loading = 'lazy';
     avatar.decoding = 'async';
-    avatar.className = 'w-14 h-14 rounded-full object-cover border-2 border-copaYellow shadow-lg';
+    avatar.className = 'w-11 h-11 rounded-full object-cover border-2 border-copaYellow shadow-lg';
     userProfileRow.appendChild(avatar);
 
     const userInfo = document.createElement('div');
     userInfo.innerHTML = `
-      <h3 class="font-black text-white text-base leading-snug">${collector.name}</h3>
-      <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1.5">
+      <h3 class="font-black text-white text-xs leading-snug">${collector.name}</h3>
+      <p class="text-[9px] text-gray-400 mt-0.5 flex items-center gap-1.5">
         📍 <strong>${collector.distance} km</strong> de distância • Visto há pouco
       </p>
     `;
@@ -3534,6 +3534,223 @@ function renderCollectorProfile(uid, container) {
       }
     }
 
+    function getStickerNameForShare(key) {
+      const parts = key.split('-');
+      if (parts[0] === 'EXTRAS') {
+        const name = legendsData[parseInt(parts[1], 10) - 1] ? legendsData[parseInt(parts[1], 10) - 1].name : `Lendário ${parts[1]}`;
+        const cat = parts[2] ? parts[2].charAt(0).toUpperCase() + parts[2].slice(1) : '';
+        return `${name} ${cat}`;
+      }
+      return getStickerDisplayName(parts[0], parseInt(parts[1], 10));
+    }
+
+    function shareTextViaSystem(title, text) {
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          text: text
+        }).catch(err => {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        });
+      } else {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+      }
+    }
+
+    function setProfileTabState() {
+      tabPerfect.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'perfect' ? 'active-tab' : ''}`;
+      tabHeHas.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'heHas' ? 'active-tab' : ''}`;
+      tabYouHave.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'youHave' ? 'active-tab' : ''}`;
+
+      tabContentContainer.innerHTML = '';
+
+      if (activeProfileTab === 'perfect') {
+        const strictUserGives = [];
+        const strictUserReceives = [];
+        const strictCount = Math.min(matchPerfectUserGives.length, matchPerfectUserReceives.length);
+        
+        for (let i = 0; i < strictCount; i++) {
+          strictUserGives.push(matchPerfectUserGives[i]);
+          strictUserReceives.push(matchPerfectUserReceives[i]);
+        }
+
+        const remainingUserGives = cardsYouHaveLackingHim;
+        const remainingUserReceives = cardsHeHasLackingYou;
+
+        const hasStrictMatch = strictCount > 0;
+        const hasPotentialMatch = (remainingUserGives.length > 0 || remainingUserReceives.length > 0);
+
+        if (!hasStrictMatch && !hasPotentialMatch) {
+          tabContentContainer.innerHTML = `
+            <div class="text-center py-8 space-y-2">
+              <p class="text-xs text-gray-400">Nenhum Match Perfeito de Troca 1:1.</p>
+              <p class="text-[9px] text-gray-500 px-4">O match perfeito surge quando você possui alguma repetida de interesse dele E ele possui alguma repetida de seu interesse.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // 1. Box 1: Match Perfeito Encontrado! (Estrito 1:1)
+        if (hasStrictMatch) {
+          const strictBox = document.createElement('div');
+          strictBox.className = 'perfect-match-box p-4 rounded-xl space-y-4 animate-fade-in mb-4 border border-copaYellow/30 bg-[#131735]/40';
+
+          strictBox.innerHTML = `
+            <div class="text-center space-y-1">
+              <h4 class="text-copaYellow font-black text-xs uppercase tracking-wider">Match Perfeito Encontrado! 🤝</h4>
+              <p class="text-[9px] text-gray-400">Excelente! Vocês podem trocar figurinhas repetidas diretamente!</p>
+            </div>
+          `;
+
+          const splitGrid = document.createElement('div');
+          splitGrid.className = 'grid grid-cols-2 gap-4 border-t border-white/5 pt-3 mb-3';
+
+          const leftCol = document.createElement('div');
+          leftCol.className = 'space-y-2';
+          leftCol.innerHTML = `<h5 class="text-[9px] font-black text-copaYellow uppercase tracking-wider">Você Recebe dele:</h5>`;
+          const leftGrid = document.createElement('div');
+          leftGrid.className = 'flex flex-wrap gap-1.5';
+          strictUserReceives.forEach(k => {
+            const cap = createMiniStickerCapsule(k);
+            leftGrid.appendChild(cap);
+          });
+          leftCol.appendChild(leftGrid);
+
+          const rightCol = document.createElement('div');
+          rightCol.className = 'space-y-2';
+          rightCol.innerHTML = `<h5 class="text-[9px] font-black text-copaGreen uppercase tracking-wider">Você Entrega:</h5>`;
+          const rightGrid = document.createElement('div');
+          rightGrid.className = 'flex flex-wrap gap-1.5';
+          strictUserGives.forEach(k => {
+            const cap = createMiniStickerCapsule(k);
+            rightGrid.appendChild(cap);
+          });
+          rightCol.appendChild(rightGrid);
+
+          splitGrid.appendChild(leftCol);
+          splitGrid.appendChild(rightCol);
+          strictBox.appendChild(splitGrid);
+
+          // Botão de ação integrado NO MESMO QUADRANTE (Share do Celular)
+          const btnShareStrict = document.createElement('button');
+          btnShareStrict.className = 'w-full py-2.5 px-4 bg-copaGreen hover:bg-opacity-95 text-black font-black uppercase text-[10px] tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-md';
+          btnShareStrict.innerHTML = `
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.574 1.97 14.101.947 11.487.947c-5.441 0-9.866 4.372-9.87 9.802 0 1.772.465 3.508 1.346 5.042L1.99 21.53l5.83-1.517zM17.75 14.61c-.347-.174-2.057-1.014-2.375-1.13-.318-.116-.549-.174-.78.174-.23.348-.895 1.13-1.097 1.362-.202.23-.404.26-.75.087-.348-.174-1.468-.541-2.796-1.728-1.034-.922-1.731-2.06-1.933-2.408-.202-.348-.022-.536.151-.708.156-.154.348-.406.52-.609.174-.203.23-.348.348-.58.116-.232.058-.435-.029-.609-.087-.174-.78-1.884-1.068-2.58-.28-.677-.566-.584-.78-.596-.202-.01-.433-.01-.664-.01-.23 0-.606.087-.923.435-.317.348-1.213 1.188-1.213 2.898 0 1.71 1.243 3.361 1.417 3.593.173.232 2.447 3.738 5.928 5.24 2.85 1.228 3.525.986 4.774.87.535-.05 2.058-.84 2.346-1.652.289-.812.289-1.507.202-1.652-.086-.145-.318-.232-.664-.406z"/>
+            </svg>
+            Abrir Negociação
+          `;
+          btnShareStrict.onclick = () => {
+            const userGivesNames = strictUserGives.map(k => getStickerNameForShare(k)).join(', ');
+            const userReceivesNames = strictUserReceives.map(k => getStickerNameForShare(k)).join(', ');
+            const appLink = window.location.origin + window.location.pathname;
+            const textMessage = `Fala, ${collector.name}! Vi seu perfil no Ultimate Cromo 2026. Temos um Match Perfeito de trocas! 🔄\nPosso te entregar: ${userGivesNames}\nE receber de você: ${userReceivesNames}\nO que acha?\nGerencie seu álbum também. Baixe o Ultimate Cromo FIFA/Panini 2026: ${appLink}`;
+            shareTextViaSystem('Match Perfeito - Ultimate Cromo 2026', textMessage);
+          };
+          strictBox.appendChild(btnShareStrict);
+          tabContentContainer.appendChild(strictBox);
+        }
+
+        // 2. Box 2: Pode dar Match! (Possível Negociação)
+        if (hasPotentialMatch) {
+          const potentialBox = document.createElement('div');
+          potentialBox.className = 'potential-match-box p-4 rounded-xl space-y-4 animate-fade-in border border-white/10 bg-white/5';
+
+          potentialBox.innerHTML = `
+            <div class="text-center space-y-1">
+              <h4 class="text-copaGreen font-black text-xs uppercase tracking-wider">Pode dar Match! 💡</h4>
+              <p class="text-[9px] text-gray-400">Vocês têm figurinhas que cruzam interesse mútuo no geral.</p>
+            </div>
+          `;
+
+          const splitGrid = document.createElement('div');
+          splitGrid.className = 'grid grid-cols-2 gap-4 border-t border-white/5 pt-3 mb-3';
+
+          const leftCol = document.createElement('div');
+          leftCol.className = 'space-y-2';
+          leftCol.innerHTML = `<h5 class="text-[9px] font-black text-copaYellow uppercase tracking-wider">Você tem e ele quer:</h5>`;
+          const leftGrid = document.createElement('div');
+          leftGrid.className = 'flex flex-wrap gap-1.5';
+          remainingUserGives.forEach(k => {
+            const cap = createMiniStickerCapsule(k);
+            leftGrid.appendChild(cap);
+          });
+          leftCol.appendChild(leftGrid);
+
+          const rightCol = document.createElement('div');
+          rightCol.className = 'space-y-2';
+          rightCol.innerHTML = `<h5 class="text-[9px] font-black text-copaGreen uppercase tracking-wider">Ele tem e você quer:</h5>`;
+          const rightGrid = document.createElement('div');
+          rightGrid.className = 'flex flex-wrap gap-1.5';
+          remainingUserReceives.forEach(k => {
+            const cap = createMiniStickerCapsule(k);
+            rightGrid.appendChild(cap);
+          });
+          rightCol.appendChild(rightGrid);
+
+          splitGrid.appendChild(leftCol);
+          splitGrid.appendChild(rightCol);
+          potentialBox.appendChild(splitGrid);
+
+          // Botão Enviar Proposta integrado NO MESMO QUADRANTE (Share do Celular)
+          const btnSharePotential = document.createElement('button');
+          btnSharePotential.className = 'w-full py-2.5 px-4 bg-copaBlue hover:bg-opacity-95 text-white font-black uppercase text-[10px] tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-md';
+          btnSharePotential.innerHTML = `
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.574 1.97 14.101.947 11.487.947c-5.441 0-9.866 4.372-9.87 9.802 0 1.772.465 3.508 1.346 5.042L1.99 21.53l5.83-1.517zM17.75 14.61c-.347-.174-2.057-1.014-2.375-1.13-.318-.116-.549-.174-.78.174-.23.348-.895 1.13-1.097 1.362-.202.23-.404.26-.75.087-.348-.174-1.468-.541-2.796-1.728-1.034-.922-1.731-2.06-1.933-2.408-.202-.348-.022-.536.151-.708.156-.154.348-.406.52-.609.174-.203.23-.348.348-.58.116-.232.058-.435-.029-.609-.087-.174-.78-1.884-1.068-2.58-.28-.677-.566-.584-.78-.596-.202-.01-.433-.01-.664-.01-.23 0-.606.087-.923.435-.317.348-1.213 1.188-1.213 2.898 0 1.71 1.243 3.361 1.417 3.593.173.232 2.447 3.738 5.928 5.24 2.85 1.228 3.525.986 4.774.87.535-.05 2.058-.84 2.346-1.652.289-.812.289-1.507.202-1.652-.086-.145-.318-.232-.664-.406z"/>
+            </svg>
+            Enviar Proposta
+          `;
+          btnSharePotential.onclick = () => {
+            const userGivesNames = remainingUserGives.map(k => getStickerNameForShare(k)).join(', ');
+            const userReceivesNames = remainingUserReceives.map(k => getStickerNameForShare(k)).join(', ');
+            const appLink = window.location.origin + window.location.pathname;
+            const textMessage = `Fala, ${collector.name}! Vi seu perfil no Ultimate Cromo 2026 e tenho uma proposta para podermos dar Match! 🔄\nMinhas repetidas que te faltam: ${userGivesNames}\nFigurinhas suas que me faltam: ${userReceivesNames}\nO que acha?\nGerencie seu álbum e envie propostas também. Baixe o Ultimate Cromo FIFA/Panini 2026: ${appLink}`;
+            shareTextViaSystem('Proposta de Troca - Ultimate Cromo 2026', textMessage);
+          };
+          potentialBox.appendChild(btnSharePotential);
+          tabContentContainer.appendChild(potentialBox);
+        }
+      } else if (activeProfileTab === 'heHas') {
+        if (cardsHeHasLackingYou.length === 0) {
+          tabContentContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Ele não tem figurinhas que faltam para você.</p>`;
+          return;
+        }
+
+        const details = document.createElement('div');
+        details.className = 'space-y-3 animate-fade-in';
+        details.innerHTML = `<h4 class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Figurinhas que ele tem e você não possui:</h4>`;
+        
+        const grid = document.createElement('div');
+        grid.className = 'flex flex-wrap gap-1.5';
+        cardsHeHasLackingYou.forEach(k => {
+          const cap = createMiniStickerCapsule(k);
+          grid.appendChild(cap);
+        });
+        details.appendChild(grid);
+        tabContentContainer.appendChild(details);
+
+      } else if (activeProfileTab === 'youHave') {
+        if (cardsYouHaveLackingHim.length === 0) {
+          tabContentContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Você não possui repetidas que faltam para ele.</p>`;
+          return;
+        }
+
+        const details = document.createElement('div');
+        details.className = 'space-y-3 animate-fade-in';
+        details.innerHTML = `<h4 class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Suas repetidas que faltam para ele:</h4>`;
+        
+        const grid = document.createElement('div');
+        grid.className = 'flex flex-wrap gap-1.5';
+        cardsYouHaveLackingHim.forEach(k => {
+          const cap = createMiniStickerCapsule(k);
+          grid.appendChild(cap);
+        });
+        details.appendChild(grid);
+        tabContentContainer.appendChild(details);
+      }
+    }
+
     // Auxiliar de Cápsula Visual
     function createMiniStickerCapsule(key) {
       const code = key.split('-')[0];
@@ -3562,48 +3779,13 @@ function renderCollectorProfile(uid, container) {
 
     setProfileTabState();
 
-    // Botões de Negociação e Proposta Customizada no rodapé do perfil
+    // Botões adicionais no rodapé do perfil (apenas proposta premium customizada se desejado)
     const bottomActions = document.createElement('div');
     bottomActions.className = 'flex flex-col gap-3 mt-6';
 
-    const btnWhatsApp = document.createElement('button');
-    btnWhatsApp.className = 'w-full py-3 px-4 bg-copaGreen hover:bg-opacity-95 text-black font-black uppercase text-[10px] tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-lg';
-    btnWhatsApp.innerHTML = `
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.574 1.97 14.101.947 11.487.947c-5.441 0-9.866 4.372-9.87 9.802 0 1.772.465 3.508 1.346 5.042L1.99 21.53l5.83-1.517zM17.75 14.61c-.347-.174-2.057-1.014-2.375-1.13-.318-.116-.549-.174-.78.174-.23.348-.895 1.13-1.097 1.362-.202.23-.404.26-.75.087-.348-.174-1.468-.541-2.796-1.728-1.034-.922-1.731-2.06-1.933-2.408-.202-.348-.022-.536.151-.708.156-.154.348-.406.52-.609.174-.203.23-.348.348-.58.116-.232.058-.435-.029-.609-.087-.174-.78-1.884-1.068-2.58-.28-.677-.566-.584-.78-.596-.202-.01-.433-.01-.664-.01-.23 0-.606.087-.923.435-.317.348-1.213 1.188-1.213 2.898 0 1.71 1.243 3.361 1.417 3.593.173.232 2.447 3.738 5.928 5.24 2.85 1.228 3.525.986 4.774.87.535-.05 2.058-.84 2.346-1.652.289-.812.289-1.507.202-1.652-.086-.145-.318-.232-.664-.406z"/>
-      </svg>
-      Abrir Negociação
-    `;
-    btnWhatsApp.onclick = () => {
-      let msg = `Fala, ${collector.name}! Vi seu perfil no Ultimate Cromo 2026. `;
-      if (hasMatchPerfect) {
-        const userGivesNames = matchPerfectUserGives.map(k => {
-          const parts = k.split('-');
-          if (parts[0] === 'EXTRAS') {
-            const name = legendsData[parseInt(parts[1], 10) - 1] ? legendsData[parseInt(parts[1], 10) - 1].name : `Lendário ${parts[1]}`;
-            return `${name} ${parts[2].toUpperCase()}`;
-          }
-          return getStickerDisplayName(parts[0], parseInt(parts[1], 10));
-        }).join(', ');
-        const userReceivesNames = matchPerfectUserReceives.map(k => {
-          const parts = k.split('-');
-          if (parts[0] === 'EXTRAS') {
-            const name = legendsData[parseInt(parts[1], 10) - 1] ? legendsData[parseInt(parts[1], 10) - 1].name : `Lendário ${parts[1]}`;
-            return `${name} ${parts[2].toUpperCase()}`;
-          }
-          return getStickerDisplayName(parts[0], parseInt(parts[1], 10));
-        }).join(', ');
-        msg += `Temos um Match Perfeito de trocas! 🔄\nPosso te entregar: ${userGivesNames}\nE receber de você: ${userReceivesNames}\nO que acha?`;
-      } else {
-        msg += `Gostaria de propor algumas trocas com você!`;
-      }
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
-    };
-    bottomActions.appendChild(btnWhatsApp);
-
     const btnCustomProposal = document.createElement('button');
-    btnCustomProposal.className = 'w-full py-2.5 px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-copaYellow font-bold text-[10px] uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5';
-    btnCustomProposal.innerHTML = `✨ Enviar Proposta (Premium)`;
+    btnCustomProposal.className = 'w-full py-2.5 px-4 bg-[#131735]/40 hover:bg-[#131735]/70 border border-white/5 text-copaYellow font-bold text-[10px] uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5';
+    btnCustomProposal.innerHTML = `✨ Proposta Personalizada (Manual Premium)`;
     btnCustomProposal.onclick = () => {
       openCustomProposalModal(collector, userStickers);
     };
