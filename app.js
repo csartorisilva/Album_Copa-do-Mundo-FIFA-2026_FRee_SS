@@ -1124,15 +1124,9 @@ function renderTeamPage(code, container) {
     card.onclick = (e) => {
       if (e.target.closest('.action-btn')) return;
       
-      const album = storage.getAlbums()[storage.getCurrentAlbumId()];
-      const sticker = album.stickers[key];
-      const isOwned = sticker && sticker.owned;
-      
-      if (!isOwned) {
-        toggleOwned(key);
-        updateCard(card, key);
-        updateTeamProgressLabel(code);
-      }
+      toggleOwned(key);
+      updateCard(card, key);
+      updateTeamProgressLabel(code);
     };
 
     updateCard(card, key);
@@ -1247,7 +1241,7 @@ function updateCard(card, key) {
       badge.className = 'rep-badge';
       card.appendChild(badge);
     }
-    badge.textContent = `x${duplicates}`;
+    badge.textContent = `+${duplicates}`;
   } else if (badge) {
     badge.remove();
   }
