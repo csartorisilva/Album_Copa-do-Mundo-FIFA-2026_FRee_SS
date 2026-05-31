@@ -67,7 +67,7 @@ body {
   transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  padding-bottom: 10rem; /* Corrige rolagem total dos cards de baixo (garante pb-40) */
+  padding-bottom: 1rem; /* Margem de respiro compacta ao final */
 }
 
 /* Efeito de curvatura/dobra da página com gradiente deslizante */
