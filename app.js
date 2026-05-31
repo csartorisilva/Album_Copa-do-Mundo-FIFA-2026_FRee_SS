@@ -230,8 +230,59 @@ function generateId() {
   return 'alb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
 }
 
-// Inicializa a aplicação
-function initApp() {
+// Controle de Cache e Sincronização de Classificação de Seleções (API Standings)
+const STANDINGS_CACHE_KEY = 'copa2026_standings_cache';
+const STANDINGS_CACHE_TIME_KEY = 'copa2026_standings_cache_time';
+const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 horas
+
+async function syncStandings() {
+  const now = Date.now();
+  const cachedTime = localStorage.getItem(STANDINGS_CACHE_TIME_KEY);
+  const cachedData = localStorage.getItem(STANDINGS_CACHE_KEY);
+
+  // 1. Tenta carregar do cache se estiver dentro do prazo de validade
+  if (cachedTime && cachedData && (now - parseInt(cachedTime, 10) < CACHE_DURATION)) {
+    console.log('Usando classificação do cache do LocalStorage.');
+    applyStandingsData(JSON.parse(cachedData));
+    return;
+  }
+
+  // 2. Sem cache ou expirado, faz requisição ao JSON público de classificação
+  try {
+    const response = await fetch('./copa2026-standings.json');
+    if (!response.ok) throw new Error('Erro na requisição do JSON público.');
+    
+    const data = await response.json();
+    if (data && data.standings) {
+      console.log('Classificação sincronizada com sucesso do servidor.');
+      localStorage.setItem(STANDINGS_CACHE_KEY, JSON.stringify(data.standings));
+      localStorage.setItem(STANDINGS_CACHE_TIME_KEY, now.toString());
+      applyStandingsData(data.standings);
+    }
+  } catch (error) {
+    console.warn('Erro ao conectar com API de classificação. Usando dados offline:', error);
+    if (cachedData) {
+      applyStandingsData(JSON.parse(cachedData));
+    }
+  }
+}
+
+function applyStandingsData(standings) {
+  groupsData.forEach(g => {
+    g.teams.forEach(team => {
+      const stats = standings[team.code];
+      if (stats) {
+        team.rank = stats.rank !== undefined ? stats.rank : team.rank;
+        team.points = stats.points !== undefined ? stats.points : team.points;
+        team.eliminated = stats.eliminated !== undefined ? stats.eliminated : team.eliminated;
+        team.eliminatedStage = stats.eliminatedStage !== undefined ? stats.eliminatedStage : team.eliminatedStage;
+      }
+    });
+  });
+}
+
+// Inicializa a aplicação de forma assíncrona para sincronizar dados da API
+async function initApp() {
   console.log('Inicializando App FIFA 2026 com visual FUT...');
   try {
     let albums = storage.getAlbums();
@@ -243,6 +294,10 @@ function initApp() {
     } else if (!storage.getCurrentAlbumId()) {
       storage.setCurrentAlbumId(Object.keys(albums)[0]);
     }
+    
+    // Executa a rotina de sincronização de dados do torneio
+    await syncStandings();
+    
     renderHeader();
     route();
   } catch (e) {
