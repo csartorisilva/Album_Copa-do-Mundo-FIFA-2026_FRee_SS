@@ -1,0 +1,7 @@
+# Credenciais de Banco de Dados
+supabase_config.js
+
+# Outros arquivos temporários / locais
+node_modules/
+.DS_Store
+*.log

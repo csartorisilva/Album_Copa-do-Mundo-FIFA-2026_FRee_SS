@@ -1,0 +1,27 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master # Dispara automaticamente ao atualizar a branch master de desenvolvimento
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Inject Supabase Credentials
+        run: |
+          echo "window.SUPABASE_URL = '${{ secrets.SUPABASE_URL }}';" > supabase_config.js
+          echo "window.SUPABASE_KEY = '${{ secrets.SUPABASE_KEY }}';" >> supabase_config.js
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: .
+          branch: gh-pages

@@ -21,25 +21,35 @@ create table if not exists public.profiles (
 -- =========================================================================
 -- 2. HABILITAR SEGURANÇA EM NÍVEL DE LINHA (RLS)
 -- =========================================================================
--- Isso protege o banco de dados contra leituras/gravações não autorizadas,
--- mesmo que suas chaves públicas sejam expostas no código do navegador.
+-- RLS é essencial para garantir a segurança dos dados do aplicativo.
+-- Impede que hackers ou pessoas não autorizadas leiam/gravem dados
+-- de forma indevida, mesmo com as chaves anônimas públicas do projeto.
 alter table public.profiles enable row level security;
 
 -- =========================================================================
--- 3. POLÍTICAS DE ACESSO SEGURO
+-- 3. POLÍTICAS DE ACESSO SEGURO E ESTRITO
 -- =========================================================================
--- Qualquer pessoa (mesmo usuários não logados) pode ler os perfis para a aba Comunidade
-create policy "Qualquer pessoa pode ler perfis"
+
+-- Limpa políticas anteriores se existirem para evitar conflitos
+drop policy if exists "Qualquer pessoa pode ler perfis públicos" on public.profiles;
+drop policy if exists "Qualquer pessoa pode ler perfis" on public.profiles;
+drop policy if exists "Usuários podem atualizar apenas seu próprio perfil" on public.profiles;
+drop policy if exists "Usuários podem atualizar o próprio perfil" on public.profiles;
+drop policy if exists "Usuários podem criar apenas seu próprio perfil" on public.profiles;
+drop policy if exists "Usuários podem criar o próprio perfil" on public.profiles;
+
+-- Política 1: Visualização pública (Necessária para a aba Comunidade exibir outros colecionadores)
+create policy "Qualquer pessoa pode ler perfis públicos"
   on public.profiles for select
   using (true);
 
--- Um usuário autenticado só pode atualizar seu próprio perfil
-create policy "Usuários podem atualizar o próprio perfil"
+-- Política 2: Modificação restrita (APENAS o próprio usuário logado com o respectivo UID pode atualizar)
+create policy "Usuários podem atualizar apenas seu próprio perfil"
   on public.profiles for update
   using (auth.uid() = uid);
 
--- Um usuário autenticado só pode criar seu próprio perfil
-create policy "Usuários podem criar o próprio perfil"
+-- Política 3: Inserção restrita (APENAS o próprio usuário logado com o respectivo UID pode inserir)
+create policy "Usuários podem criar apenas seu próprio perfil"
   on public.profiles for insert
   with check (auth.uid() = uid);
 
