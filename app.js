@@ -32,7 +32,7 @@ const storage = {
 // Mapeamento de URLs estáveis e públicas de brasões/logos das federações de futebol reais (Wikimedia Commons Thumbnails PNG)
 const crestsMap = {
   USA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/US_Soccer_Federation_logo.svg/120px-US_Soccer_Federation_logo.svg.png',
-  MEX: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Federacion_Mexicana_de_Futbol_Asociacion.svg/120px-Federacion_Mexicana_de_Futbol_Asociacion.svg.png',
+  MEX: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/FMF_Logo.png/120px-FMF_Logo.png',
   CAN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Canada_Soccer_logo.svg/120px-Canada_Soccer_logo.svg.png',
   BRA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Brazilian_Football_Confederation_logo.svg/120px-Brazilian_Football_Confederation_logo.svg.png',
   COL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Federacion_Colombiana_de_Futbol_logo.svg/120px-Federacion_Colombiana_de_Futbol_logo.svg.png',
