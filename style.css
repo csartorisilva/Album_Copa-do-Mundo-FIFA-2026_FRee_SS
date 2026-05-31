@@ -178,9 +178,9 @@ body {
 
 /* Card Back: Closed sticker (FUT styling) */
 .card-back {
-  background: var(--fut-dark-gradient);
+  background: linear-gradient(135deg, #2c3240 0%, #171b26 100%);
   border: none;
-  box-shadow: inset 0 0 0 2px #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
   padding: 8px;
   justify-content: center;
   align-items: center;
@@ -190,7 +190,7 @@ body {
 }
 
 .sticker-card:hover .card-back {
-  box-shadow: inset 0 0 0 2px rgba(255, 199, 38, 0.4), var(--gold-glow);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15), 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
 .fifa-logo-placeholder {
@@ -316,31 +316,32 @@ body {
 }
 
 .action-btn {
-  background: rgba(19, 21, 56, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: #fff;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-size: 0.75rem;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  font-weight: 800;
+  font-size: 0.7rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
   cursor: pointer;
+  backdrop-filter: blur(4px);
 }
 
 .action-btn:hover {
-  background: var(--copa-blue);
-  border-color: var(--copa-blue);
-  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 199, 38, 0.4);
+  transform: translateY(-1px) scale(1.05);
 }
 
 .action-btn.btn-remove:hover, .action-btn.btn-minus:hover {
-  background: #f44336;
-  border-color: #f44336;
+  background: rgba(244, 67, 54, 0.25);
+  border-color: rgba(244, 67, 54, 0.5);
 }
 
 /* Custom Scrollbar for app layout */
@@ -422,7 +423,7 @@ body {
 /* Nome ou categoria do jogador na base central (Posicionado acima do logo 26) */
 .player-name-label {
   position: absolute;
-  top: calc(50% - 39px); /* Posicionado acima do logotipo 26 no centro */
+  top: 28px; /* Revela no topo */
   left: 4px;
   right: 4px;
   text-align: center;
@@ -510,5 +511,23 @@ body {
   opacity: 0.75;
   pointer-events: none;
   clip-path: polygon(10% 0%, 90% 0%, 100% 8%, 100% 92%, 90% 100%, 10% 100%, 0% 92%, 0% 8%);
+}
+
+/* OCR Scanner Animations */
+@keyframes scan-line {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+.animate-scan-line {
+  animation: scan-line 2s infinite linear;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in {
+  animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 

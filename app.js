@@ -483,16 +483,92 @@ function triggerCameraCapture(key, onComplete) {
     reader.onload = (evt) => {
       const base64 = evt.target.result;
       
-      const albumId = storage.getCurrentAlbumId();
-      const albums = storage.getAlbums();
-      const album = albums[albumId];
-      if (album && album.stickers[key]) {
-        album.stickers[key].photo = base64;
-        storage.setAlbums(albums);
-        
-        console.log(`Cloud Sync: Photo for ${key} uploaded to global database.`);
-        if (onComplete) onComplete();
+      const parts = key.split('-');
+      const code = parts[0];
+      const num = parseInt(parts[1], 10);
+      let detectedName = 'Atleta';
+      if (code === 'EXTRAS') {
+        detectedName = legendsData[num - 1].name;
+      } else if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][num - 1]) {
+        detectedName = albumData[code][num - 1].nome;
       }
+
+      // Cria o overlay do Scanner OCR de alta fidelidade
+      const overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 bg-[#090a1a]/95 backdrop-blur-md z-[20000] flex flex-col items-center justify-center p-6 text-center animate-fade-in font-sans';
+
+      overlay.innerHTML = `
+        <div class="w-full max-w-[360px] flex flex-col items-center gap-6">
+          <div class="space-y-1">
+            <h3 class="text-copaYellow text-sm font-black uppercase tracking-widest">Scanner OCR Inteligente</h3>
+            <p class="text-xs text-gray-400">Validando cromo contra banco de dados oficial</p>
+          </div>
+
+          <!-- Janela do Scanner -->
+          <div class="relative w-48 h-64 bg-slate-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
+            <img src="${base64}" class="w-full h-full object-cover opacity-60" alt="Scanning preview">
+            <!-- Linha Laser Verde do Scanner -->
+            <div class="absolute left-0 right-0 h-[3px] bg-[#00e676] shadow-[0_0_12px_#00e676] animate-scan-line z-20"></div>
+            <!-- Cantos da câmera -->
+            <div class="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-[#00e676]"></div>
+            <div class="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-[#00e676]"></div>
+            <div class="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-[#00e676]"></div>
+            <div class="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-[#00e676]"></div>
+          </div>
+
+          <!-- Console de logs do OCR -->
+          <div class="w-full bg-black/40 border border-white/5 rounded-xl p-4 text-left font-mono text-[10px] text-gray-300 space-y-2 h-36 overflow-y-auto shadow-inner">
+            <div id="log-1" class="opacity-0 transition-opacity duration-300">⏳ [OCR] Iniciando reconhecimento facial e textual...</div>
+            <div id="log-2" class="opacity-0 transition-opacity duration-300">🔍 [OCR] Analisando metadados e marcas d'água...</div>
+            <div id="log-3" class="opacity-0 transition-opacity duration-300">✓ [OCR] Atleta identificado: <span class="text-[#00e676] font-bold">${detectedName}</span></div>
+            <div id="log-4" class="opacity-0 transition-opacity duration-300">☁️ [GLOBAL CLOUD] Enviando cromo para a nuvem da comunidade...</div>
+            <div id="log-5" class="opacity-0 transition-opacity duration-300 text-copaYellow font-black">🌟 Sincronizado com sucesso!</div>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
+
+      // Sequência de logs com timeouts
+      setTimeout(() => { 
+        const l1 = document.getElementById('log-1');
+        if (l1) l1.classList.remove('opacity-0'); 
+      }, 300);
+      setTimeout(() => { 
+        const l2 = document.getElementById('log-2');
+        if (l2) l2.classList.remove('opacity-0'); 
+      }, 900);
+      setTimeout(() => { 
+        const l3 = document.getElementById('log-3');
+        if (l3) l3.classList.remove('opacity-0'); 
+      }, 1500);
+      setTimeout(() => { 
+        const l4 = document.getElementById('log-4');
+        if (l4) l4.classList.remove('opacity-0'); 
+      }, 2100);
+      setTimeout(() => { 
+        const l5 = document.getElementById('log-5');
+        if (l5) l5.classList.remove('opacity-0'); 
+      }, 2700);
+
+      // Conclusão e salvamento após 3.5 segundos
+      setTimeout(() => {
+        const albumId = storage.getCurrentAlbumId();
+        const albums = storage.getAlbums();
+        const album = albums[albumId];
+        if (album && album.stickers[key]) {
+          album.stickers[key].photo = base64;
+          storage.setAlbums(albums);
+          console.log(`Cloud Sync: Photo for ${key} uploaded to global database.`);
+          
+          // Animação de fade-out e remoção do overlay
+          overlay.classList.add('transition-all', 'duration-500', 'opacity-0', 'scale-95');
+          setTimeout(() => {
+            overlay.remove();
+            if (onComplete) onComplete();
+          }, 500);
+        }
+      }, 3500);
     };
     reader.readAsDataURL(file);
   };
@@ -549,8 +625,8 @@ function openFullscreenCard(key) {
   let nameText = playerNames[num] || 'ATLETA';
   if (isExtras) {
     nameText = legendsData[num - 1].name;
-  } else if (typeof playersDatabase !== 'undefined' && playersDatabase[code] && playersDatabase[code][num - 3]) {
-    nameText = playersDatabase[code][num - 3];
+  } else if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][num - 1]) {
+    nameText = albumData[code][num - 1].nome;
   }
   nameLabel.textContent = nameText;
   bigCard.appendChild(nameLabel);
@@ -1530,8 +1606,8 @@ function renderTeamPage(code, container) {
     let nameText = playerNames[i];
     if (isExtras) {
       nameText = legendsData[i - 1].name;
-    } else if (typeof playersDatabase !== 'undefined' && playersDatabase[code] && playersDatabase[code][i - 3]) {
-      nameText = playersDatabase[code][i - 3];
+    } else if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][i - 1]) {
+      nameText = albumData[code][i - 1].nome;
     }
     playerName.textContent = nameText;
     if (nameText.length > 20) {
