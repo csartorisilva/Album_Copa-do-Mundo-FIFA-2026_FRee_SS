@@ -55,7 +55,7 @@
 <body class="bg-[#02040a] text-gray-100 font-sans min-h-screen flex justify-center items-stretch p-0 sm:p-4">
   
   <!-- Container principal simulando formato de app móvel (Padrão Web App) -->
-  <div class="w-full max-w-[480px] bg-[#050814] border-x border-white/5 flex flex-col min-h-screen sm:min-h-[90vh] sm:my-auto sm:rounded-2xl sm:overflow-hidden shadow-2xl relative">
+  <div class="w-full max-w-full sm:max-w-[480px] md:max-w-[720px] lg:max-w-[960px] bg-[#050814] border-x border-white/5 flex flex-col min-h-screen sm:min-h-[90vh] sm:my-auto sm:rounded-2xl sm:overflow-hidden shadow-2xl relative">
     
     <!-- Header compacto ajustado para Web App com Ações Rápidas -->
     <header class="bg-[#070d1e]/95 border-b border-white/10 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
@@ -134,10 +134,10 @@
               </svg>
             </button>
 
-            <!-- 3. Figurinhas Repetidas / Trocas (Ícone de setas de troca: direita amarela, esquerda verde) -->
+            <!-- 3. Trocas (Ícone de setas de troca: direita amarela, esquerda verde) -->
             <button onclick="location.hash = '#trades'" 
                     class="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-copaGreen/30 w-7 h-7 flex items-center justify-center rounded-lg text-white transition"
-                    title="Figurinhas Repetidas / Trocas">
+                    title="Trocas">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <!-- Seta para a Direita (Superior): Amarela -->
                 <path class="text-copaYellow" stroke-linecap="round" stroke-linejoin="round" d="M16.5 3L21 7.5m0 0L16.5 12M21 7.5H7.5" />
@@ -146,11 +146,13 @@
               </svg>
             </button>
 
-            <!-- 4. Comunidade (Ícone de 3 Pessoas em azul marinho) -->
-            <button onclick="location.hash = '#community'" 
-                    class="bg-white hover:bg-gray-100 w-7 h-7 flex items-center justify-center rounded-lg transition shadow-sm"
+            <!-- 4. Comunidade (Ícone de 3 Pessoas, abre Trocas Manuais/Deu Match) -->
+            <button onclick="location.hash = '#trades-manual'" 
+                    class="bg-transparent hover:bg-white/10 border border-white/5 hover:border-purple-500/30 w-7 h-7 flex items-center justify-center rounded-lg transition"
                     title="Comunidades de Troca">
-              <img src="./comunidade.png" class="w-4 h-4 object-contain" alt="Comunidade">
+              <svg class="w-4 h-4 text-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.85)]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+              </svg>
             </button>
 
             <!-- 3. Compartilhar Geral (Ícone de share) -->

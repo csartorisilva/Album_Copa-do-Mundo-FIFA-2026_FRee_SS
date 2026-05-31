@@ -29,59 +29,58 @@ const storage = {
 };
 
 // Mapeamento de URLs estáveis e públicas de brasões/logos das federações de futebol reais (Wikimedia Commons)
-// Mapeamento de URLs estáveis e públicas de brasões/logos das federações de futebol reais (Wikimedia Commons Thumbnails PNG)
 const crestsMap = {
-  USA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/US_Soccer_Federation_logo.svg/120px-US_Soccer_Federation_logo.svg.png',
-  MEX: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/FMF_Logo.png/120px-FMF_Logo.png',
-  CAN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Canada_Soccer_logo.svg/120px-Canada_Soccer_logo.svg.png',
-  BRA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Brazilian_Football_Confederation_logo.svg/120px-Brazilian_Football_Confederation_logo.svg.png',
-  COL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Federacion_Colombiana_de_Futbol_logo.svg/120px-Federacion_Colombiana_de_Futbol_logo.svg.png',
-  PAR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Asociacion_Paraguaya_de_Futbol_logo.svg/120px-Asociacion_Paraguaya_de_Futbol_logo.svg.png',
-  ARG: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Asociaci%C3%B3n_del_F%C3%BAtbol_Argentino_logo.svg/120px-Asociaci%C3%B3n_del_F%C3%BAtbol_Argentino_logo.svg.png',
-  URU: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg/120px-Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg.png',
-  KSA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Saudi_Arabia_Football_Federation_logo.svg/120px-Saudi_Arabia_Football_Federation_logo.svg.png',
-  FRA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Logo_F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football.svg/120px-Logo_F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football.svg.png',
-  MAR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/F%C3%A9d%C3%A9ration_royale_marocaine_de_football.svg/120px-F%C3%A9d%C3%A9ration_royale_marocaine_de_football.svg.png',
-  AUT: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Austrian_Football_Association_logo.svg/120px-Austrian_Football_Association_logo.svg.png',
-  ESP: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Real_Federaci%C3%B3n_Espa%C3%B1ola_de_F%C3%BAtbol_logo.svg/120px-Real_Federaci%C3%B3n_Espa%C3%B1ola_de_F%C3%BAtbol_logo.svg.png',
-  JPN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Japan_Football_Association_logo.svg/120px-Japan_Football_Association_logo.svg.png',
-  ECU: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Federacion_Ecuatoriana_de_Futbol.svg/120px-Federacion_Ecuatoriana_de_Futbol.svg.png',
-  EGY: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Egyptian_Football_Association_logo.svg/120px-Egyptian_Football_Association_logo.svg.png',
-  GER: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Deutscher_Fu%C3%9Fball-Bund_logo.svg/120px-Deutscher_Fu%C3%9Fball-Bund_logo.svg.png',
-  BEL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Royal_Belgian_FA_logo.svg/120px-Royal_Belgian_FA_logo.svg.png',
-  KOR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Korea_Football_Association_logo.svg/120px-Korea_Football_Association_logo.svg.png',
-  TUN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Tunisian_Football_Federation_logo.svg/120px-Tunisian_Football_Federation_logo.svg.png',
-  ENG: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/38/England_crest_2009.svg/120px-England_crest_2009.svg.png',
-  SEN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/F%C3%A9d%C3%A9ration_S%C3%A9n%C3%A9galaise_de_Football.svg/120px-F%C3%A9d%C3%A9ration_S%C3%A9n%C3%A9galaise_de_Football.svg.png',
-  IRN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Football_Federation_Islamic_Republic_of_Iran_logo.svg/120px-Football_Federation_Islamic_Republic_of_Iran_logo.svg.png',
-  POR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Federa%C3%A7%C3%A3o_Portuguesa_de_Futebol_logo.svg/120px-Federa%C3%A7%C3%A3o_Portuguesa_de_Futebol_logo.svg.png',
-  GHA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Ghana_Football_Association_logo.svg/120px-Ghana_Football_Association_logo.svg.png',
-  TUR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Turkish_Football_Federation_logo.svg/120px-Turkish_Football_Federation_logo.svg.png',
-  AUS: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Football_Australia_logo.svg/120px-Football_Australia_logo.svg.png',
-  ALG: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Algerian_Football_Federation_logo.svg/120px-Algerian_Football_Federation_logo.svg.png',
-  NED: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Knvb_logo.svg/120px-Knvb_logo.svg.png',
-  CRO: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Croatian_Football_Federation_logo.svg/120px-Croatian_Football_Federation_logo.svg.png',
-  SCO: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/65/Scottish_Football_Association_crest.svg/120px-Scottish_Football_Association_crest.svg.png',
-  SUI: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Swiss_Football_Association_logo.svg/120px-Swiss_Football_Association_logo.svg.png',
-  PAN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Federacion_Panamena_de_Futbol.svg/120px-Federacion_Panamena_de_Futbol.svg.png',
-  SWE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Swedish_Football_Association_logo.svg/120px-Swedish_Football_Association_logo.svg.png',
-  NZL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/New_Zealand_Football_logo.svg/120px-New_Zealand_Football_logo.svg.png',
+  USA: './crests/brasão da seleção USA.png',
+  MEX: './crests/brasão da seleção mexico.png',
+  CAN: './crests/brasão da seleção canada.png',
+  BRA: './crests/brasão da seleção brasil.png',
+  COL: './crests/brasão da seleção colombia.webp',
+  PAR: './crests/brasão da seleção paraguai.png',
+  ARG: './crests/brasão da seleção argentina.png',
+  URU: './crests/brasão da seleção uruguai.webp',
+  KSA: './crests/brasão da seleção arabia saudita.png',
+  FRA: './crests/brasão da seleção França.png',
+  MAR: './crests/brasão da seleção marrocos.png',
+  AUT: './crests/brasão da seleção austria.png',
+  ESP: './crests/brasão da seleção espanha.png',
+  JPN: './crests/brasão da seleção japão.png',
+  ECU: './crests/brasão da seleção equador.png',
+  EGY: './crests/brasão da seleção egito.png',
+  GER: './crests/brasão da seleção alemanha.webp',
+  BEL: './crests/brasão da seleção belgica.jpg',
+  KOR: './crests/brasão seleção iraque.png',
+  TUN: './crests/brasão da seleção tunisia.png',
+  ENG: './crests/brasão da seleção ira.png',
+  SEN: './crests/brasão da seleção senegal.png',
+  IRN: './crests/brasão da seleção ira.png',
+  POR: './crests/brasão da seleção portugual.png',
+  GHA: './crests/brasão da seleção gana.png',
+  TUR: './crests/brasão da seleção turquia.png',
+  AUS: './crests/brasão da seleção australia.png',
+  ALG: './crests/brasão da seleção argelia.png',
+  NED: './crests/brasão da seleção holanda.png',
+  CRO: './crests/brasão da seleção croacia.png',
+  SCO: './crests/brasão da seleção escocia.png',
+  SUI: './crests/brasão da seleção suiça.png',
+  PAN: './crests/brasão da seleção panama.png',
+  SWE: './crests/brasão da seleção suecia.png',
+  NZL: './crests/brasão da seleção nova zelandia.png',
+  RSA: './crests/brasão da seleção iraque.png',
+  CZE: './crests/brasão seleção iraque.png',
+  BIH: './crests/brasão da seleção bosnia.jpg',
+  QAT: './crests/brasão da seleção Catar.png',
+  HAI: './crests/brasão da seleção haiti.png',
+  CUW: './crests/brasão da seleção curaçao.png',
+  CIV: './crests/brasão da seleção costa do marfim.png',
+  CPV: './crests/brasão da seleção cabo verde.png',
+  IRQ: './crests/brasão da seleção iraque.png',
+  NOR: './crests/brasão da seleção noruegua.png',
   FWC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png',
   CC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png',
   // Enriquecidos com Wikimedia Commons estáveis
-  RSA: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/South_African_Football_Association_logo.svg/120px-South_African_Football_Association_logo.svg.png',
-  CZE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Logo_FA%C4%8CR.svg/120px-Logo_FA%C4%8CR.svg.png',
-  BIH: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/NFSBiH_logo.svg/120px-NFSBiH_logo.svg.png',
-  QAT: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Qatar_Football_Association_logo.svg/120px-Qatar_Football_Association_logo.svg.png',
-  HAI: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Logo_F%C3%A9d%C3%A9ration_Ha%C3%AFtienne_de_Football_2021.png/120px-Logo_F%C3%A9d%C3%A9ration_Ha%C3%AFtienne_de_Football_2021.png',
-  CUW: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/FFK_Logo.png/120px-FFK_Logo.png',
-  CIV: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Logo_F%C3%A9d%C3%A9ration_Ivoirienne_de_Football.png/120px-Logo_F%C3%A9d%C3%A9ration_Ivoirienne_de_Football.png',
-  CPV: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/36/Cape_Verde_football_association_crest.png/120px-Cape_Verde_football_association_crest.png',
-  IRQ: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Iraq_FA_logo.svg/120px-Iraq_FA_logo.svg.png',
-  NOR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Norway_national_football_team_crest.svg/120px-Norway_national_football_team_crest.svg.png',
   JOR: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Jordan_Football_Association_logo.svg/120px-Jordan_Football_Association_logo.svg.png',
-  COD: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Logo_Fecofa.png/120px-Logo_Fecofa.png',
-  UZB: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Uzbekistan_Football_Association_logo.svg/120px-Uzbekistan_Football_Association_logo.svg.png',
+  COD: './crests/brasão da seleção congo.jpg',
+  UZB: './crests/brasão da seleção usbequistao.jpg',
   EXTRAS: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/120px-Golden_Ball.svg.png'
 };
 
@@ -543,7 +542,7 @@ function checkAlbumEntryPopup() {
 
 // Compartilhamento geral do aplicativo
 function shareApp() {
-  const title = 'Ultimate Cromos FIFA 2026';
+  const title = 'Ultimate Cromo FIFA 2026';
   const link = window.location.origin + window.location.pathname;
   const text = `Eu uso o app-web (${link}) para o controle do meu álbum, ele tem um excelente layout e a funcionalidade de Trocas Qualificadas, onde o próprio app encontra as figurinhas faltantes para trocar.`;
   shareText(title, text);
@@ -640,6 +639,7 @@ function triggerCameraCapture(key, onComplete) {
       overlay.innerHTML = `
         <div class="w-full max-w-[360px] flex flex-col items-center gap-6">
           <div class="space-y-1">
+            <span class="text-copaYellow text-[8px] tracking-widest font-black mb-0.5">Ultimate Cromo</span>
             <h3 class="text-copaYellow text-sm font-black uppercase tracking-widest">Scanner OCR Inteligente</h3>
             <p class="text-xs text-gray-400">Validando cromo contra banco de dados oficial</p>
           </div>
@@ -799,7 +799,7 @@ function openFullscreenCard(key) {
   btnShare.className = 'flex-1 px-4 py-2.5 bg-copaYellow hover:bg-opacity-90 text-black text-xs font-black uppercase tracking-wider rounded-xl transition';
   btnShare.textContent = 'Compartilhar Cromo';
   btnShare.onclick = () => {
-    const textShare = `Olha o meu card de ${stickerName} colado no app Ultimate Cromos FIFA 2026!`;
+    const textShare = `Olha o meu card de ${stickerName} colado no app Ultimate Cromo FIFA 2026!`;
     shareText(stickerName, textShare);
   };
   btnRow.appendChild(btnShare);
@@ -952,7 +952,7 @@ function renderHeader() {
     if (user) {
       // Avatar com badge verde de online
       authBtn.innerHTML = `
-        <img src="${user.photo_url}" class="w-full h-full object-cover" alt="Perfil" onerror="this.style.display='none';this.parentElement.innerHTML='\uD83D\uDC64'">
+        <img src="${user.photo_url}" class="w-full h-full object-cover rounded-full" alt="Perfil" onerror="this.style.display='none';this.parentElement.innerHTML='\uD83D\uDC64'">
         <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-copaGreen rounded-full border-2 border-[#070d1e] block"></span>
       `;
       authBtn.style.position = 'relative';
@@ -1014,15 +1014,19 @@ function renderNewPage(hash, root) {
   } else if (hash.startsWith('#team-')) {
     const code = hash.split('-')[1];
     renderTeamPage(code, pageContainer);
-  } else if (hash.startsWith('#trades')) {
+  } else if (hash.startsWith('#trades') || hash.startsWith('#community')) {
+    if (hash === '#trades-manual') {
+      currentTradesSubTab = 'manual';
+      currentCommunityTab = 'favorites';
+    } else if (hash === '#trades') {
+      currentTradesSubTab = 'match';
+    }
     renderTrades(pageContainer);
   } else if (hash.startsWith('#login')) {
     renderLogin(pageContainer);
   } else if (hash.startsWith('#community-profile-')) {
     const uid = hash.substring('#community-profile-'.length);
     renderCollectorProfile(uid, pageContainer);
-  } else if (hash.startsWith('#community')) {
-    renderCommunity(pageContainer);
   } else {
     location.hash = '#home';
     return;
@@ -1325,7 +1329,7 @@ function renderHome(container) {
   progressSection.appendChild(progressBarBg);
 
   const textStats = document.createElement('div');
-  textStats.className = 'flex justify-between mt-3 text-xs font-semibold text-gray-300';
+  textStats.className = 'flex justify-between mt-1 text-xs font-semibold text-gray-300';
   textStats.innerHTML = `
     <div><span class="text-base font-black text-white">${stats.owned}</span> / ${stats.total} Adquiridas</div>
     <div><span class="text-base font-black text-copaYellow">${stats.duplicates}</span> Repetidas</div>
@@ -1334,7 +1338,7 @@ function renderHome(container) {
 
   // Bloco de Compartilhamento (exibido abaixo das estatísticas sem o rótulo)
   const shareBlock = document.createElement('div');
-  shareBlock.className = 'flex flex-col gap-2 mt-1 w-full';
+  shareBlock.className = 'flex flex-col gap-2 mt-0.5 w-full';
   
   const shareButtonsContainer = document.createElement('div');
   shareButtonsContainer.className = 'grid grid-cols-3 gap-2 w-full';
@@ -1397,10 +1401,6 @@ function renderHome(container) {
     banner.style.cursor = 'pointer';
     rootHome.appendChild(banner);
   }
-
-  // 3. PRIMEIRA LINHA: 4 Blocos de Seções Especiais com Progresso
-  const specialGrid = document.createElement('div');
-  specialGrid.className = 'grid grid-cols-4 gap-2';
 
   // Helper de progresso local
   function getSpecialProgress(code) {
@@ -1502,58 +1502,13 @@ function renderHome(container) {
     }
   ];
 
-  specialBlocks.forEach(sec => {
-    const box = document.createElement('div');
-    box.className = `glass-panel rounded-xl border cursor-pointer flex flex-col items-center text-center transition group relative overflow-hidden p-2.5 gap-1.5 ${sec.color}`;
-    box.onclick = () => location.hash = sec.hash;
-
-    // Logo SVG inline centralizado
-    const logoWrapper = document.createElement('div');
-    logoWrapper.className = 'w-9 h-9 flex items-center justify-center';
-    logoWrapper.innerHTML = sec.logo;
-    box.appendChild(logoWrapper);
-
-    // Título
-    const titleEl = document.createElement('p');
-    titleEl.className = 'font-black text-[9px] text-white uppercase tracking-widest leading-none';
-    titleEl.textContent = sec.title;
-    box.appendChild(titleEl);
-
-    // Descrição
-    const descEl = document.createElement('p');
-    descEl.className = 'text-[8px] text-gray-500 leading-none';
-    descEl.textContent = sec.desc;
-    box.appendChild(descEl);
-
-    // Progresso
-    const progEl = document.createElement('p');
-    const pct = sec.prog.total > 0 ? Math.round((sec.prog.owned / sec.prog.total) * 100) : 0;
-    progEl.className = 'text-[9px] font-black leading-none mt-0.5';
-    progEl.style.color = sec.accentColor;
-    progEl.textContent = `${sec.prog.owned}/${sec.prog.total}`;
-    box.appendChild(progEl);
-
-    // Mini barra de progresso
-    const barBg = document.createElement('div');
-    barBg.className = 'w-full h-1 bg-white/5 rounded-full overflow-hidden';
-    const barFill = document.createElement('div');
-    barFill.className = 'h-full rounded-full transition-all';
-    barFill.style.width = `${pct}%`;
-    barFill.style.background = sec.accentColor;
-    barBg.appendChild(barFill);
-    box.appendChild(barBg);
-
-    specialGrid.appendChild(box);
-  });
-  rootHome.appendChild(specialGrid);
-
   // 4. Divisor de Título Grupos + Link Classificação Geral (Movido para cá)
   const groupsHeaderRow = document.createElement('div');
-  groupsHeaderRow.className = 'flex justify-between items-center border-b border-white/5 pb-1 mt-6';
+  groupsHeaderRow.className = 'flex justify-between items-center border-b border-white/5 pb-1 mt-4';
 
   const groupsTitle = document.createElement('h3');
   groupsTitle.className = 'text-xs font-black uppercase tracking-wider text-gray-500';
-  groupsTitle.textContent = 'Seleções por Grupos';
+  groupsTitle.textContent = 'Figurinhas';
   groupsHeaderRow.appendChild(groupsTitle);
 
   const tableLink = document.createElement('a');
@@ -1573,6 +1528,103 @@ function renderHome(container) {
   // 5. LINHAS SEGUINTES: Cada grupo exibido abaixo do outro (Vertical)
   const groupsContainer = document.createElement('div');
   groupsContainer.className = 'space-y-5';
+
+  // Card do grupo ESPECIAIS no mesmo padrão das seleções
+  const specialsGroupCard = document.createElement('div');
+  specialsGroupCard.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
+  
+  const specialsGroupHeader = document.createElement('div');
+  specialsGroupHeader.className = 'border-b border-white/5 pb-1 w-full';
+
+  const specialsGTitle = document.createElement('h4');
+  specialsGTitle.className = 'font-black text-[10px] text-gray-400 uppercase tracking-widest';
+  specialsGTitle.textContent = 'ESPECIAIS';
+  specialsGroupHeader.appendChild(specialsGTitle);
+  specialsGroupCard.appendChild(specialsGroupHeader);
+
+  const specialsGrid = document.createElement('div');
+  specialsGrid.className = 'grid grid-cols-4 gap-1';
+
+  const specialItems = [
+    {
+      name: 'FIFA',
+      code: 'FWC',
+      limit: 19,
+      prog: fwcProg,
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="6" fill="#0033A0"/><text x="24" y="30" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="14" fill="white">FIFA</text></svg>`),
+      grayscale: false
+    },
+    {
+      name: 'Escudos',
+      code: 'ESCUDOS',
+      limit: 48,
+      prog: shProg,
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" fill="#FFC726" opacity="0.85"/><path d="M24 10L10 17v9c0 7.5 6 13.5 14 15 8-1.5 14-7.5 14-15v-9L24 10z" fill="#090a1a" opacity="0.3"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="9" fill="white">ESCUDO</text></svg>`),
+      grayscale: false
+    },
+    {
+      name: 'Coca-Cola',
+      code: 'CC',
+      limit: 14,
+      prog: ccProg,
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="6" fill="#E31E2D"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="7.5" fill="white">Coca-Cola</text></svg>`),
+      grayscale: false
+    },
+    {
+      name: 'Premium',
+      code: 'EXTRAS',
+      limit: legendsData.length * 4,
+      prog: premProg,
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="6" fill="#FFD700"/><polygon points="24,8 28,18 39,18 30,25 34,36 24,29 14,36 18,25 9,18 20,18" fill="#131735"/></svg>`),
+      grayscale: false
+    }
+  ];
+
+  specialItems.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'cursor-pointer transition flex flex-col items-center justify-center gap-1 group relative py-1.5 px-0.5 hover:scale-105 mt-2 h-auto pb-2';
+    card.onclick = () => location.hash = `#team-${item.code}`;
+
+    const crestWrapper = document.createElement('div');
+    crestWrapper.className = 'relative w-12 h-12 flex items-center justify-center';
+
+    const crestImg = document.createElement('img');
+    if (item.code === 'ESCUDOS') {
+      // Inserir escudo padrão ou SVG
+      crestImg.src = `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" fill="#FFC726" opacity="0.85"/><path d="M24 10L10 17v9c0 7.5 6 13.5 14 15 8-1.5 14-7.5 14-15v-9L24 10z" fill="#090a1a" opacity="0.3"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="9" fill="white">ESCUDO</text></svg>`);
+    } else {
+      crestImg.src = item.logo;
+    }
+    crestImg.alt = item.name;
+    crestImg.loading = 'lazy';
+    crestImg.decoding = 'async';
+    crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]';
+    if (item.grayscale) {
+      crestImg.classList.add('grayscale', 'opacity-60');
+    }
+    crestWrapper.appendChild(crestImg);
+    card.appendChild(crestWrapper);
+
+    const name = document.createElement('div');
+    name.className = 'text-[9px] font-black uppercase tracking-wider text-gray-300 group-hover:text-white mt-1 text-center truncate w-full';
+    name.textContent = item.name;
+    card.appendChild(name);
+
+    const progSpan = document.createElement('span');
+    if (item.prog.owned === item.limit) {
+      progSpan.className = 'text-[8px] font-black text-copaYellow';
+      progSpan.textContent = '✓ Completa';
+    } else {
+      progSpan.className = 'text-[8px] font-semibold text-gray-500';
+      progSpan.textContent = `${item.prog.owned}/${item.limit}`;
+    }
+    card.appendChild(progSpan);
+
+    specialsGrid.appendChild(card);
+  });
+
+  specialsGroupCard.appendChild(specialsGrid);
+  groupsContainer.appendChild(specialsGroupCard);
 
   groupsData.forEach(g => {
     const groupCard = document.createElement('div');
@@ -1596,7 +1648,7 @@ function renderHome(container) {
     const sortedTeams = [...g.teams].sort((a, b) => a.rank - b.rank);
     sortedTeams.forEach(team => {
       const card = document.createElement('div');
-      card.className = 'cursor-pointer transition flex flex-col items-center justify-center gap-1 group relative py-1.5 px-0.5 hover:scale-105 mt-2 h-20';
+      card.className = 'cursor-pointer transition flex flex-col items-center justify-center gap-1 group relative py-1.5 px-0.5 hover:scale-105 mt-2 h-auto pb-2';
       card.onclick = () => location.hash = `#team-${team.code}`;
 
       // Injeta o Balãozinho de Fase (FG, R16, etc. com cores dinâmicas)
@@ -1681,11 +1733,24 @@ function getTeamProgress(teamCode) {
   if (!album) return { owned: 0 };
   
   let owned = 0;
-  const limit = (teamCode === 'FWC') ? 19 : (teamCode === 'CC') ? 14 : 20;
-  for (let i = 1; i <= limit; i++) {
-    const key = `${teamCode}-${i}`;
-    if (album.stickers[key] && album.stickers[key].owned) {
-      owned++;
+  if (teamCode === 'ESCUDOS') {
+    groupsData.forEach(g => g.teams.forEach(t => {
+      if (album.stickers[`${t.code}-1`]?.owned) owned++;
+    }));
+  } else if (teamCode === 'EXTRAS') {
+    const variants = ['ouro', 'prata', 'bronze', 'bordo'];
+    legendsData.forEach((_, idx) => {
+      variants.forEach(v => {
+        if (album.stickers[`EXTRAS-${idx + 1}-${v}`]?.owned) owned++;
+      });
+    });
+  } else {
+    const limit = (teamCode === 'FWC') ? 19 : (teamCode === 'CC') ? 14 : 20;
+    for (let i = 1; i <= limit; i++) {
+      const key = `${teamCode}-${i}`;
+      if (album.stickers[key] && album.stickers[key].owned) {
+        owned++;
+      }
     }
   }
   return { owned };
@@ -2002,6 +2067,9 @@ function renderTeamPage(code, container) {
   } else if (code === 'EXTRAS') {
     crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/100px-Golden_Ball.svg.png';
     crest.className = 'w-10 h-10 object-contain';
+  } else if (code === 'ESCUDOS') {
+    crest.src = `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" fill="#FFC726" opacity="0.85"/><path d="M24 10L10 17v9c0 7.5 6 13.5 14 15 8-1.5 14-7.5 14-15v-9L24 10z" fill="#090a1a" opacity="0.3"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="9" fill="white">ESCUDO</text></svg>`);
+    crest.className = 'w-10 h-10 object-contain';
   } else {
     crest.src = crestsMap[code] || `./logo2026.png`;
     crest.className = 'w-10 h-10 object-contain filter drop-shadow-[0_2px_8px_rgba(255,255,255,0.05)]';
@@ -2025,7 +2093,7 @@ function renderTeamPage(code, container) {
   teamTitle.className = 'text-sm font-black uppercase tracking-wide flex items-center gap-1.5 flex-wrap';
   
   // Imagem real da bandeira em frente ao nome (evita bug de renderização de emojis no Windows)
-  if (code !== 'FWC' && code !== 'CC' && code !== 'EXTRAS') {
+  if (code !== 'FWC' && code !== 'CC' && code !== 'EXTRAS' && code !== 'ESCUDOS') {
     const flagImg = document.createElement('img');
     const flagCode = (flagMap[code] || 'us').toLowerCase();
     flagImg.src = `https://flagcdn.com/w40/${flagCode}.png`;
@@ -2037,7 +2105,12 @@ function renderTeamPage(code, container) {
 
   // Nome do País
   const nameSpan = document.createElement('span');
-  nameSpan.textContent = teamName;
+  let displayNameText = teamName;
+  if (code === 'FWC') displayNameText = 'Figurinhas FIFA - Escudo';
+  else if (code === 'ESCUDOS') displayNameText = 'Escudos das Seleção';
+  else if (code === 'CC') displayNameText = 'Coca-Cola';
+  else if (code === 'EXTRAS') displayNameText = 'LEGENDS';
+  nameSpan.textContent = displayNameText;
   teamTitle.appendChild(nameSpan);
 
   // Estrelas dos Títulos
@@ -2049,7 +2122,7 @@ function renderTeamPage(code, container) {
   }
 
   // Badge de fase ao lado do nome (ex: Fase de Grupos)
-  if (code !== 'FWC' && code !== 'CC' && code !== 'EXTRAS') {
+  if (code !== 'FWC' && code !== 'CC' && code !== 'EXTRAS' && code !== 'ESCUDOS') {
     const cachedStandingsData = localStorage.getItem(STANDINGS_CACHE_KEY);
     const standingsForTeam = cachedStandingsData ? JSON.parse(cachedStandingsData) : null;
     const teamObj = groupsData.flatMap(g => g.teams).find(t => t.code === code);
@@ -2062,7 +2135,7 @@ function renderTeamPage(code, container) {
     }
   }
   
-  const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
+  const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : (code === 'ESCUDOS') ? 48 : (code === 'EXTRAS') ? (legendsData.length * 4) : 20;
   const stats = getTeamProgress(code);
 
   const titlesSub = document.createElement('p');
@@ -2070,8 +2143,14 @@ function renderTeamPage(code, container) {
   if (titleInfo) {
     titlesSub.innerHTML = `<span class="text-copaYellow font-black">Títulos Mundiais:</span> ${titleInfo.years}`;
   } else {
-    if (code === 'FWC' || code === 'CC' || code === 'EXTRAS') {
-      titlesSub.textContent = '';
+    if (code === 'FWC') {
+      titlesSub.textContent = 'Figurinhas brilhantes';
+    } else if (code === 'ESCUDOS') {
+      titlesSub.textContent = 'Figurinhas brilhantes';
+    } else if (code === 'CC') {
+      titlesSub.textContent = 'Metálicos';
+    } else if (code === 'EXTRAS') {
+      titlesSub.textContent = 'Figurinhas Premium';
     } else {
       titlesSub.textContent = 'Sem títulos mundiais';
     }
@@ -2132,118 +2211,228 @@ function renderTeamPage(code, container) {
 
   rootTeam.appendChild(headerPanel);
 
-  // Grade responsiva de figurinhas (20 cromos)
+  // Grade responsiva de figurinhas
   const grid = document.createElement('div');
-  grid.className = 'grid-fifa';
+  if (code === 'EXTRAS') {
+    grid.className = 'grid grid-cols-4 gap-3 mt-6'; // 4 cards na mesma linha para Legends
+  } else {
+    grid.className = 'grid-fifa';
+  }
 
-  for (let i = 1; i <= limit; i++) {
-    const key = `${code}-${i}`;
-    const isSpecial = (code === 'EXTRAS'); // Apenas Legends Premium são especiais
-
-    const card = document.createElement('div');
-    card.className = `sticker-card ${isSpecial ? 'special' : ''}`;
-    card.id = `card-${key}`;
-
-    const inner = document.createElement('div');
-    inner.className = 'card-inner';
-
-    // Determina o texto de identificação do cromo (sigla + número ou nome completo para Legends)
-    const stickerCode = (code === 'EXTRAS') ? legendsData[i - 1].name : `${code} ${i}`;
-    const isExtras = (code === 'EXTRAS');
-
-    // 1. Verso (Não Possuído - FUT Card fechado com marca d'água da Copa 2026)
-    const cardBack = document.createElement('div');
-    cardBack.className = 'card-back';
-
-    const backLogoComp = createLogoComposition(stickerCode, isExtras);
-    cardBack.appendChild(backLogoComp);
-    inner.appendChild(cardBack);
-
-    // 2. Frente (Possuído - FUT Card aberto com marca d'água da Copa 2026 e dados do atleta)
-    const cardFront = document.createElement('div');
-    cardFront.className = `card-front ${isSpecial ? 'special shiny-effect' : ''} relative flex flex-col justify-between p-2 overflow-visible`;
-
-    const frontLogoComp = createLogoComposition(stickerCode, isExtras);
-    cardFront.appendChild(frontLogoComp);
-
-    // Determina o país para bandeira/brasão (específico do jogador se for extras, ou o código da seleção se normal)
-    const stickerCountry = (code === 'EXTRAS') ? legendsData[i - 1].country : code;
-
-    // Frente superior (Código e mini escudo redondo da federação)
-    const frontHeader = document.createElement('div');
-    frontHeader.className = 'flex justify-between items-center w-full z-10';
+  // Se for ESCUDOS, os cards devem replicar as ações e cópia fiel das figurinhas nº 1 de cada seleção
+  if (code === 'ESCUDOS') {
+    const allTeamsList = [];
+    groupsData.forEach(g => g.teams.forEach(t => allTeamsList.push(t)));
     
-    const teamTag = document.createElement('span');
-    teamTag.className = 'text-[9px] font-black uppercase tracking-wider text-white';
-    teamTag.textContent = stickerCountry;
-    frontHeader.appendChild(teamTag);
+    allTeamsList.forEach(team => {
+      const originalKey = `${team.code}-1`;
+      const card = document.createElement('div');
+      card.className = 'sticker-card';
+      card.id = `card-${originalKey}`;
 
-    const miniCrest = document.createElement('img');
-    const flagCode = (flagMap[stickerCountry] || 'us').toLowerCase();
-    miniCrest.src = crestsMap[stickerCountry] || `https://flagcdn.com/w40/${flagCode}.png`;
-    miniCrest.alt = 'Escudo';
-    miniCrest.loading = 'lazy';
-    miniCrest.decoding = 'async';
-    miniCrest.className = 'w-5 h-5 object-contain rounded-full border border-white/20 bg-white/10';
-    miniCrest.onerror = function() {
-      this.src = `https://flagcdn.com/w40/${flagCode}.png`;
-      this.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
+      const inner = document.createElement('div');
+      inner.className = 'card-inner';
+
+      const cardBack = document.createElement('div');
+      cardBack.className = 'card-back';
+      const backLogoComp = createLogoComposition(`${team.code} 1`, false);
+      cardBack.appendChild(backLogoComp);
+      inner.appendChild(cardBack);
+
+      const cardFront = document.createElement('div');
+      cardFront.className = 'card-front relative flex flex-col justify-between p-2 overflow-visible';
+      const frontLogoComp = createLogoComposition(`${team.code} 1`, false);
+      cardFront.appendChild(frontLogoComp);
+
+      // Frente superior
+      const frontHeader = document.createElement('div');
+      frontHeader.className = 'flex justify-between items-center w-full z-10';
+      const teamTag = document.createElement('span');
+      teamTag.className = 'text-[9px] font-black uppercase tracking-wider text-white';
+      teamTag.textContent = team.code;
+      frontHeader.appendChild(teamTag);
+
+      const miniCrest = document.createElement('img');
+      const flagCode = (flagMap[team.code] || 'us').toLowerCase();
+      miniCrest.src = `https://flagcdn.com/w40/${flagCode}.png`;
+      miniCrest.alt = 'Bandeira';
+      miniCrest.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
+      frontHeader.appendChild(miniCrest);
+      cardFront.appendChild(frontHeader);
+
+      // Nome
+      const playerName = document.createElement('div');
+      playerName.className = 'player-name-label';
+      playerName.textContent = `${team.name} Escudo`;
+      cardFront.appendChild(playerName);
+
+      const frontActions = document.createElement('div');
+      frontActions.className = 'card-actions z-10';
+      cardFront.appendChild(frontActions);
+
+      inner.appendChild(cardFront);
+      inner.appendChild(cardBack);
+      card.appendChild(inner);
+
+      card.onclick = (e) => {
+        if (e.target.closest('.action-btn')) return;
+        toggleOwned(originalKey);
+        updateCard(card, originalKey);
+        updateTeamProgressLabel('ESCUDOS');
+      };
+
+      updateCard(card, originalKey);
+      grid.appendChild(card);
+    });
+  } else if (code === 'EXTRAS') {
+    // Legends Premium: 4 variações por atleta (ouro, prata, bronze, bordo)
+    const variants = ['ouro', 'prata', 'bronze', 'bordo'];
+    const borderColors = {
+      ouro: 'inset 0 0 0 2.5px #FFD700, 0 0 15px rgba(255, 215, 0, 0.4)',
+      prata: 'inset 0 0 0 2.5px #C0C0C0, 0 0 15px rgba(192, 192, 192, 0.4)',
+      bronze: 'inset 0 0 0 2.5px #CD7F32, 0 0 15px rgba(205, 127, 50, 0.4)',
+      bordo: 'inset 0 0 0 2.5px #800020, 0 0 15px rgba(128, 0, 32, 0.4)'
     };
-    frontHeader.appendChild(miniCrest);
-    cardFront.appendChild(frontHeader);
 
-    // Nome/Posição do atleta centralizado no rodapé
-    const playerName = document.createElement('div');
-    playerName.className = 'player-name-label';
-    let nameText = playerNames[i];
-    if (isExtras) {
-      nameText = legendsData[i - 1].name;
-    } else if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][i - 1]) {
-      nameText = albumData[code][i - 1].nome;
-    }
-    playerName.textContent = nameText;
-    if (nameText.length > 20) {
-      playerName.classList.add('name-very-long');
-    } else if (nameText.length > 13) {
-      playerName.classList.add('name-long');
-    }
-    cardFront.appendChild(playerName);
+    legendsData.forEach((legend, idx) => {
+      variants.forEach(variant => {
+        const key = `EXTRAS-${idx + 1}-${variant}`;
+        const stickerCode = `${legend.name}`;
+        
+        const card = document.createElement('div');
+        card.className = 'sticker-card special';
+        card.id = `card-${key}`;
 
-    // Frente inferior (Ações discretas nos cantos inferiores)
-    const frontActions = document.createElement('div');
-    frontActions.className = 'card-actions z-10';
-    cardFront.appendChild(frontActions);
+        const inner = document.createElement('div');
+        inner.className = 'card-inner';
 
-    inner.appendChild(cardFront);
-    inner.appendChild(cardBack); // garante o preserve-3d
-    card.appendChild(inner);
+        const cardBack = document.createElement('div');
+        cardBack.className = `card-back special ${variant}`;
+        const backLogoComp = createLogoComposition(stickerCode, true);
+        cardBack.appendChild(backLogoComp);
+        inner.appendChild(cardBack);
 
-    // Clique no card
-    card.onclick = (e) => {
-      if (e.target.closest('.action-btn')) return;
+        const cardFront = document.createElement('div');
+        cardFront.className = `card-front special shiny-effect ${variant} relative flex flex-col justify-between p-2 overflow-visible`;
+        
+        const frontLogoComp = createLogoComposition(stickerCode, true);
+        cardFront.appendChild(frontLogoComp);
+
+        const frontHeader = document.createElement('div');
+        frontHeader.className = 'flex justify-between items-center w-full z-10';
+        
+        const teamTag = document.createElement('span');
+        teamTag.className = 'text-[7px] font-black uppercase tracking-wider text-white';
+        teamTag.textContent = variant;
+        frontHeader.appendChild(teamTag);
+
+        const flagCode = legend.country.toLowerCase();
+        miniCrest.src = `https://flagcdn.com/w40/${flagCode}.png`;
+        miniCrest.alt = 'Bandeira';
+        miniCrest.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
+        frontHeader.appendChild(miniCrest);
+        cardFront.appendChild(frontHeader);
+
+        const playerName = document.createElement('div');
+        playerName.className = 'player-name-label';
+        playerName.textContent = legend.name;
+        cardFront.appendChild(playerName);
+
+        const frontActions = document.createElement('div');
+        frontActions.className = 'card-actions z-10';
+        cardFront.appendChild(frontActions);
+
+        inner.appendChild(cardFront);
+        inner.appendChild(cardBack);
+        card.appendChild(inner);
+
+        card.onclick = (e) => {
+          if (e.target.closest('.action-btn')) return;
+          toggleOwned(key);
+          updateCard(card, key);
+          updateTeamProgressLabel('EXTRAS');
+        };
+
+        updateCard(card, key);
+        grid.appendChild(card);
+      });
+    });
+  } else {
+    // FIFA (FWC) e Coca-Cola (CC) e normais
+    for (let i = 1; i <= limit; i++) {
+      const key = `${code}-${i}`;
+      const card = document.createElement('div');
+      card.className = 'sticker-card';
+      card.id = `card-${key}`;
+
+      const inner = document.createElement('div');
+      inner.className = 'card-inner';
+
+      const stickerCode = `${code} ${i}`;
       
-      const albumId = storage.getCurrentAlbumId();
-      const albums = storage.getAlbums();
-      const album = albums[albumId];
-      const wasOwned = album && album.stickers[key] && album.stickers[key].owned;
+      const cardBack = document.createElement('div');
+      cardBack.className = 'card-back';
+      const backLogoComp = createLogoComposition(stickerCode, false);
+      cardBack.appendChild(backLogoComp);
+      inner.appendChild(cardBack);
+
+      const cardFront = document.createElement('div');
+      cardFront.className = 'card-front relative flex flex-col justify-between p-2 overflow-visible';
+      const frontLogoComp = createLogoComposition(stickerCode, false);
+      cardFront.appendChild(frontLogoComp);
+
+      const frontHeader = document.createElement('div');
+      frontHeader.className = 'flex justify-between items-center w-full z-10';
       
-      toggleOwned(key);
-      updateCard(card, key);
-      
-      const stats = getTeamProgress(code);
-      if (!wasOwned && stats.owned === limit) {
-        // Completou a seleção! Animação Goal e delay checkmark
-        updateTeamProgressLabel(code, true);
-        triggerGoalAnimation(() => {
-          updateTeamProgressLabel(code, false);
-        });
+      const teamTag = document.createElement('span');
+      teamTag.className = 'text-[9px] font-black uppercase tracking-wider text-white';
+      teamTag.textContent = code;
+      frontHeader.appendChild(teamTag);
+
+      const miniCrest = document.createElement('img');
+      if (code === 'FWC') {
+        // Logo da fifa ao invés de bandeira
+        miniCrest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
+        miniCrest.className = 'w-5 h-5 object-contain bg-white/10 p-0.5 rounded border border-white/20';
+      } else if (code === 'CC') {
+        // Logo da coca-cola ao invés de bandeira
+        miniCrest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png';
+        miniCrest.className = 'w-5 h-5 object-contain bg-white/10 p-0.5 rounded border border-white/20';
       } else {
-        updateTeamProgressLabel(code, false);
+        const flagCode = (flagMap[code] || 'us').toLowerCase();
+        miniCrest.src = crestsMap[code] || `https://flagcdn.com/w40/${flagCode}.png`;
+        miniCrest.className = 'w-5 h-5 object-contain rounded-full border border-white/20 bg-white/10';
       }
-    };
+      frontHeader.appendChild(miniCrest);
+      cardFront.appendChild(frontHeader);
 
-    updateCard(card, key);
-    grid.appendChild(card);
+      const playerName = document.createElement('div');
+      playerName.className = 'player-name-label';
+      let nameText = playerNames[i] || `${code} ${i}`;
+      if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][i - 1]) {
+        nameText = albumData[code][i - 1].nome;
+      }
+      playerName.textContent = nameText;
+      cardFront.appendChild(playerName);
+
+      const frontActions = document.createElement('div');
+      frontActions.className = 'card-actions z-10';
+      cardFront.appendChild(frontActions);
+
+      inner.appendChild(cardFront);
+      inner.appendChild(cardBack);
+      card.appendChild(inner);
+
+      card.onclick = (e) => {
+        if (e.target.closest('.action-btn')) return;
+        toggleOwned(key);
+        updateCard(card, key);
+        updateTeamProgressLabel(code);
+      };
+
+      updateCard(card, key);
+      grid.appendChild(card);
+    }
   }
 
   rootTeam.appendChild(grid);
@@ -2253,7 +2442,7 @@ function renderTeamPage(code, container) {
 // Contador e atualizador de progresso da seleção dinâmico
 function updateTeamProgressLabel(code, delayCheckmark = false) {
   const stats = getTeamProgress(code);
-  const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
+  const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : (code === 'ESCUDOS') ? 48 : (code === 'EXTRAS') ? (legendsData.length * 4) : 20;
   
   // 1. Atualiza o texto descritivo
   const label = document.getElementById('teamProgressLabel');
@@ -2523,145 +2712,704 @@ function updateCard(card, key) {
   }
 }
 
-// ------------------- TROCAS -------------------
-function renderTrades(container) {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'glass-panel p-5 rounded-2xl border-white/5 space-y-4';
+function createMiniStickerCapsule(key) {
+  const code = key.split('-')[0];
+  const i = parseInt(key.split('-')[1], 10);
+  const isSpecial = (code === 'EXTRAS');
 
-  const title = document.createElement('h2');
-  title.className = 'text-base font-black uppercase tracking-wider text-copaYellow';
-  title.textContent = 'Figurinhas Repetidas';
-  wrapper.appendChild(title);
-
-  // Alerta de Segurança Infantil
-  const safetyBanner = document.createElement('div');
-  safetyBanner.className = 'bg-red-950/45 border border-red-500/30 p-3 rounded-xl flex items-start gap-2.5 text-[10px] text-red-200 leading-normal shadow-lg';
-  safetyBanner.innerHTML = `
-    <span class="text-sm">⚠️</span>
-    <div>
-      <strong class="text-red-400 font-bold block mb-0.5">Alerta de Segurança Infantil</strong>
-      Não troque figurinha com desconhecido, sem a presença de um adulto de sua confiança, de preferência fazer trocas somente com amigos próximos.
-    </div>
-  `;
-  wrapper.appendChild(safetyBanner);
-
-  const albumId = storage.getCurrentAlbumId();
-  const albums = storage.getAlbums();
-  const album = albums[albumId];
+  const el = document.createElement('div');
+  el.className = `text-[9px] font-black px-2 py-1 rounded border tracking-wide uppercase transition-all duration-150 select-none cursor-pointer ${isSpecial ? 'bg-copaYellow/10 text-copaYellow border-copaYellow/20 hover:bg-copaYellow/20' : 'bg-copaGreen/10 text-copaGreen border-copaGreen/20 hover:bg-copaGreen/20'}`;
   
-  const listDiv = document.createElement('div');
-  listDiv.className = 'space-y-4';
+  let pName = key;
+  if (isSpecial) {
+    const variant = key.split('-')[2];
+    const capVariant = variant ? variant.charAt(0).toUpperCase() + variant.slice(1) : '';
+    pName = (legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`) + ' ' + capVariant;
+    el.textContent = `${legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`} ${capVariant}`;
+  } else if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][i - 1]) {
+    pName = albumData[code][i - 1].nome;
+    el.textContent = `${code} ${i}`;
+  } else {
+    pName = playerNames[i] || key;
+    el.textContent = key;
+  }
+  el.title = pName;
+  return el;
+}
 
-  if (!album) {
-    listDiv.innerHTML = '<p class="text-xs text-gray-500">Nenhum álbum ativo.</p>';
-    wrapper.appendChild(listDiv);
-    container.appendChild(wrapper);
+function getStickerNameForShare(key) {
+  const parts = key.split('-');
+  if (parts[0] === 'EXTRAS') {
+    const name = legendsData[parseInt(parts[1], 10) - 1] ? legendsData[parseInt(parts[1], 10) - 1].name : `Lendário ${parts[1]}`;
+    const cat = parts[2] ? parts[2].charAt(0).toUpperCase() + parts[2].slice(1) : '';
+    return `${name} ${cat}`;
+  }
+  return getStickerDisplayName(parts[0], parseInt(parts[1], 10));
+}
+
+function shareTextViaSystem(title, text) {
+  if (navigator.share) {
+    navigator.share({
+      title: title,
+      text: text
+    }).catch(err => {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    });
+  } else {
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+  }
+}
+
+// ------------------- TROCAS -------------------
+// Global Trades State
+let currentTradesSubTab = 'match'; // 'match' ou 'manual'
+
+function renderTrades(container) {
+  const user = authDb.getCurrentUser();
+  if (!user) {
+    const lockBox = document.createElement('div');
+    lockBox.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 text-center space-y-6 animate-fade-in';
+    lockBox.innerHTML = `
+      <div class="text-5xl">🔒</div>
+      <h2 class="text-xl font-black text-white uppercase tracking-wider">Acesso Restrito</h2>
+      <p class="text-xs text-gray-400">Faça login para participar das Trocas e ver pessoas próximas com quem você pode trocar figurinhas.</p>
+      <button onclick="location.hash = '#login'" class="w-full py-3 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 text-black font-black text-xs uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition">
+        Entrar / Fazer Login
+      </button>
+    `;
+    container.appendChild(lockBox);
     return;
   }
 
-  const duplicates = [];
-  Object.entries(album.stickers).forEach(([key, val]) => {
-    if (val.owned && val.duplicate > 0) {
-      const parts = key.split('-');
-      const code = parts[0];
-      const teamName = teamsMap[code] || (code === 'FWC' ? 'FIFA' : code === 'CC' ? 'Coca-Cola' : code === 'EXTRAS' ? 'Premium' : null);
-      if (teamName) {
-        duplicates.push({
-          key: key,
-          team: teamName,
-          code: code,
-          number: parts[1],
-          count: val.duplicate
-        });
-      }
+  if (!user.latitude || !user.longitude) {
+    const tempLat = sessionStorage.getItem('temp_latitude');
+    const tempLng = sessionStorage.getItem('temp_longitude');
+    if (tempLat && tempLng) {
+      user.latitude = parseFloat(tempLat);
+      user.longitude = parseFloat(tempLng);
+      authDb.updateLocation(user.latitude, user.longitude).then(() => { renderHeader(); });
+    } else {
+      authDb.fetchLocationByIp().then(loc => {
+        if (loc) {
+          user.latitude = loc.lat;
+          user.longitude = loc.lng;
+          authDb.updateLocation(loc.lat, loc.lng).then(() => { renderHeader(); route(); });
+        } else {
+          showGPSRequestScreen(container);
+        }
+      }).catch(() => {
+        showGPSRequestScreen(container);
+      });
+      return;
     }
-  });
-
-  if (duplicates.length === 0) {
-    listDiv.innerHTML = `
-      <div class="text-center py-6 space-y-2">
-        <div class="text-2xl">📭</div>
-        <p class="text-xs font-bold text-gray-300">Nenhuma repetida encontrada.</p>
-        <p class="text-[10px] text-gray-500">Marque cromos extras na tela de seleções para listar aqui.</p>
-      </div>
-    `;
-  } else {
-    // Botão de Negociação via WhatsApp
-    const btnNegotiate = document.createElement('button');
-    btnNegotiate.className = 'w-full px-4 py-3 bg-copaGreen hover:opacity-90 text-black text-xs font-black uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2 mb-4';
-    btnNegotiate.innerHTML = `
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.968C16.574 1.97 14.101.947 11.487.947c-5.441 0-9.866 4.372-9.87 9.802 0 1.772.465 3.508 1.346 5.042L1.99 21.53l5.83-1.517zM17.75 14.61c-.347-.174-2.057-1.014-2.375-1.13-.318-.116-.549-.174-.78.174-.23.348-.895 1.13-1.097 1.362-.202.23-.404.26-.75.087-.348-.174-1.468-.541-2.796-1.728-1.034-.922-1.731-2.06-1.933-2.408-.202-.348-.022-.536.151-.708.156-.154.348-.406.52-.609.174-.203.23-.348.348-.58.116-.232.058-.435-.029-.609-.087-.174-.78-1.884-1.068-2.58-.28-.677-.566-.584-.78-.596-.202-.01-.433-.01-.664-.01-.23 0-.606.087-.923.435-.317.348-1.213 1.188-1.213 2.898 0 1.71 1.243 3.361 1.417 3.593.173.232 2.447 3.738 5.928 5.24 2.85 1.228 3.525.986 4.774.87.535-.05 2.058-.84 2.346-1.652.289-.812.289-1.507.202-1.652-.086-.145-.318-.232-.664-.406z"/>
-      </svg>
-      Gerar Mensagem de Negociação
-    `;
-    listDiv.appendChild(btnNegotiate);
-
-    const grid = document.createElement('div');
-    grid.className = 'grid grid-cols-2 gap-3';
-    
-    duplicates.forEach(item => {
-      const itemCard = document.createElement('label');
-      itemCard.className = 'bg-white/5 border border-white/5 p-3 rounded-xl flex items-center justify-between gap-2 cursor-pointer hover:bg-white/10 transition';
-      
-      const leftSide = document.createElement('div');
-      leftSide.className = 'flex items-center gap-2.5';
-
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.className = 'w-4 h-4 rounded border-white/10 text-copaYellow bg-[#131735] focus:ring-0 cursor-pointer';
-      
-      let stickerName = `${item.code} ${item.number}`;
-      if (item.code === 'EXTRAS') {
-        stickerName = legendsData[parseInt(item.number, 10) - 1].name;
-      }
-      checkbox.dataset.stickerName = stickerName;
-      leftSide.appendChild(checkbox);
-
-      const info = document.createElement('div');
-      const teamLabel = document.createElement('div');
-      teamLabel.className = 'text-[9px] font-black uppercase tracking-wider text-copaYellow';
-      teamLabel.textContent = item.team;
-      const numLabel = document.createElement('div');
-      numLabel.className = 'text-xs font-black text-white';
-      numLabel.textContent = stickerName;
-      
-      info.appendChild(teamLabel);
-      info.appendChild(numLabel);
-      leftSide.appendChild(info);
-      itemCard.appendChild(leftSide);
-
-      const qty = document.createElement('div');
-      qty.className = 'bg-copaYellow text-black font-black text-xs px-2 py-1 rounded-lg';
-      qty.textContent = `${item.count}x`;
-      itemCard.appendChild(qty);
-
-      grid.appendChild(itemCard);
-    });
-    listDiv.appendChild(grid);
-
-    // Click handler para gerar mensagem
-    btnNegotiate.onclick = () => {
-      const checked = Array.from(grid.querySelectorAll('input[type="checkbox"]:checked'));
-      if (checked.length === 0) {
-        alert('Por favor, selecione pelo menos uma figurinha repetida para negociar.');
-        return;
-      }
-      const selectedNames = checked.map(cb => cb.dataset.stickerName).join(', ');
-      const textMessage = `Oi, vi no app Ultimate Cromos FIFA/Panini 2026 que você tem essas figurinhas que eu estou precisando: ${selectedNames}. Eu tenho essas disponíveis. Vamos fazer trocá-las?`;
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textMessage)}`, '_blank');
-    };
   }
 
-  wrapper.appendChild(listDiv);
+  function showGPSRequestScreen(container) {
+    const gpsBox = document.createElement('div');
+    gpsBox.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 text-center space-y-6 animate-fade-in';
+    gpsBox.innerHTML = `
+      <div class="text-5xl">📍</div>
+      <h2 class="text-xl font-black text-white uppercase tracking-wider">Permissão de GPS Requerida</h2>
+      <p class="text-xs text-gray-400">Para calcular a distância e listar outros colecionadores que estão ao seu redor, precisamos que você compartilhe sua geolocalização.</p>
+      <button id="btnRequestGPSCommunity" class="w-full py-3 rounded-xl bg-[#00e676] text-black font-black text-xs uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition">
+        Permitir Acesso ao GPS
+      </button>
+    `;
+    gpsBox.querySelector('#btnRequestGPSCommunity').onclick = () => {
+      gpsBox.querySelector('#btnRequestGPSCommunity').textContent = "Obtendo GPS...";
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          await authDb.updateLocation(position.coords.latitude, position.coords.longitude);
+          const activeAlbumId = storage.getCurrentAlbumId();
+          const albums = storage.getAlbums();
+          if (activeAlbumId && albums[activeAlbumId]) {
+            await authDb.syncStickers(albums[activeAlbumId].stickers);
+          }
+          renderHeader();
+          route();
+        },
+        (error) => {
+          console.error(error);
+          alert("Não foi possível acessar sua localização. Certifique-se de que deu permissão no seu navegador.");
+          route();
+        }
+      );
+    };
+    container.appendChild(gpsBox);
+  }
 
-  const back = document.createElement('button');
-  back.className = 'w-full px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold uppercase text-gray-300 tracking-wider rounded-xl transition';
-  back.textContent = 'Voltar para Home';
-  back.onclick = () => location.hash = '#home';
-  wrapper.appendChild(back);
+  const mainDiv = document.createElement('div');
+  mainDiv.className = 'space-y-5 py-2 animate-fade-in';
 
-  container.appendChild(wrapper);
+  const headerRow = document.createElement('div');
+  headerRow.className = 'flex justify-between items-center w-full mb-1';
+  
+  const title = document.createElement('h2');
+  title.className = 'text-xs font-black text-white uppercase tracking-wider';
+  title.textContent = '🤝 Central de Trocas';
+  
+  const btnBack = document.createElement('button');
+  btnBack.className = 'py-1 px-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold text-[9px] uppercase tracking-wide rounded-lg transition';
+  btnBack.textContent = '🏠 Voltar ao Álbum';
+  btnBack.onclick = () => {
+    location.hash = '#home';
+  };
+  
+  headerRow.appendChild(title);
+  headerRow.appendChild(btnBack);
+  mainDiv.appendChild(headerRow);
+
+  const tabCard = document.createElement('div');
+  tabCard.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
+  
+  const tabRow = document.createElement('div');
+  tabRow.className = 'flex border-b border-white/5';
+  
+  const tabMatch = document.createElement('button');
+  tabMatch.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'match' ? 'active-tab' : ''}`;
+  tabMatch.textContent = 'O que Pode Dar Match! 💡';
+  
+  const tabManual = document.createElement('button');
+  tabManual.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'manual' ? 'active-tab' : ''}`;
+  tabManual.innerHTML = '🤝 MATCH PERFEITO';
+  
+  tabRow.appendChild(tabMatch);
+  tabRow.appendChild(tabManual);
+  tabCard.appendChild(tabRow);
+  mainDiv.appendChild(tabCard);
+  
+  const subContentContainer = document.createElement('div');
+  subContentContainer.className = 'space-y-4';
+  mainDiv.appendChild(subContentContainer);
+  container.appendChild(mainDiv);
+
+  function setTradesSubTabState() {
+    tabMatch.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'match' ? 'active-tab' : ''}`;
+    tabManual.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'manual' ? 'active-tab' : ''}`;
+    
+    subContentContainer.innerHTML = '';
+    
+    if (currentTradesSubTab === 'match') {
+      renderMatchSuggestions(subContentContainer);
+    } else {
+      renderManualTradesList(subContentContainer);
+    }
+  }
+
+  tabMatch.onclick = () => { currentTradesSubTab = 'match'; setTradesSubTabState(); };
+  tabManual.onclick = () => { currentTradesSubTab = 'manual'; setTradesSubTabState(); };
+  setTradesSubTabState();
+
+  async function renderMatchSuggestions(subContainer) {
+    subContainer.innerHTML = '';
+    // 1. Barra de filtro superior com Lupa e Raio
+    const filterCard = document.createElement('div');
+    filterCard.className = 'glass-panel p-3 rounded-xl border border-white/5 bg-[#131735]/60 flex justify-between items-center w-full mb-3';
+    
+    const filterWrapper = document.createElement('div');
+    filterWrapper.className = 'flex items-center gap-2';
+    
+    const searchIcon = document.createElement('span');
+    searchIcon.textContent = '🔎';
+    searchIcon.className = 'text-xs text-copaYellow';
+    filterWrapper.appendChild(searchIcon);
+
+    const filterLabel = document.createElement('span');
+    filterLabel.className = 'text-[9px] font-black text-gray-400 uppercase tracking-wider';
+    filterLabel.textContent = 'Buscar no raio:';
+    filterWrapper.appendChild(filterLabel);
+
+    const radiusSelector = document.createElement('select');
+    radiusSelector.className = 'bg-[#131735] text-white border border-white/10 text-[10px] px-2 py-1 rounded-lg focus:outline-none cursor-pointer';
+    
+    const radiusOptions = [
+      { value: 1, label: '1 km' },
+      { value: 5, label: '5 km' },
+      { value: 15, label: '15 km' },
+      { value: 50, label: '50 km' },
+      { value: 99999, label: 'Ilimitado' }
+    ];
+
+    radiusOptions.forEach(opt => {
+      const el = document.createElement('option');
+      el.value = opt.value;
+      el.textContent = opt.label;
+      if (opt.value === currentCommunityRadius) el.selected = true;
+      radiusSelector.appendChild(el);
+    });
+
+    radiusSelector.onchange = (e) => {
+      currentCommunityRadius = parseInt(e.target.value, 10);
+      renderMatchSuggestions(subContainer);
+    };
+
+    filterWrapper.appendChild(radiusSelector);
+    filterCard.appendChild(filterWrapper);
+    subContainer.appendChild(filterCard);
+
+    const listDiv = document.createElement('div');
+    listDiv.className = 'space-y-4';
+    subContainer.appendChild(listDiv);
+
+    listDiv.innerHTML = '<p class="text-center text-xs text-gray-400 py-6 animate-pulse">Cruzando dados de colecionadores...</p>';
+    
+    try {
+      const allCollectors = await authDb.getNearbyCollectors(user.latitude, user.longitude, currentCommunityRadius);
+      const favs = authDb.getFavorites();
+      const collectors = allCollectors.filter(c => favs.includes(c.uid));
+      listDiv.innerHTML = '';
+      
+      const localAlbums = JSON.parse(localStorage.getItem('albums') || '{}');
+      const activeAlbumId = localStorage.getItem('currentAlbumId');
+      const activeAlbum = localAlbums[activeAlbumId] || { stickers: {} };
+      const userStickers = activeAlbum.stickers || {};
+      
+      const matchingCollectors = [];
+      
+      const allCodes = [];
+      groupsData.forEach(g => g.teams.forEach(t => allCodes.push(t.code)));
+      allCodes.push('FWC', 'CC', 'EXTRAS');
+
+      collectors.forEach(c => {
+        const heHasForYou = [];
+        const youHaveForHim = [];
+
+        allCodes.forEach(code => {
+          if (code === 'EXTRAS') return;
+          const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
+          for (let i = 1; i <= limit; i++) {
+            const key = `${code}-${i}`;
+            const userSticker = userStickers[key];
+            const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
+
+            const collectorSticker = c.stickers[key];
+            const collectorOwned = collectorSticker ? collectorSticker.owned : false;
+            const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
+            const userOwned = userSticker ? userSticker.owned : false;
+
+            if (userDup > 0 && !collectorOwned) {
+              youHaveForHim.push(key);
+            }
+            if (collectorDup > 0 && !userOwned) {
+              heHasForYou.push(key);
+            }
+          }
+        });
+
+        const premiumVariants = ['ouro', 'prata', 'bronze', 'bordo'];
+        premiumVariants.forEach(variant => {
+          for (let i = 1; i <= 20; i++) {
+            const key = `EXTRAS-${i}-${variant}`;
+            const userSticker = userStickers[key];
+            const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
+
+            const collectorSticker = c.stickers[key];
+            const collectorOwned = collectorSticker ? collectorSticker.owned : false;
+            const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
+            const userOwned = userSticker ? userSticker.owned : false;
+
+            if (userDup > 0 && !collectorOwned) {
+              youHaveForHim.push(key);
+            }
+            if (collectorDup > 0 && !userOwned) {
+              heHasForYou.push(key);
+            }
+          }
+        });
+        
+        if (heHasForYou.length > 0 && youHaveForHim.length > 0) {
+          matchingCollectors.push({
+            collector: c,
+            heHasForYou,
+            youHaveForHim
+          });
+        }
+      });
+      
+      if (matchingCollectors.length === 0) {
+        listDiv.innerHTML = `
+          <div class="glass-panel p-8 rounded-2xl border-white/5 text-center py-10">
+            <p class="text-xs text-gray-400">Nenhum match encontrado na sua área no raio de ${currentCommunityRadius === 99999 ? 'Ilimitado' : currentCommunityRadius + ' km'}.</p>
+            <p class="text-[9px] text-gray-500 mt-2">Dica: Adicione mais figurinhas repetidas no seu álbum ou aumente o raio de busca!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      matchingCollectors.forEach(item => {
+        const c = item.collector;
+        
+        const card = document.createElement('div');
+        card.className = 'glass-panel p-4 rounded-xl border border-white/5 bg-[#131735]/40 space-y-3 transition hover:border-white/10';
+        
+        // Header clicável para expandir
+        const cardHeader = document.createElement('div');
+        cardHeader.className = 'flex justify-between items-center cursor-pointer';
+        
+        const userInfo = document.createElement('div');
+        userInfo.className = 'flex items-center gap-2.5';
+        
+        const avatar = document.createElement('img');
+        avatar.src = c.photo_url;
+        avatar.className = 'w-8 h-8 rounded-full object-cover border border-white/10';
+        
+        const textInfo = document.createElement('div');
+        textInfo.className = 'text-left';
+        textInfo.innerHTML = `
+          <h3 class="font-black text-white text-[10px] leading-tight">${c.name} <span class="text-[7px] bg-purple-500 text-white font-black uppercase px-1.5 py-0.5 rounded-full ml-1 animate-pulse">🤝 MATCH PERFEITO</span></h3>
+          <p class="text-[8px] text-gray-400 mt-0.5">📍 ${c.distance} km de distância</p>
+        `;
+        
+        userInfo.appendChild(avatar);
+        userInfo.appendChild(textInfo);
+        cardHeader.appendChild(userInfo);
+        
+        const pairCount = Math.min(item.heHasForYou.length, item.youHaveForHim.length);
+        const countsCol = document.createElement('div');
+        countsCol.className = 'text-right flex flex-col gap-0.5';
+        countsCol.innerHTML = `
+          <p class="text-[10px] text-gray-300 font-bold">${pairCount} Match(es) Perfeito(s) 🤝</p>
+          <p class="text-[8px] text-gray-400">Clique para expandir</p>
+        `;
+        cardHeader.appendChild(countsCol);
+        card.appendChild(cardHeader);
+        
+        // Área expansível (Escondida por padrão)
+        const expandedArea = document.createElement('div');
+        expandedArea.className = 'border-t border-white/5 pt-3 space-y-3';
+        expandedArea.style.display = 'none';
+        
+        // Construção dos pares de Match Perfeito
+        const perfectPairs = [];
+        for (let i = 0; i < pairCount; i++) {
+          perfectPairs.push({
+            receive: item.heHasForYou[i],
+            give: item.youHaveForHim[i],
+            selected: true
+          });
+        }
+        
+        const listHeader = document.createElement('div');
+        listHeader.className = 'flex justify-between items-center px-2 text-[8px] font-black text-gray-400 uppercase tracking-wider mb-1';
+        listHeader.innerHTML = `
+          <span>Ele me dá</span>
+          <span>Troca 1:1</span>
+          <span>Eu entrego</span>
+        `;
+        expandedArea.appendChild(listHeader);
+        
+        const pairsListContainer = document.createElement('div');
+        pairsListContainer.className = 'space-y-2 max-h-[200px] overflow-y-auto pr-1';
+        
+        perfectPairs.forEach((pair, idx) => {
+          const row = document.createElement('div');
+          row.className = 'flex items-center justify-between p-2 rounded-xl border border-white/5 bg-[#131735]/40 hover:bg-[#131735]/70 transition cursor-pointer select-none';
+          
+          const leftSide = document.createElement('div');
+          leftSide.className = 'flex items-center gap-2';
+          
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = pair.selected;
+          checkbox.className = 'rounded border-white/10 bg-[#131735] text-copaYellow focus:ring-0 cursor-pointer';
+          
+          const receiveCap = createMiniStickerCapsule(pair.receive);
+          receiveCap.style.pointerEvents = 'none';
+          
+          leftSide.appendChild(checkbox);
+          leftSide.appendChild(receiveCap);
+          
+          const arrow = document.createElement('span');
+          arrow.className = 'text-xs text-gray-400 font-bold';
+          arrow.textContent = '⇄';
+          
+          const rightSide = document.createElement('div');
+          rightSide.className = 'flex items-center gap-2';
+          
+          const giveCap = createMiniStickerCapsule(pair.give);
+          giveCap.style.pointerEvents = 'none';
+          
+          rightSide.appendChild(giveCap);
+          
+          row.appendChild(leftSide);
+          row.appendChild(arrow);
+          row.appendChild(rightSide);
+          
+          row.onclick = (e) => {
+            e.stopPropagation();
+            pair.selected = !pair.selected;
+            checkbox.checked = pair.selected;
+            if (pair.selected) {
+              row.className = 'flex items-center justify-between p-2 rounded-xl border border-copaYellow/20 bg-[#131735]/40 hover:bg-[#131735]/70 transition cursor-pointer select-none';
+            } else {
+              row.className = 'flex items-center justify-between p-2 rounded-xl border border-white/5 bg-[#131735]/20 hover:bg-[#131735]/40 transition cursor-pointer select-none opacity-50';
+            }
+            updateCounter();
+          };
+          
+          if (pair.selected) {
+            row.className = 'flex items-center justify-between p-2 rounded-xl border border-copaYellow/20 bg-[#131735]/40 hover:bg-[#131735]/70 transition cursor-pointer select-none';
+          }
+          
+          pairsListContainer.appendChild(row);
+        });
+        expandedArea.appendChild(pairsListContainer);
+        
+        // Rodapé do expandível com contador e botão de ação
+        const footerRow = document.createElement('div');
+        footerRow.className = 'flex justify-between items-center border-t border-white/5 pt-2 mt-2';
+        
+        const counterText = document.createElement('span');
+        counterText.className = 'text-[9px] font-black text-white uppercase tracking-wide';
+        
+        function updateCounter() {
+          const selectedPairs = perfectPairs.filter(p => p.selected);
+          counterText.innerHTML = `<span class="text-copaYellow font-black">${selectedPairs.length}</span> Match(es) selecionado(s)`;
+        }
+        updateCounter();
+        footerRow.appendChild(counterText);
+        
+        const btnNegotiate = document.createElement('button');
+        btnNegotiate.className = 'py-1 px-2.5 bg-[#00e676] hover:bg-opacity-95 text-black font-black uppercase text-[8px] rounded-lg transition';
+        btnNegotiate.textContent = 'Abrir Negociação';
+        btnNegotiate.onclick = (e) => {
+          e.stopPropagation();
+          const selectedPairs = perfectPairs.filter(p => p.selected);
+          if (selectedPairs.length === 0) {
+            alert("Selecione pelo menos um Match Perfeito para negociar.");
+            return;
+          }
+          const giveNames = selectedPairs.map(p => getStickerNameForShare(p.give)).join(', ');
+          const receiveNames = selectedPairs.map(p => getStickerNameForShare(p.receive)).join(', ');
+          const textMessage = `Fala, ${c.name}! Vi seu perfil no Ultimate Cromo 2026 e temos um MATCH PERFEITO! 🤝\n\nQuero receber: ${receiveNames}\nVou entregar: ${giveNames}\n\nVamos fechar essa troca 1:1? 🔄`;
+          shareTextViaSystem(`Negociar com ${c.name}`, textMessage);
+        };
+        footerRow.appendChild(btnNegotiate);
+        expandedArea.appendChild(footerRow);
+        card.appendChild(expandedArea);
+        
+        // Ação de Toggle no Header
+        cardHeader.onclick = () => {
+          if (expandedArea.style.display === 'none') {
+            expandedArea.style.display = 'block';
+            card.classList.add('border-copaYellow/20');
+          } else {
+            expandedArea.style.display = 'none';
+            card.classList.remove('border-copaYellow/20');
+          }
+        };
+        
+        listDiv.appendChild(card);
+      });
+      
+    } catch (e) {
+      console.error(e);
+      subContainer.innerHTML = '<p class="text-center text-xs text-red-400 py-6">Erro ao processar matches automáticos.</p>';
+    }
+  }
+
+  async function renderManualTradesList(subContainer) {
+    subContainer.innerHTML = '';
+    const listCard = document.createElement('div');
+    listCard.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
+    
+    const filtersRow = document.createElement('div');
+    filtersRow.className = 'flex justify-between items-center w-full';
+    
+    const filterWrapper = document.createElement('div');
+    filterWrapper.className = 'flex items-center gap-1.5';
+    
+    const filterLabel = document.createElement('span');
+    filterLabel.className = 'text-[9px] font-black text-gray-400 uppercase tracking-wider';
+    filterLabel.textContent = 'Raio:';
+    filterWrapper.appendChild(filterLabel);
+
+    const radiusSelector = document.createElement('select');
+    radiusSelector.className = 'bg-[#131735] text-white border border-white/10 text-[10px] px-2 py-1 rounded-lg focus:outline-none cursor-pointer';
+    
+    const options = [
+      { value: 1, label: '1 km' },
+      { value: 5, label: '5 km' },
+      { value: 15, label: '15 km' },
+      { value: 50, label: '50 km' },
+      { value: 99999, label: 'Ilimitado' }
+    ];
+
+    options.forEach(opt => {
+      const el = document.createElement('option');
+      el.value = opt.value;
+      el.textContent = opt.label;
+      if (opt.value === currentCommunityRadius) el.selected = true;
+      radiusSelector.appendChild(el);
+    });
+
+    radiusSelector.onchange = (e) => {
+      currentCommunityRadius = parseInt(e.target.value, 10);
+      renderManualTradesList(subContainer);
+    };
+
+    filterWrapper.appendChild(radiusSelector);
+    filtersRow.appendChild(filterWrapper);
+    
+    const tabWrapper = document.createElement('div');
+    tabWrapper.className = 'flex gap-2';
+    
+    const btnNearby = document.createElement('button');
+    btnNearby.className = `px-2 py-1 text-[9px] font-bold rounded transition ${currentCommunityTab === 'nearby' ? 'bg-copaGreen text-black font-black' : 'bg-white/5 text-gray-400 hover:text-white'}`;
+    btnNearby.textContent = 'Próximos';
+    btnNearby.onclick = () => {
+      currentCommunityTab = 'nearby';
+      renderManualTradesList(subContainer);
+    };
+    
+    const btnFavs = document.createElement('button');
+    btnFavs.className = `px-2 py-1 text-[9px] font-bold rounded transition ${currentCommunityTab === 'favorites' ? 'bg-copaGreen text-black font-black' : 'bg-white/5 text-gray-400 hover:text-white'}`;
+    btnFavs.textContent = 'Favoritos';
+    btnFavs.onclick = () => {
+      currentCommunityTab = 'favorites';
+      renderManualTradesList(subContainer);
+    };
+    
+    tabWrapper.appendChild(btnNearby);
+    tabWrapper.appendChild(btnFavs);
+    filtersRow.appendChild(tabWrapper);
+    
+    listCard.appendChild(filtersRow);
+    subContainer.appendChild(listCard);
+    
+    const listDiv = document.createElement('div');
+    listDiv.className = 'space-y-3';
+    subContainer.appendChild(listDiv);
+    
+    listDiv.innerHTML = '<p class="text-center text-xs text-gray-400 py-6 animate-pulse">Buscando colecionadores...</p>';
+    
+    try {
+      const collectors = await authDb.getNearbyCollectors(user.latitude, user.longitude, currentCommunityRadius);
+      listDiv.innerHTML = '';
+
+      let filtered = collectors;
+      if (currentCommunityTab === 'favorites') {
+        const favs = authDb.getFavorites();
+        filtered = collectors.filter(c => favs.includes(c.uid));
+      }
+
+      if (filtered.length === 0) {
+        listDiv.innerHTML = `
+          <div class="glass-panel p-8 rounded-2xl border-white/5 text-center py-10">
+            <p class="text-xs text-gray-400">${currentCommunityTab === 'favorites' ? 'Nenhum colecionador favoritado na sua rede.' : 'Nenhum colecionador encontrado neste raio.'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const localAlbums = JSON.parse(localStorage.getItem('albums') || '{}');
+      const activeAlbumId = localStorage.getItem('currentAlbumId');
+      const activeAlbum = localAlbums[activeAlbumId] || { stickers: {} };
+      const userStickers = activeAlbum.stickers || {};
+
+      filtered.forEach(c => {
+        let missingForUser = 0;
+        let missingForCollector = 0;
+
+        Object.entries(c.stickers).forEach(([key, val]) => {
+          const userSticker = userStickers[key];
+          const userOwned = userSticker ? userSticker.owned : false;
+          const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
+          
+          if (val.owned && !userOwned) {
+            missingForUser++;
+          }
+          if (userDup > 0 && !val.owned) {
+            missingForCollector++;
+          }
+        });
+
+        const isPerfectMatch = (missingForUser > 0 && missingForCollector > 0);
+
+        const card = document.createElement('div');
+        card.className = `glass-panel p-4 rounded-xl border-white/5 flex items-center justify-between gap-4 collector-card cursor-pointer ${isPerfectMatch ? 'perfect-match-box' : ''}`;
+        card.onclick = (e) => {
+          if (e.target.closest('button')) return;
+          location.hash = `#community-profile-${c.uid}`;
+        };
+
+        const avatar = document.createElement('img');
+        avatar.src = c.photo_url;
+        avatar.loading = 'lazy';
+        avatar.decoding = 'async';
+        avatar.className = 'w-10 h-10 rounded-full object-cover border border-white/10';
+        card.appendChild(avatar);
+
+        const info = document.createElement('div');
+        info.className = 'flex-1 min-w-0';
+        
+        const nameRow = document.createElement('div');
+        nameRow.className = 'flex items-center gap-1.5';
+        
+        const nameText = document.createElement('h3');
+        nameText.className = 'font-bold text-xs text-white truncate';
+        nameText.textContent = c.name;
+        nameRow.appendChild(nameText);
+
+        if (isPerfectMatch) {
+          const matchBadge = document.createElement('span');
+          matchBadge.className = 'text-[7px] font-black uppercase bg-copaYellow text-black px-1.5 py-0.5 rounded-full tracking-wider animate-pulse';
+          matchBadge.textContent = 'Troca Certeira';
+          nameRow.appendChild(matchBadge);
+        }
+
+        info.appendChild(nameRow);
+
+        const subInfo = document.createElement('p');
+        subInfo.className = 'text-[9px] text-gray-400 mt-1';
+        subInfo.innerHTML = `📍 <strong>${c.distance} km</strong> de distância • Visto há pouco`;
+        info.appendChild(subInfo);
+
+        const stats = document.createElement('p');
+        stats.className = 'text-[9px] text-copaGreen font-bold mt-1.5 flex items-center gap-2';
+        
+        let statsHtml = "";
+        if (missingForUser > 0) {
+          statsHtml += `<span class="text-copaYellow font-bold">Te falta: ${missingForUser}</span>`;
+        }
+        if (missingForCollector > 0) {
+          if (statsHtml) statsHtml += ` <span class="text-white/10">|</span> `;
+          statsHtml += `<span class="text-copaGreen font-bold">Falta para ele: ${missingForCollector}</span>`;
+        }
+        if (!statsHtml) {
+          statsHtml = `<span class="text-gray-500 font-normal">Nenhuma troca qualificada</span>`;
+        }
+        stats.innerHTML = statsHtml;
+        info.appendChild(stats);
+
+        card.appendChild(info);
+
+        const favBtn = document.createElement('button');
+        favBtn.className = 'w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-xs transition duration-200';
+        
+        const isFav = authDb.isFavorite(c.uid);
+        favBtn.innerHTML = isFav ? '❤️' : '🤍';
+        favBtn.title = isFav ? 'Remover da Minha Rede' : 'Adicionar à Minha Rede';
+        favBtn.onclick = (e) => {
+          e.stopPropagation();
+          const state = authDb.toggleFavorite(c.uid);
+          favBtn.innerHTML = state ? '❤️' : '🤍';
+          renderManualTradesList(subContainer);
+        };
+
+        card.appendChild(favBtn);
+        listDiv.appendChild(card);
+      });
+
+    } catch (e) {
+      console.error(e);
+      listDiv.innerHTML = '<p class="text-center text-xs text-red-400 py-6">Erro ao carregar colecionadores.</p>';
+    }
+  }
+
+  tabMatch.onclick = () => { currentTradesSubTab = 'match'; setTradesSubTabState(); };
+  tabManual.onclick = () => { currentTradesSubTab = 'manual'; setTradesSubTabState(); };
+  setTradesSubTabState();
 }
 
 // Funções utilitárias de compartilhamento de listas
@@ -2863,327 +3611,6 @@ let currentCommunityRadius = 50; // default 50km
 let currentCommunityTab = "nearby"; // "nearby" ou "favorites"
 let activeProfileTab = "perfect"; // "perfect", "heHas", "youHave"
 
-function renderCommunity(container) {
-  const user = authDb.getCurrentUser();
-  if (!user) {
-    // Caso deslogado, mostra aviso e redireciona para login
-    const lockBox = document.createElement('div');
-    lockBox.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 text-center space-y-6 animate-fade-in';
-    
-    lockBox.innerHTML = `
-      <div class="text-5xl">🔒</div>
-      <h2 class="text-xl font-black text-white uppercase tracking-wider">Acesso Restrito</h2>
-      <p class="text-xs text-gray-400">Faça login para participar da Comunidade de Colecionadores e ver pessoas próximas com quem você pode trocar figurinhas.</p>
-      <button onclick="location.hash = '#login'" class="w-full py-3 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 text-black font-black text-xs uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition">
-        Entrar / Fazer Login
-      </button>
-    `;
-    container.appendChild(lockBox);
-    return;
-  }
-
-  if (!user.latitude || !user.longitude) {
-    // Tenta primeiro obter por IP de forma silenciosa e rápida
-    const tempLat = sessionStorage.getItem('temp_latitude');
-    const tempLng = sessionStorage.getItem('temp_longitude');
-    if (tempLat && tempLng) {
-      user.latitude = parseFloat(tempLat);
-      user.longitude = parseFloat(tempLng);
-      // E atualiza silenciosamente no perfil do banco
-      authDb.updateLocation(user.latitude, user.longitude).then(() => {
-        renderHeader();
-      });
-    } else {
-      // Faz uma busca ativa por IP rápida para salvar o usuário
-      authDb.fetchLocationByIp().then(loc => {
-        if (loc) {
-          user.latitude = loc.lat;
-          user.longitude = loc.lng;
-          authDb.updateLocation(loc.lat, loc.lng).then(() => {
-            renderHeader();
-            route();
-          });
-        } else {
-          // Fallback: Caso o IP falhe também, exibe a tela de solicitação de GPS
-          showGPSRequestScreen(container);
-        }
-      }).catch(() => {
-        showGPSRequestScreen(container);
-      });
-      return;
-    }
-  }
-
-  // Auxiliar para exibição de solicitação de GPS se o IP também falhar
-  function showGPSRequestScreen(container) {
-    const gpsBox = document.createElement('div');
-    gpsBox.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 text-center space-y-6 animate-fade-in';
-    
-    gpsBox.innerHTML = `
-      <div class="text-5xl">📍</div>
-      <h2 class="text-xl font-black text-white uppercase tracking-wider">Permissão de GPS Requerida</h2>
-      <p class="text-xs text-gray-400">Para calcular a distância e listar outros colecionadores que estão ao seu redor, precisamos que você compartilhe sua geolocalização.</p>
-      <button id="btnRequestGPSCommunity" class="w-full py-3 rounded-xl bg-[#00e676] text-black font-black text-xs uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition">
-        Permitir Acesso ao GPS
-      </button>
-      <p class="text-[10px] text-gray-500 font-bold mt-4">Nota: Em modo Simulado, suas coordenadas reais serão usadas apenas localmente para calcular a distância dos colecionadores fictícios ao seu redor.</p>
-    `;
-    
-    gpsBox.querySelector('#btnRequestGPSCommunity').onclick = () => {
-      gpsBox.querySelector('#btnRequestGPSCommunity').textContent = "Obtendo GPS...";
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          await authDb.updateLocation(position.coords.latitude, position.coords.longitude);
-          // Sincroniza figurinhas
-          const activeAlbumId = storage.getCurrentAlbumId();
-          const albums = storage.getAlbums();
-          if (activeAlbumId && albums[activeAlbumId]) {
-            await authDb.syncStickers(albums[activeAlbumId].stickers);
-          }
-          renderHeader();
-          route();
-        },
-        (error) => {
-          console.error(error);
-          alert("Não foi possível acessar sua localização. Certifique-se de que deu permissão no seu navegador.");
-          route();
-        }
-      );
-    };
-
-    container.appendChild(gpsBox);
-  }
-
-  // Página da Comunidade Principal
-  const mainDiv = document.createElement('div');
-  mainDiv.className = 'space-y-6 py-2 animate-fade-in';
-
-  // Cabeçalho da Comunidade com Filtros
-  const headerCard = document.createElement('div');
-  headerCard.className = 'glass-panel p-5 rounded-2xl border-white/5 flex flex-col gap-4';
-
-  const headerTitleRow = document.createElement('div');
-  headerTitleRow.className = 'flex justify-between items-center w-full';
-  
-  const titleInfo = document.createElement('div');
-  titleInfo.innerHTML = `
-    <h2 class="text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
-      <span>👥 Comunidade</span>
-    </h2>
-    <p class="text-[10px] text-gray-400 mt-0.5">Encontre colecionadores ao seu redor para trocas</p>
-  `;
-  headerTitleRow.appendChild(titleInfo);
-
-  // Seletor de Raio
-  const filterWrapper = document.createElement('div');
-  filterWrapper.className = 'flex items-center gap-1.5';
-  
-  const filterLabel = document.createElement('span');
-  filterLabel.className = 'text-[9px] font-black text-gray-400 uppercase tracking-wider';
-  filterLabel.textContent = 'Raio:';
-  filterWrapper.appendChild(filterLabel);
-
-  const radiusSelector = document.createElement('select');
-  radiusSelector.className = 'bg-[#131735] text-white border border-white/10 text-[10px] px-2 py-1 rounded-lg focus:outline-none cursor-pointer';
-  
-  const options = [
-    { value: 1, label: '1 km' },
-    { value: 5, label: '5 km' },
-    { value: 15, label: '15 km' },
-    { value: 50, label: '50 km' },
-    { value: 99999, label: 'Ilimitado' }
-  ];
-
-  options.forEach(opt => {
-    const el = document.createElement('option');
-    el.value = opt.value;
-    el.textContent = opt.label;
-    if (opt.value === currentCommunityRadius) el.selected = true;
-    radiusSelector.appendChild(el);
-  });
-
-  radiusSelector.onchange = (e) => {
-    currentCommunityRadius = parseInt(e.target.value, 10);
-    renderCommunityList();
-  };
-
-  filterWrapper.appendChild(radiusSelector);
-  headerTitleRow.appendChild(filterWrapper);
-  headerCard.appendChild(headerTitleRow);
-
-  // Tabs de Navegação da Comunidade
-  const tabRow = document.createElement('div');
-  tabRow.className = 'flex border-b border-white/5';
-  
-  const tabNearby = document.createElement('button');
-  tabNearby.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentCommunityTab === 'nearby' ? 'active-tab' : ''}`;
-  tabNearby.textContent = 'Próximos de Mim';
-  tabNearby.onclick = () => {
-    currentCommunityTab = 'nearby';
-    tabNearby.classList.add('active-tab');
-    tabFavs.classList.remove('active-tab');
-    renderCommunityList();
-  };
-
-  const tabFavs = document.createElement('button');
-  tabFavs.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentCommunityTab === 'favorites' ? 'active-tab' : ''}`;
-  tabFavs.textContent = 'Minha Rede (Favoritos)';
-  tabFavs.onclick = () => {
-    currentCommunityTab = 'favorites';
-    tabFavs.classList.add('active-tab');
-    tabNearby.classList.remove('active-tab');
-    renderCommunityList();
-  };
-
-  tabRow.appendChild(tabNearby);
-  tabRow.appendChild(tabFavs);
-  headerCard.appendChild(tabRow);
-  mainDiv.appendChild(headerCard);
-
-  // Container da Lista de Colecionadores
-  const listContainer = document.createElement('div');
-  listContainer.className = 'space-y-3';
-  mainDiv.appendChild(listContainer);
-  container.appendChild(mainDiv);
-
-  // Carrega e renderiza a lista de colecionadores
-  async function renderCommunityList() {
-    listContainer.innerHTML = '<p class="text-center text-xs text-gray-400 py-6 animate-pulse">Buscando colecionadores...</p>';
-    
-    try {
-      const collectors = await authDb.getNearbyCollectors(user.latitude, user.longitude, currentCommunityRadius);
-      listContainer.innerHTML = '';
-
-      // Filtra se a tab for favoritos
-      let filtered = collectors;
-      if (currentCommunityTab === 'favorites') {
-        const favs = authDb.getFavorites();
-        filtered = collectors.filter(c => favs.includes(c.uid));
-      }
-
-      if (filtered.length === 0) {
-        listContainer.innerHTML = `
-          <div class="glass-panel p-8 rounded-2xl border-white/5 text-center py-10">
-            <p class="text-xs text-gray-400">${currentCommunityTab === 'favorites' ? 'Nenhum colecionador favoritado na sua rede.' : 'Nenhum colecionador encontrado neste raio.'}</p>
-          </div>
-        `;
-        return;
-      }
-
-      // Dados locais para calcular interesses de troca
-      const localAlbums = JSON.parse(localStorage.getItem('albums') || '{}');
-      const activeAlbumId = localStorage.getItem('currentAlbumId');
-      const activeAlbum = localAlbums[activeAlbumId] || { stickers: {} };
-      const userStickers = activeAlbum.stickers || {};
-
-      filtered.forEach(c => {
-        // Calcula o cruzamento rápido para exibir estatísticas resumidas
-        let missingForUser = 0; // O que ele tem que te falta
-        let missingForCollector = 0; // O que você tem repetido que falta para ele
-
-        Object.entries(c.stickers).forEach(([key, val]) => {
-          const userSticker = userStickers[key];
-          const userOwned = userSticker ? userSticker.owned : false;
-          const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
-          
-          if (val.owned && !userOwned) {
-            missingForUser++;
-          }
-          if (userDup > 0 && !val.owned) {
-            missingForCollector++;
-          }
-        });
-
-        const isPerfectMatch = (missingForUser > 0 && missingForCollector > 0);
-
-        const card = document.createElement('div');
-        card.className = `glass-panel p-4 rounded-xl border-white/5 flex items-center justify-between gap-4 collector-card cursor-pointer ${isPerfectMatch ? 'perfect-match-box' : ''}`;
-        card.onclick = (e) => {
-          if (e.target.closest('button')) return;
-          location.hash = `#community-profile-${c.uid}`;
-        };
-
-        const avatar = document.createElement('img');
-        avatar.src = c.photo_url;
-        avatar.loading = 'lazy';
-        avatar.decoding = 'async';
-        avatar.className = 'w-10 h-10 rounded-full object-cover border border-white/10';
-        card.appendChild(avatar);
-
-        const info = document.createElement('div');
-        info.className = 'flex-1 min-w-0';
-        
-        const nameRow = document.createElement('div');
-        nameRow.className = 'flex items-center gap-1.5';
-        
-        const nameText = document.createElement('h3');
-        nameText.className = 'font-bold text-xs text-white truncate';
-        nameText.textContent = c.name;
-        nameRow.appendChild(nameText);
-
-        if (isPerfectMatch) {
-          const matchBadge = document.createElement('span');
-          matchBadge.className = 'text-[7px] font-black uppercase bg-copaYellow text-black px-1.5 py-0.5 rounded-full tracking-wider animate-pulse';
-          matchBadge.textContent = 'Troca Certeira';
-          nameRow.appendChild(matchBadge);
-        }
-
-        info.appendChild(nameRow);
-
-        const subInfo = document.createElement('p');
-        subInfo.className = 'text-[9px] text-gray-400 mt-1';
-        subInfo.innerHTML = `📍 <strong>${c.distance} km</strong> de distância • Visto há pouco`;
-        info.appendChild(subInfo);
-
-        const stats = document.createElement('p');
-        stats.className = 'text-[9px] text-copaGreen font-bold mt-1.5 flex items-center gap-2';
-        
-        let statsHtml = "";
-        if (missingForUser > 0) {
-          statsHtml += `<span class="text-copaYellow font-bold">Te falta: ${missingForUser}</span>`;
-        }
-        if (missingForCollector > 0) {
-          if (statsHtml) statsHtml += ` <span class="text-white/10">|</span> `;
-          statsHtml += `<span class="text-copaGreen font-bold">Falta para ele: ${missingForCollector}</span>`;
-        }
-        if (!statsHtml) {
-          statsHtml = `<span class="text-gray-500 font-normal">Nenhuma troca qualificada</span>`;
-        }
-        stats.innerHTML = statsHtml;
-        info.appendChild(stats);
-
-        card.appendChild(info);
-
-        // Ações: Favoritar
-        const favBtn = document.createElement('button');
-        favBtn.className = 'w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-xs transition duration-200';
-        
-        const isFav = authDb.isFavorite(c.uid);
-        favBtn.innerHTML = isFav ? '❤️' : '🤍';
-        favBtn.title = isFav ? 'Remover da Minha Rede' : 'Adicionar à Minha Rede';
-        favBtn.onclick = (e) => {
-          e.stopPropagation();
-          const state = authDb.toggleFavorite(c.uid);
-          favBtn.innerHTML = state ? '❤️' : '🤍';
-          if (currentCommunityTab === 'favorites') {
-            renderCommunityList(); // atualiza a lista se for aba de favoritos
-          }
-        };
-
-        card.appendChild(favBtn);
-        listContainer.appendChild(card);
-      });
-
-    } catch (e) {
-      console.error(e);
-      listContainer.innerHTML = '<p class="text-center text-xs text-red-400 py-6">Erro ao carregar colecionadores.</p>';
-    }
-  }
-
-  // Inicializa a lista
-  renderCommunityList();
-}
-
 function renderCollectorProfile(uid, container) {
   const user = authDb.getCurrentUser();
   if (!user) {
@@ -3225,7 +3652,7 @@ function renderCollectorProfile(uid, container) {
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
       </svg>
     `;
-    backBtn.onclick = () => location.hash = '#community';
+    backBtn.onclick = () => location.hash = '#trades';
     backRow.appendChild(backBtn);
 
     const favBtn = document.createElement('button');
@@ -3267,6 +3694,8 @@ function renderCollectorProfile(uid, container) {
     const activeAlbum = localAlbums[activeAlbumId] || { stickers: {} };
     const userStickers = activeAlbum.stickers || {};
 
+    const cardsHeHas = [];
+    const cardsHeLacks = [];
     const cardsHeHasLackingYou = [];
     const cardsYouHaveLackingHim = [];
     
@@ -3288,6 +3717,12 @@ function renderCollectorProfile(uid, container) {
             const collectorSticker = collector.stickers[key];
             const collectorOwned = collectorSticker ? collectorSticker.owned : false;
             const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
+
+            if (collectorOwned) {
+              cardsHeHas.push(key);
+            } else {
+              cardsHeLacks.push(key);
+            }
 
             // Ele tem (e tem de sobra para trocar) que te falta
             if (collectorOwned && collectorDup > 0 && !userOwned) {
@@ -3314,6 +3749,12 @@ function renderCollectorProfile(uid, container) {
           const collectorSticker = collector.stickers[key];
           const collectorOwned = collectorSticker ? collectorSticker.owned : false;
           const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
+
+          if (collectorOwned) {
+            cardsHeHas.push(key);
+          } else {
+            cardsHeLacks.push(key);
+          }
 
           // Ele tem (e tem de sobra para trocar) que te falta
           if (collectorOwned && collectorDup > 0 && !userOwned) {
@@ -3413,7 +3854,7 @@ function renderCollectorProfile(uid, container) {
 
     const tabHeHas = document.createElement('button');
     tabHeHas.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'heHas' ? 'active-tab' : ''}`;
-    tabHeHas.textContent = `Ele Tem (${cardsHeHasLackingYou.length})`;
+    tabHeHas.textContent = `Ele Tem (${cardsHeHas.length})`;
     tabHeHas.onclick = () => {
       activeProfileTab = 'heHas';
       setProfileTabState();
@@ -3421,7 +3862,7 @@ function renderCollectorProfile(uid, container) {
 
     const tabYouHave = document.createElement('button');
     tabYouHave.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'youHave' ? 'active-tab' : ''}`;
-    tabYouHave.textContent = `Você Tem (${cardsYouHaveLackingHim.length})`;
+    tabYouHave.textContent = `Ele Não Tem (${cardsHeLacks.length})`;
     tabYouHave.onclick = () => {
       activeProfileTab = 'youHave';
       setProfileTabState();
@@ -3435,127 +3876,6 @@ function renderCollectorProfile(uid, container) {
     const tabContentContainer = document.createElement('div');
     crossTabsCard.appendChild(tabContentContainer);
     mainDiv.appendChild(crossTabsCard);
-
-    function setProfileTabState() {
-      tabPerfect.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'perfect' ? 'active-tab' : ''}`;
-      tabHeHas.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'heHas' ? 'active-tab' : ''}`;
-      tabYouHave.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'youHave' ? 'active-tab' : ''}`;
-
-      tabContentContainer.innerHTML = '';
-
-      if (activeProfileTab === 'perfect') {
-        if (!hasMatchPerfect) {
-          tabContentContainer.innerHTML = `
-            <div class="text-center py-8 space-y-2">
-              <p class="text-xs text-gray-400">Nenhum Match Perfeito de Troca 1:1.</p>
-              <p class="text-[9px] text-gray-500 px-4">O match perfeito surge quando você possui alguma repetida de interesse dele E ele possui alguma repetida de seu interesse.</p>
-            </div>
-          `;
-          return;
-        }
-
-        const containerBox = document.createElement('div');
-        containerBox.className = 'perfect-match-box p-4 rounded-xl space-y-4 animate-fade-in';
-
-        containerBox.innerHTML = `
-          <div class="text-center space-y-1">
-            <h4 class="text-copaYellow font-black text-xs uppercase tracking-wider">Match Perfeito Encontrado! 🤝</h4>
-            <p class="text-[9px] text-gray-400">Excelente! Vocês podem trocar figurinhas repetidas diretamente!</p>
-          </div>
-        `;
-
-        const splitGrid = document.createElement('div');
-        splitGrid.className = 'grid grid-cols-2 gap-4 border-t border-white/5 pt-3';
-
-        const leftCol = document.createElement('div');
-        leftCol.className = 'space-y-2';
-        leftCol.innerHTML = `<h5 class="text-[9px] font-black text-copaYellow uppercase tracking-wider">Você Recebe dele:</h5>`;
-        const leftGrid = document.createElement('div');
-        leftGrid.className = 'flex flex-wrap gap-1.5';
-        matchPerfectUserReceives.forEach(k => {
-          const cap = createMiniStickerCapsule(k);
-          leftGrid.appendChild(cap);
-        });
-        leftCol.appendChild(leftGrid);
-
-        const rightCol = document.createElement('div');
-        rightCol.className = 'space-y-2';
-        rightCol.innerHTML = `<h5 class="text-[9px] font-black text-copaGreen uppercase tracking-wider">Você Entrega:</h5>`;
-        const rightGrid = document.createElement('div');
-        rightGrid.className = 'flex flex-wrap gap-1.5';
-        matchPerfectUserGives.forEach(k => {
-          const cap = createMiniStickerCapsule(k);
-          rightGrid.appendChild(cap);
-        });
-        rightCol.appendChild(rightGrid);
-
-        splitGrid.appendChild(leftCol);
-        splitGrid.appendChild(rightCol);
-        containerBox.appendChild(splitGrid);
-        tabContentContainer.appendChild(containerBox);
-
-      } else if (activeProfileTab === 'heHas') {
-        if (cardsHeHasLackingYou.length === 0) {
-          tabContentContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Ele não tem figurinhas que faltam para você.</p>`;
-          return;
-        }
-
-        const details = document.createElement('div');
-        details.className = 'space-y-3 animate-fade-in';
-        details.innerHTML = `<h4 class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Figurinhas que ele tem e você não possui:</h4>`;
-        
-        const grid = document.createElement('div');
-        grid.className = 'flex flex-wrap gap-1.5';
-        cardsHeHasLackingYou.forEach(k => {
-          const cap = createMiniStickerCapsule(k);
-          grid.appendChild(cap);
-        });
-        details.appendChild(grid);
-        tabContentContainer.appendChild(details);
-
-      } else if (activeProfileTab === 'youHave') {
-        if (cardsYouHaveLackingHim.length === 0) {
-          tabContentContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Você não possui repetidas que faltam para ele.</p>`;
-          return;
-        }
-
-        const details = document.createElement('div');
-        details.className = 'space-y-3 animate-fade-in';
-        details.innerHTML = `<h4 class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Suas repetidas que faltam para ele:</h4>`;
-        
-        const grid = document.createElement('div');
-        grid.className = 'flex flex-wrap gap-1.5';
-        cardsYouHaveLackingHim.forEach(k => {
-          const cap = createMiniStickerCapsule(k);
-          grid.appendChild(cap);
-        });
-        details.appendChild(grid);
-        tabContentContainer.appendChild(details);
-      }
-    }
-
-    function getStickerNameForShare(key) {
-      const parts = key.split('-');
-      if (parts[0] === 'EXTRAS') {
-        const name = legendsData[parseInt(parts[1], 10) - 1] ? legendsData[parseInt(parts[1], 10) - 1].name : `Lendário ${parts[1]}`;
-        const cat = parts[2] ? parts[2].charAt(0).toUpperCase() + parts[2].slice(1) : '';
-        return `${name} ${cat}`;
-      }
-      return getStickerDisplayName(parts[0], parseInt(parts[1], 10));
-    }
-
-    function shareTextViaSystem(title, text) {
-      if (navigator.share) {
-        navigator.share({
-          title: title,
-          text: text
-        }).catch(err => {
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-        });
-      } else {
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-      }
-    }
 
     function setProfileTabState() {
       tabPerfect.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'perfect' ? 'active-tab' : ''}`;
@@ -3712,18 +4032,18 @@ function renderCollectorProfile(uid, container) {
           tabContentContainer.appendChild(potentialBox);
         }
       } else if (activeProfileTab === 'heHas') {
-        if (cardsHeHasLackingYou.length === 0) {
-          tabContentContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Ele não tem figurinhas que faltam para você.</p>`;
+        if (cardsHeHas.length === 0) {
+          tabContentContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Ele não tem nenhuma figurinha em estoque.</p>`;
           return;
         }
 
         const details = document.createElement('div');
         details.className = 'space-y-3 animate-fade-in';
-        details.innerHTML = `<h4 class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Figurinhas que ele tem e você não possui:</h4>`;
+        details.innerHTML = `<h4 class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Figurinhas que ele possui no álbum dele:</h4>`;
         
         const grid = document.createElement('div');
         grid.className = 'flex flex-wrap gap-1.5';
-        cardsHeHasLackingYou.forEach(k => {
+        cardsHeHas.forEach(k => {
           const cap = createMiniStickerCapsule(k);
           grid.appendChild(cap);
         });
@@ -3731,50 +4051,24 @@ function renderCollectorProfile(uid, container) {
         tabContentContainer.appendChild(details);
 
       } else if (activeProfileTab === 'youHave') {
-        if (cardsYouHaveLackingHim.length === 0) {
-          tabContentContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Você não possui repetidas que faltam para ele.</p>`;
+        if (cardsHeLacks.length === 0) {
+          tabContentContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">Ele já completou todo o álbum.</p>`;
           return;
         }
 
         const details = document.createElement('div');
         details.className = 'space-y-3 animate-fade-in';
-        details.innerHTML = `<h4 class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Suas repetidas que faltam para ele:</h4>`;
+        details.innerHTML = `<h4 class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Figurinhas que estão faltando para ele:</h4>`;
         
         const grid = document.createElement('div');
         grid.className = 'flex flex-wrap gap-1.5';
-        cardsYouHaveLackingHim.forEach(k => {
+        cardsHeLacks.forEach(k => {
           const cap = createMiniStickerCapsule(k);
           grid.appendChild(cap);
         });
         details.appendChild(grid);
         tabContentContainer.appendChild(details);
       }
-    }
-
-    // Auxiliar de Cápsula Visual
-    function createMiniStickerCapsule(key) {
-      const code = key.split('-')[0];
-      const i = parseInt(key.split('-')[1], 10);
-      const isSpecial = (code === 'EXTRAS');
-
-      const el = document.createElement('div');
-      el.className = `text-[9px] font-black px-2 py-1 rounded border tracking-wide uppercase transition-all duration-150 select-none ${isSpecial ? 'bg-copaYellow/10 text-copaYellow border-copaYellow/20 hover:bg-copaYellow/20' : 'bg-copaGreen/10 text-copaGreen border-copaGreen/20 hover:bg-copaGreen/20'}`;
-      
-      let pName = key;
-      if (isSpecial) {
-        const variant = key.split('-')[2];
-        const capVariant = variant ? variant.charAt(0).toUpperCase() + variant.slice(1) : '';
-        pName = (legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`) + ' ' + capVariant;
-        el.textContent = `${legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`} ${capVariant}`;
-      } else if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][i - 1]) {
-        pName = albumData[code][i - 1].nome;
-        el.textContent = `${code} ${i}`;
-      } else {
-        pName = playerNames[i] || key;
-        el.textContent = key;
-      }
-      el.title = pName;
-      return el;
     }
 
     setProfileTabState();

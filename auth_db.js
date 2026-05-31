@@ -41,6 +41,7 @@
       photo_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80",
       offsetLat: 0.008,  // ~1.2 km de distância
       offsetLng: -0.005,
+      birthdate: "1990-05-15",
       // Carlos terá um match perfeito: tem o que você quer e quer o que você tem repetido
       generateStickers: (userStickers) => {
         const stickers = {};
@@ -72,6 +73,7 @@
       photo_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&h=80&q=80",
       offsetLat: -0.025, // ~3.5 km
       offsetLng: 0.015,
+      birthdate: "1995-10-20",
       // Mariana tem figurinhas que te faltam, mas não quer nada das suas repetidas
       generateStickers: (userStickers) => {
         const stickers = {};
@@ -91,6 +93,7 @@
       photo_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&h=80&q=80",
       offsetLat: 0.085,  // ~12 km
       offsetLng: -0.045,
+      birthdate: "2012-08-12", // menor de idade
       // Felipe quer suas repetidas, mas não tem nada para te dar de volta
       generateStickers: (userStickers) => {
         const stickers = {};
@@ -110,6 +113,7 @@
       photo_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&h=80&q=80",
       offsetLat: -0.185, // ~28 km
       offsetLng: 0.125,
+      birthdate: "2013-03-04", // menor de idade
       // Júlia tem um perfil médio/baixo
       generateStickers: (userStickers) => {
         const stickers = {};
@@ -182,7 +186,7 @@
     },
 
     // Login Simulado ou Real
-    async login(provider, username = "") {
+    async login(provider, username = "", birthdate = "") {
       if (isDemoMode) {
         // Simulação de login
         const randomId = Math.random().toString(36).substring(2, 10);
@@ -205,6 +209,7 @@
           name: name,
           photo_url: photo,
           provider: provider,
+          birthdate: birthdate,
           latitude: null,
           longitude: null,
           last_seen: new Date().toISOString()
@@ -319,6 +324,7 @@
             latitude: collectorLat,
             longitude: collectorLng,
             distance: dist,
+            birthdate: c.birthdate,
             stickers: c.generateStickers(userStickers),
             last_seen: new Date(Date.now() - (dist * 120000)).toISOString() // tempo simulado
           };

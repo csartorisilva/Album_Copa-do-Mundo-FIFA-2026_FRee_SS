@@ -37,6 +37,51 @@ body {
 .grid-fifa {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-auto-rows: 180px; /* Fixed rows for desktop */
+  gap: 1.25rem;
+  margin-top: 1.5rem; /* mt-6 to separate from header */
+}
+
+/* Mobile layout */
+@media (max-width: 640px) {
+  .grid-fifa {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 145px; /* Linhas fixas para travar a grade no celular */
+    gap: 0.75rem;
+    margin-top: 1rem; /* mt-4 no celular */
+  }
+}
+.grid-fifa {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-auto-rows: 180px; /* Fixed rows for desktop */
+  gap: 1.25rem;
+  margin-top: 1.5rem; /* mt-6 to separate from header */
+}
+
+/* Mobile layout */
+@media (max-width: 640px) {
+  .grid-fifa {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 145px; /* Linhas fixas para travar a grade no celular */
+    gap: 0.75rem;
+    margin-top: 1rem; /* mt-4 no celular */
+  }
+}
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-auto-rows: 180px; /* Fixed rows for desktop */
+  gap: 1.25rem;
+  margin-top: 1.5rem; /* mt-6 to separate from header */
+}
+
+
+
+}
+
+
+
   grid-auto-rows: 180px; /* Linhas fixas para travar a grade no desktop */
   gap: 1.25rem;
   margin-top: 1.5rem; /* mt-6 para desgrudar do cabeçalho da seleção */
@@ -51,7 +96,15 @@ body {
   }
 }
 
-/* 3D Perspective Container for page flips */
+/* Two-line responsive grid for selection cards */
+.two-line-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 1rem;
+  height: 100%;
+}
+
 #appRoot {
   perspective: 2000px;
   transform-style: preserve-3d;
@@ -149,12 +202,88 @@ body {
 }
 
 .sticker-card:hover {
-  transform: scale(0.98) translateY(-2px);
+  transform: scale(1.02) translateY(-4px);
 }
 
 .sticker-card.is-flipped:hover {
-  transform: scale(1.03) translateY(-2px);
+  transform: scale(1.03) translateY(-4px);
 }
+
+/* Shimmer Line effect (Contínuo e Suave) */
+.card-front::after, .card-back::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+  z-index: 10;
+  animation: shimmer-loop 5s infinite ease-in-out;
+}
+
+/* Quando colada (possuída), o brilho na frente se torna ouro brilhante premium */
+.sticker-card.is-flipped .card-front::after {
+  background: linear-gradient(
+    to right,
+    rgba(255, 215, 0, 0) 0%,
+    rgba(255, 223, 0, 0.5) 50%,
+    rgba(255, 215, 0, 0) 100%
+  );
+}
+
+
+/* Ondulação do Brilho por Colunas - Desktop (4 colunas) */
+.sticker-card:nth-child(4n+1) .card-front::after,
+.sticker-card:nth-child(4n+1) .card-back::after {
+  animation-delay: 0s;
+}
+.sticker-card:nth-child(4n+2) .card-front::after,
+.sticker-card:nth-child(4n+2) .card-back::after {
+  animation-delay: 0.3s;
+}
+.sticker-card:nth-child(4n+3) .card-front::after,
+.sticker-card:nth-child(4n+3) .card-back::after {
+  animation-delay: 0.6s;
+}
+.sticker-card:nth-child(4n) .card-front::after,
+.sticker-card:nth-child(4n) .card-back::after {
+  animation-delay: 0.9s;
+}
+
+/* Ondulação do Brilho por Colunas - Mobile (2 colunas) */
+@media (max-width: 640px) {
+  .sticker-card:nth-child(2n+1) .card-front::after,
+  .sticker-card:nth-child(2n+1) .card-back::after {
+    animation-delay: 0s;
+  }
+  .sticker-card:nth-child(2n) .card-front::after,
+  .sticker-card:nth-child(2n) .card-back::after {
+    animation-delay: 0.3s;
+  }
+}
+
+
+@keyframes shimmer-loop {
+  0% {
+    left: -150%;
+  }
+  30% {
+    left: 150%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+
 
 @media (max-width: 640px) {
   .sticker-card {
@@ -599,6 +728,62 @@ body {
   border-bottom: 2px solid var(--copa-yellow);
   color: var(--copa-yellow) !important;
 }
+
+/* Premium (EXTRAS) Sizing & Aspect Ratio */
+.sticker-card.special {
+  height: 155px !important;
+  max-height: 155px !important;
+}
+@media (max-width: 640px) {
+  .sticker-card.special {
+    height: 110px !important;
+    max-height: 110px !important;
+  }
+}
+
+/* Premium Card Variant Colors (Contornos) */
+.card-front.special.ouro {
+  box-shadow: inset 0 0 0 2.5px #FFD700, 0 0 15px rgba(255, 215, 0, 0.45) !important;
+}
+.card-back.special.ouro {
+  box-shadow: inset 0 0 0 1.5px rgba(255, 215, 0, 0.35) !important;
+}
+
+.card-front.special.prata {
+  box-shadow: inset 0 0 0 2.5px #C0C0C0, 0 0 15px rgba(192, 192, 192, 0.45) !important;
+}
+.card-back.special.prata {
+  box-shadow: inset 0 0 0 1.5px rgba(192, 192, 192, 0.35) !important;
+}
+
+.card-front.special.bronze {
+  box-shadow: inset 0 0 0 2.5px #CD7F32, 0 0 15px rgba(205, 127, 50, 0.45) !important;
+}
+.card-back.special.bronze {
+  box-shadow: inset 0 0 0 1.5px rgba(205, 127, 50, 0.35) !important;
+}
+
+.card-front.special.bordo {
+  box-shadow: inset 0 0 0 2.5px #800020, 0 0 15px rgba(128, 0, 32, 0.45) !important;
+}
+.card-back.special.bordo {
+  box-shadow: inset 0 0 0 1.5px rgba(128, 0, 32, 0.35) !important;
+}
+
+/* Uniformidade de Tamanho dos Brasões/Escudos */
+.team-crest-img {
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: contain;
+  display: block;
+}
+
+.standard-crest {
+  width: 40px !important;
+  height: 40px !important;
+  object-fit: contain;
+}
+
 
 
 
