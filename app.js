@@ -1334,7 +1334,7 @@ function renderHome(container) {
 
   // Bloco de Compartilhamento (exibido abaixo das estatísticas sem o rótulo)
   const shareBlock = document.createElement('div');
-  shareBlock.className = 'flex flex-col gap-2 mt-2 pt-3.5 border-t border-white/5 w-full';
+  shareBlock.className = 'flex flex-col gap-2 mt-1 w-full';
   
   const shareButtonsContainer = document.createElement('div');
   shareButtonsContainer.className = 'grid grid-cols-3 gap-2 w-full';
