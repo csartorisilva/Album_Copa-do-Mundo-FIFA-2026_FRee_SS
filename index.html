@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Álbum de Figurinhas FIFA 2026</title>
+  <meta name="description" content="Gerencie álbuns de figurinhas da Copa do Mundo FIFA 2026 – totalmente gratuito, mobile‑first, sem servidor." />
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Configuração da paleta oficial da Copa 2026 (cores base)
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            copaBlue: '#0033A0',   // azul escuro oficial
+            copaGreen: '#009639',  // verde floresta oficial
+            copaYellow: '#FFC726', // amarelo dourado oficial
+            copaGray: '#F2F2F2',   // cinza neutro
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-copaGray text-gray-900 font-sans min-h-screen flex flex-col">
+  <!-- Header com seletor de álbum -->
+  <header class="bg-copaBlue text-white p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">Álbum FIFA 2026</h1>
+    <select id="albumSelector" class="bg-white text-gray-800 p-2 rounded" onchange="app.switchAlbum(this.value)"></select>
+  </header>
+
+  <!-- Main container -->
+  <main id="appRoot" class="flex-1 p-4"></main>
+
+  <!-- Footer -->
+  <footer class="bg-copaBlue text-white p-2 text-center flex items-center justify-center gap-2">
+    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M224.1 141c-63.6 0-115 51.4-115 115 0 55.5 38.3 102.1 89.3 111.9v73.4h51.4v-73.4c51-9.8 89.3-56.4 89.3-111.9 0-63.6-51.4-115-115-115zm0 180c-35.9 0-65-29.1-65-65s29.1-65 65-65 65 29.1 65 65-29.1 65-65 65z"/></svg>
+    Produzido por <a href="https://instagram.com/free_ss" target="_blank" class="underline">@free_ss</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
