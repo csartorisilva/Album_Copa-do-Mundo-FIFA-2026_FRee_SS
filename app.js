@@ -1402,40 +1402,151 @@ function renderHome(container) {
     rootHome.appendChild(banner);
   }
 
-  // 3. PRIMEIRA LINHA: Seções Especiais (LADO A LADO na mesma linha)
+  // 3. PRIMEIRA LINHA: 4 Blocos de Seções Especiais com Progresso
   const specialGrid = document.createElement('div');
-  specialGrid.className = 'grid grid-cols-3 gap-2.5';
-  
-  const specialSections = [
-    { title: 'FIFA', desc: 'Especial Copa', hash: '#team-FWC', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/200px-FIFA_logo_without_slogan.svg.png' },
-    { title: 'Coca-Cola', desc: 'Metálicos', hash: '#team-CC', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/200px-Coca-Cola_logo.svg.png' },
-    { title: 'Premium', desc: 'Fig. Extras', hash: '#team-EXTRAS', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/100px-Golden_Ball.svg.png' }
+  specialGrid.className = 'grid grid-cols-4 gap-2';
+
+  // Helper de progresso local
+  function getSpecialProgress(code) {
+    const albumId = storage.getCurrentAlbumId();
+    const albums = storage.getAlbums();
+    const album = albums[albumId];
+    if (!album) return { owned: 0, total: 0 };
+    const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
+    let owned = 0;
+    for (let i = 1; i <= limit; i++) {
+      if (album.stickers[`${code}-${i}`]?.owned) owned++;
+    }
+    return { owned, total: limit };
+  }
+
+  // Helper: progresso dos escudos (figurinha #1 de cada seleção)
+  function getShieldsProgress() {
+    const albumId = storage.getCurrentAlbumId();
+    const albums = storage.getAlbums();
+    const album = albums[albumId];
+    if (!album) return { owned: 0, total: 48 };
+    let owned = 0;
+    groupsData.forEach(g => g.teams.forEach(t => {
+      if (album.stickers[`${t.code}-1`]?.owned) owned++;
+    }));
+    return { owned, total: 48 };
+  }
+
+  // Helper: progresso das figurinhas Premium (EXTRAS com 4 variações cada)
+  function getPremiumProgress() {
+    const albumId = storage.getCurrentAlbumId();
+    const albums = storage.getAlbums();
+    const album = albums[albumId];
+    if (!album) return { owned: 0, total: legendsData.length * 4 };
+    const variants = ['ouro', 'prata', 'bronze', 'bordo'];
+    let owned = 0;
+    legendsData.forEach((_, idx) => {
+      variants.forEach(v => {
+        if (album.stickers[`EXTRAS-${idx + 1}-${v}`]?.owned) owned++;
+      });
+    });
+    return { owned, total: legendsData.length * 4 };
+  }
+
+  const fwcProg   = getSpecialProgress('FWC');
+  const shProg    = getShieldsProgress();
+  const ccProg    = getSpecialProgress('CC');
+  const premProg  = getPremiumProgress();
+
+  const specialBlocks = [
+    {
+      title: 'FIFA',
+      desc: 'Especial Copa',
+      hash: '#team-FWC',
+      prog: fwcProg,
+      color: 'border-blue-500/20 hover:border-blue-400/40',
+      accentColor: '#4285F4',
+      logo: `<svg viewBox="0 0 48 48" class="w-8 h-auto opacity-90" fill="none">
+        <rect width="48" height="48" rx="6" fill="#004E98"/>
+        <text x="24" y="32" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="900" font-size="18" fill="white">FIFA</text>
+      </svg>`
+    },
+    {
+      title: 'Escudos',
+      desc: '48 Seleções',
+      hash: '#team-ESCUDOS',
+      prog: shProg,
+      color: 'border-copaYellow/20 hover:border-copaYellow/50',
+      accentColor: '#FFC726',
+      logo: `<svg viewBox="0 0 48 48" class="w-8 h-auto" fill="none">
+        <path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" fill="#FFC726" opacity="0.85"/>
+        <path d="M24 10L10 17v9c0 7.5 6 13.5 14 15 8-1.5 14-7.5 14-15v-9L24 10z" fill="#090a1a" opacity="0.3"/>
+        <text x="24" y="30" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="900" font-size="11" fill="white">ESCUDO</text>
+      </svg>`
+    },
+    {
+      title: 'Coca-Cola',
+      desc: 'Metálicos',
+      hash: '#team-CC',
+      prog: ccProg,
+      color: 'border-red-500/20 hover:border-red-400/40',
+      accentColor: '#E31E2D',
+      logo: `<svg viewBox="0 0 48 48" class="w-8 h-auto" fill="none">
+        <rect width="48" height="48" rx="6" fill="#E31E2D"/>
+        <text x="24" y="20" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="8" fill="white">Coca-Cola</text>
+        <text x="24" y="34" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="700" font-size="7" fill="white" opacity="0.8">ZERO</text>
+      </svg>`
+    },
+    {
+      title: 'Premium',
+      desc: 'Lendários',
+      hash: '#team-EXTRAS',
+      prog: premProg,
+      color: 'border-yellow-300/20 hover:border-yellow-300/50',
+      accentColor: '#FFD700',
+      logo: `<svg viewBox="0 0 48 48" class="w-8 h-auto" fill="none">
+        <polygon points="24,4 29,18 44,18 32,27 37,42 24,33 11,42 16,27 4,18 19,18" fill="#FFD700" opacity="0.9"/>
+      </svg>`
+    }
   ];
 
-  specialSections.forEach(sec => {
+  specialBlocks.forEach(sec => {
     const box = document.createElement('div');
-    box.className = 'glass-panel p-3 rounded-xl border-white/5 hover:border-copaYellow/30 cursor-pointer flex flex-col justify-center items-center text-center transition group relative overflow-hidden h-16';
+    box.className = `glass-panel rounded-xl border cursor-pointer flex flex-col items-center text-center transition group relative overflow-hidden p-2.5 gap-1.5 ${sec.color}`;
     box.onclick = () => location.hash = sec.hash;
 
-    if (sec.logo) {
-      const bgLogo = document.createElement('img');
-      bgLogo.src = sec.logo;
-      bgLogo.loading = 'lazy';
-      bgLogo.decoding = 'async';
-      bgLogo.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-auto opacity-10 pointer-events-none group-hover:scale-110 transition';
-      box.appendChild(bgLogo);
-    }
+    // Logo SVG inline centralizado
+    const logoWrapper = document.createElement('div');
+    logoWrapper.className = 'w-9 h-9 flex items-center justify-center';
+    logoWrapper.innerHTML = sec.logo;
+    box.appendChild(logoWrapper);
 
-    const title = document.createElement('h4');
-    title.className = 'font-black text-xs text-copaYellow uppercase tracking-wider group-hover:scale-105 transition z-10';
-    title.textContent = sec.title;
-    
-    const desc = document.createElement('p');
-    desc.className = 'text-[9px] text-gray-500 font-semibold z-10';
-    desc.textContent = sec.desc;
+    // Título
+    const titleEl = document.createElement('p');
+    titleEl.className = 'font-black text-[9px] text-white uppercase tracking-widest leading-none';
+    titleEl.textContent = sec.title;
+    box.appendChild(titleEl);
 
-    box.appendChild(title);
-    box.appendChild(desc);
+    // Descrição
+    const descEl = document.createElement('p');
+    descEl.className = 'text-[8px] text-gray-500 leading-none';
+    descEl.textContent = sec.desc;
+    box.appendChild(descEl);
+
+    // Progresso
+    const progEl = document.createElement('p');
+    const pct = sec.prog.total > 0 ? Math.round((sec.prog.owned / sec.prog.total) * 100) : 0;
+    progEl.className = 'text-[9px] font-black leading-none mt-0.5';
+    progEl.style.color = sec.accentColor;
+    progEl.textContent = `${sec.prog.owned}/${sec.prog.total}`;
+    box.appendChild(progEl);
+
+    // Mini barra de progresso
+    const barBg = document.createElement('div');
+    barBg.className = 'w-full h-1 bg-white/5 rounded-full overflow-hidden';
+    const barFill = document.createElement('div');
+    barFill.className = 'h-full rounded-full transition-all';
+    barFill.style.width = `${pct}%`;
+    barFill.style.background = sec.accentColor;
+    barBg.appendChild(barFill);
+    box.appendChild(barBg);
+
     specialGrid.appendChild(box);
   });
   rootHome.appendChild(specialGrid);
