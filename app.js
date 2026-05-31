@@ -2213,11 +2213,10 @@ function renderTeamPage(code, container) {
 
   // Grade responsiva de figurinhas
   const grid = document.createElement('div');
-  if (code === 'EXTRAS') {
-    grid.className = 'grid grid-cols-4 gap-3 mt-6'; // 4 cards na mesma linha para Legends
-  } else {
-    grid.className = 'grid-fifa';
-  }
+  grid.className = 'grid-fifa';
+
+  const extrasContainer = document.createElement('div');
+  extrasContainer.className = 'space-y-4 mt-6';
 
   // Se for ESCUDOS, os cards devem replicar as ações e cópia fiel das figurinhas nº 1 de cada seleção
   if (code === 'ESCUDOS') {
@@ -2287,14 +2286,32 @@ function renderTeamPage(code, container) {
   } else if (code === 'EXTRAS') {
     // Legends Premium: 4 variações por atleta (ouro, prata, bronze, bordo)
     const variants = ['ouro', 'prata', 'bronze', 'bordo'];
-    const borderColors = {
-      ouro: 'inset 0 0 0 2.5px #FFD700, 0 0 15px rgba(255, 215, 0, 0.4)',
-      prata: 'inset 0 0 0 2.5px #C0C0C0, 0 0 15px rgba(192, 192, 192, 0.4)',
-      bronze: 'inset 0 0 0 2.5px #CD7F32, 0 0 15px rgba(205, 127, 50, 0.4)',
-      bordo: 'inset 0 0 0 2.5px #800020, 0 0 15px rgba(128, 0, 32, 0.4)'
-    };
 
     legendsData.forEach((legend, idx) => {
+      const row = document.createElement('div');
+      row.className = 'glass-panel p-3.5 rounded-2xl border-white/5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 hover:border-yellow-500/20 transition duration-200';
+      
+      const playerInfo = document.createElement('div');
+      playerInfo.className = 'flex items-center gap-3.5 min-w-0 sm:w-1/4 flex-shrink-0';
+      
+      const flagImg = document.createElement('img');
+      const flagCode = legend.country.toLowerCase();
+      flagImg.src = `https://flagcdn.com/w40/${flagCode}.png`;
+      flagImg.loading = 'lazy';
+      flagImg.decoding = 'async';
+      flagImg.className = 'w-6 h-4 object-cover border border-white/20 rounded shadow-sm flex-shrink-0';
+      playerInfo.appendChild(flagImg);
+      
+      const nameLabel = document.createElement('span');
+      nameLabel.className = 'font-black text-xs text-white uppercase tracking-wider truncate';
+      nameLabel.textContent = legend.name;
+      playerInfo.appendChild(nameLabel);
+      
+      row.appendChild(playerInfo);
+      
+      const cardsGrid = document.createElement('div');
+      cardsGrid.className = 'grid grid-cols-4 gap-2 flex-1';
+      
       variants.forEach(variant => {
         const key = `EXTRAS-${idx + 1}-${variant}`;
         const stickerCode = `${legend.name}`;
@@ -2323,12 +2340,11 @@ function renderTeamPage(code, container) {
         
         const teamTag = document.createElement('span');
         teamTag.className = 'text-[7px] font-black uppercase tracking-wider text-white';
-        teamTag.textContent = variant;
+        teamTag.textContent = variant.toUpperCase();
         frontHeader.appendChild(teamTag);
 
-        const flagCode = legend.country.toLowerCase();
+        const miniCrest = document.createElement('img');
         miniCrest.src = `https://flagcdn.com/w40/${flagCode}.png`;
-        miniCrest.alt = 'Bandeira';
         miniCrest.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
         frontHeader.appendChild(miniCrest);
         cardFront.appendChild(frontHeader);
@@ -2354,8 +2370,11 @@ function renderTeamPage(code, container) {
         };
 
         updateCard(card, key);
-        grid.appendChild(card);
+        cardsGrid.appendChild(card);
       });
+      
+      row.appendChild(cardsGrid);
+      extrasContainer.appendChild(row);
     });
   } else {
     // FIFA (FWC) e Coca-Cola (CC) e normais
@@ -2435,7 +2454,11 @@ function renderTeamPage(code, container) {
     }
   }
 
-  rootTeam.appendChild(grid);
+  if (code === 'EXTRAS') {
+    rootTeam.appendChild(extrasContainer);
+  } else {
+    rootTeam.appendChild(grid);
+  }
   container.appendChild(rootTeam);
 }
 
