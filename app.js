@@ -31,54 +31,60 @@ const storage = {
 // Mapeamento de URLs estáveis e públicas de brasões/logos das federações de futebol reais (Wikimedia Commons)
 // Mapeamento de URLs estáveis e públicas de brasões/logos das federações de futebol reais (Wikimedia Commons Thumbnails PNG)
 const crestsMap = {
-  US: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/US_Soccer_Federation_logo.svg/120px-US_Soccer_Federation_logo.svg.png',
-  MX: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Federacion_Mexicana_de_Futbol_Asociacion.svg/120px-Federacion_Mexicana_de_Futbol_Asociacion.svg.png',
-  CA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Canada_Soccer_logo.svg/120px-Canada_Soccer_logo.svg.png',
-  CR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Costa_Rica_Football_Federation_logo.svg/120px-Costa_Rica_Football_Federation_logo.svg.png',
-  BR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Brazilian_Football_Confederation_logo.svg/120px-Brazilian_Football_Confederation_logo.svg.png',
-  CO: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Federacion_Colombiana_de_Futbol_logo.svg/120px-Federacion_Colombiana_de_Futbol_logo.svg.png',
-  PY: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Asociacion_Paraguaya_de_Futbol_logo.svg/120px-Asociacion_Paraguaya_de_Futbol_logo.svg.png',
-  CM: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/F%C3%A9d%C3%A9ration_Camerounaise_de_Football_logo.svg/120px-F%C3%A9d%C3%A9ration_Camerounaise_de_Football_logo.svg.png',
-  AR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Asociaci%C3%B3n_del_F%C3%BAtbol_Argentino_logo.svg/120px-Asociaci%C3%B3n_del_F%C3%BAtbol_Argentino_logo.svg.png',
-  CL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Federaci%C3%B3n_de_F%C3%BAtbol_de_Chile_logo.svg/120px-Federaci%C3%B3n_de_F%C3%BAtbol_de_Chile_logo.svg.png',
-  UY: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg/120px-Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg.png',
-  SA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Saudi_Arabia_Football_Federation_logo.svg/120px-Saudi_Arabia_Football_Federation_logo.svg.png',
-  FR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Logo_F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football.svg/120px-Logo_F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football.svg.png',
-  MA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/F%C3%A9d%C3%A9ration_royale_marocaine_de_football.svg/120px-F%C3%A9d%C3%A9ration_royale_marocaine_de_football.svg.png',
-  AT: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Austrian_Football_Association_logo.svg/120px-Austrian_Football_Association_logo.svg.png',
-  NG: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Nigeria_Football_Federation_logo.svg/120px-Nigeria_Football_Federation_logo.svg.png',
-  ES: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Real_Federaci%C3%B3n_Espa%C3%B1ola_de_F%C3%BAtbol_logo.svg/120px-Real_Federaci%C3%B3n_Espa%C3%B1ola_de_F%C3%BAtbol_logo.svg.png',
-  JP: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Japan_Football_Association_logo.svg/120px-Japan_Football_Association_logo.svg.png',
-  EC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Federacion_Ecuatoriana_de_Futbol.svg/120px-Federacion_Ecuatoriana_de_Futbol.svg.png',
-  EG: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Egyptian_Football_Association_logo.svg/120px-Egyptian_Football_Association_logo.svg.png',
-  DE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Deutscher_Fu%C3%9Fball-Bund_logo.svg/120px-Deutscher_Fu%C3%9Fball-Bund_logo.svg.png',
-  BE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Royal_Belgian_FA_logo.svg/120px-Royal_Belgian_FA_logo.svg.png',
-  KR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Korea_Football_Association_logo.svg/120px-Korea_Football_Association_logo.svg.png',
-  TN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Tunisian_Football_Federation_logo.svg/120px-Tunisian_Football_Federation_logo.svg.png',
-  'GB-ENG': 'https://upload.wikimedia.org/wikipedia/en/thumb/3/38/England_crest_2009.svg/120px-England_crest_2009.svg.png',
-  SN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/F%C3%A9d%C3%A9ration_S%C3%A9n%C3%A9galaise_de_Football.svg/120px-F%C3%A9d%C3%A9ration_S%C3%A9n%C3%A9galaise_de_Football.svg.png',
-  IR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Football_Federation_Islamic_Republic_of_Iran_logo.svg/120px-Football_Federation_Islamic_Republic_of_Iran_logo.svg.png',
-  HN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Federaci%C3%B3n_Nacional_Aut%C3%B3noma_de_Honduras_logo.svg/120px-Federaci%C3%B3n_Nacional_Aut%C3%B3noma_de_Honduras_logo.svg.png',
-  PT: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Federa%C3%A7%C3%A3o_Portuguesa_de_Futebol_logo.svg/120px-Federa%C3%A7%C3%A3o_Portuguesa_de_Futebol_logo.svg.png',
-  GH: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Ghana_Football_Association_logo.svg/120px-Ghana_Football_Association_logo.svg.png',
-  TR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Turkish_Football_Federation_logo.svg/120px-Turkish_Football_Federation_logo.svg.png',
-  PE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Federaci%C3%B3n_Peruana_de_F%C3%BAtbol_logo.svg/120px-Federaci%C3%B3n_Peruana_de_F%C3%BAtbol_logo.svg.png',
-  IT: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Italy_national_football_team_logo_%282023%29.svg/120px-Italy_national_football_team_logo_%282023%29.svg.png',
-  AU: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Football_Australia_logo.svg/120px-Football_Australia_logo.svg.png',
-  DZ: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Algerian_Football_Federation_logo.svg/120px-Algerian_Football_Federation_logo.svg.png',
-  JM: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Jamaica_Football_Federation_logo.svg/120px-Jamaica_Football_Federation_logo.svg.png',
-  NL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Knvb_logo.svg/120px-Knvb_logo.svg.png',
-  HR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Croatian_Football_Federation_logo.svg/120px-Croatian_Football_Federation_logo.svg.png',
-  'GB-SCT': 'https://upload.wikimedia.org/wikipedia/en/thumb/6/65/Scottish_Football_Association_crest.svg/120px-Scottish_Football_Association_crest.svg.png',
-  ML: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/F%C3%A9d%C3%A9ration_Malienne_de_Football.svg/120px-F%C3%A9d%C3%A9ration_Malienne_de_Football.svg.png',
-  DK: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Dansk_Boldspil-Union_logo.svg/120px-Dansk_Boldspil-Union_logo.svg.png',
-  CH: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Swiss_Football_Association_logo.svg/120px-Swiss_Football_Association_logo.svg.png',
-  RS: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Football_Association_of_Serbia_logo.svg/120px-Football_Association_of_Serbia_logo.svg.png',
-  PA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Federacion_Panamena_de_Futbol.svg/120px-Federacion_Panamena_de_Futbol.svg.png',
-  UA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Ukrainian_Association_of_Football_logo.svg/120px-Ukrainian_Association_of_Football_logo.svg.png',
-  SE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Swedish_Football_Association_logo.svg/120px-Swedish_Football_Association_logo.svg.png',
-  PL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Polish_Football_Association_logo.svg/120px-Polish_Football_Association_logo.svg.png',
-  NZ: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/New_Zealand_Football_logo.svg/120px-New_Zealand_Football_logo.svg.png'
+  USA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/US_Soccer_Federation_logo.svg/120px-US_Soccer_Federation_logo.svg.png',
+  MEX: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Federacion_Mexicana_de_Futbol_Asociacion.svg/120px-Federacion_Mexicana_de_Futbol_Asociacion.svg.png',
+  CAN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Canada_Soccer_logo.svg/120px-Canada_Soccer_logo.svg.png',
+  BRA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Brazilian_Football_Confederation_logo.svg/120px-Brazilian_Football_Confederation_logo.svg.png',
+  COL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Federacion_Colombiana_de_Futbol_logo.svg/120px-Federacion_Colombiana_de_Futbol_logo.svg.png',
+  PAR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Asociacion_Paraguaya_de_Futbol_logo.svg/120px-Asociacion_Paraguaya_de_Futbol_logo.svg.png',
+  ARG: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Asociaci%C3%B3n_del_F%C3%BAtbol_Argentino_logo.svg/120px-Asociaci%C3%B3n_del_F%C3%BAtbol_Argentino_logo.svg.png',
+  URU: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg/120px-Asociaci%C3%B3n_Uruguaya_de_F%C3%BAtbol_logo.svg.png',
+  KSA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Saudi_Arabia_Football_Federation_logo.svg/120px-Saudi_Arabia_Football_Federation_logo.svg.png',
+  FRA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Logo_F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football.svg/120px-Logo_F%C3%A9d%C3%A9ration_Fran%C3%A7aise_de_Football.svg.png',
+  MAR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/F%C3%A9d%C3%A9ration_royale_marocaine_de_football.svg/120px-F%C3%A9d%C3%A9ration_royale_marocaine_de_football.svg.png',
+  AUT: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Austrian_Football_Association_logo.svg/120px-Austrian_Football_Association_logo.svg.png',
+  ESP: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Real_Federaci%C3%B3n_Espa%C3%B1ola_de_F%C3%BAtbol_logo.svg/120px-Real_Federaci%C3%B3n_Espa%C3%B1ola_de_F%C3%BAtbol_logo.svg.png',
+  JPN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Japan_Football_Association_logo.svg/120px-Japan_Football_Association_logo.svg.png',
+  ECU: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Federacion_Ecuatoriana_de_Futbol.svg/120px-Federacion_Ecuatoriana_de_Futbol.svg.png',
+  EGY: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Egyptian_Football_Association_logo.svg/120px-Egyptian_Football_Association_logo.svg.png',
+  GER: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Deutscher_Fu%C3%9Fball-Bund_logo.svg/120px-Deutscher_Fu%C3%9Fball-Bund_logo.svg.png',
+  BEL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Royal_Belgian_FA_logo.svg/120px-Royal_Belgian_FA_logo.svg.png',
+  KOR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Korea_Football_Association_logo.svg/120px-Korea_Football_Association_logo.svg.png',
+  TUN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Tunisian_Football_Federation_logo.svg/120px-Tunisian_Football_Federation_logo.svg.png',
+  ENG: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/38/England_crest_2009.svg/120px-England_crest_2009.svg.png',
+  SEN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/F%C3%A9d%C3%A9ration_S%C3%A9n%C3%A9galaise_de_Football.svg/120px-F%C3%A9d%C3%A9ration_S%C3%A9n%C3%A9galaise_de_Football.svg.png',
+  IRN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Football_Federation_Islamic_Republic_of_Iran_logo.svg/120px-Football_Federation_Islamic_Republic_of_Iran_logo.svg.png',
+  POR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Federa%C3%A7%C3%A3o_Portuguesa_de_Futebol_logo.svg/120px-Federa%C3%A7%C3%A3o_Portuguesa_de_Futebol_logo.svg.png',
+  GHA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Ghana_Football_Association_logo.svg/120px-Ghana_Football_Association_logo.svg.png',
+  TUR: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Turkish_Football_Federation_logo.svg/120px-Turkish_Football_Federation_logo.svg.png',
+  AUS: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Football_Australia_logo.svg/120px-Football_Australia_logo.svg.png',
+  ALG: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Algerian_Football_Federation_logo.svg/120px-Algerian_Football_Federation_logo.svg.png',
+  NED: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Knvb_logo.svg/120px-Knvb_logo.svg.png',
+  CRO: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Croatian_Football_Federation_logo.svg/120px-Croatian_Football_Federation_logo.svg.png',
+  SCO: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/65/Scottish_Football_Association_crest.svg/120px-Scottish_Football_Association_crest.svg.png',
+  SUI: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Swiss_Football_Association_logo.svg/120px-Swiss_Football_Association_logo.svg.png',
+  PAN: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Federacion_Panamena_de_Futbol.svg/120px-Federacion_Panamena_de_Futbol.svg.png',
+  SWE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Swedish_Football_Association_logo.svg/120px-Swedish_Football_Association_logo.svg.png',
+  NZL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/New_Zealand_Football_logo.svg/120px-New_Zealand_Football_logo.svg.png'
+};
+
+// Tradutor de sigla de 3 letras para código de 2 letras do FlagCDN
+const flagMap = {
+  FWC: 'us',
+  CC: 'us',
+  EXTRAS: 'us',
+  MEX: 'mx', RSA: 'za', KOR: 'kr', CZE: 'cz',
+  CAN: 'ca', BIH: 'ba', QAT: 'qa', SUI: 'ch',
+  BRA: 'br', MAR: 'ma', HAI: 'ht', SCO: 'gb-sct',
+  USA: 'us', PAR: 'py', AUS: 'au', TUR: 'tr',
+  GER: 'de', CUW: 'cw', CIV: 'ci', ECU: 'ec',
+  NED: 'nl', JPN: 'jp', SWE: 'se', TUN: 'tn',
+  BEL: 'be', EGY: 'eg', IRN: 'ir', NZL: 'nz',
+  ESP: 'es', CPV: 'cv', KSA: 'sa', URU: 'uy',
+  FRA: 'fr', SEN: 'sn', IRQ: 'iq', NOR: 'no',
+  ARG: 'ar', ALG: 'dz', AUT: 'at', JOR: 'jo',
+  POR: 'pt', COD: 'cd', UZB: 'uz', COL: 'co',
+  ENG: 'gb-eng', CRO: 'hr', GHA: 'gh', PAN: 'pa'
 };
 
 // Dados estruturados das seleções e grupos da Copa 2026 (48 seleções)
@@ -86,109 +92,109 @@ const groupsData = [
   {
     name: 'Grupo A',
     teams: [
-      { code: 'US', name: 'EUA', rank: 1, points: 7, eliminated: false },
-      { code: 'MX', name: 'México', rank: 2, points: 4, eliminated: true, eliminatedStage: 'Oitavas' },
-      { code: 'CA', name: 'Canadá', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'CR', name: 'Costa Rica', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'MEX', name: 'México', rank: 1, points: 0, eliminated: false },
+      { code: 'RSA', name: 'África do S.', rank: 2, points: 0, eliminated: false },
+      { code: 'KOR', name: 'Coreia do S.', rank: 3, points: 0, eliminated: false },
+      { code: 'CZE', name: 'Rep. Tcheca', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo B',
     teams: [
-      { code: 'BR', name: 'Brasil', rank: 1, points: 9, eliminated: false },
-      { code: 'CO', name: 'Colômbia', rank: 2, points: 6, eliminated: true, eliminatedStage: 'Quartas' },
-      { code: 'PY', name: 'Paraguai', rank: 3, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'CM', name: 'Camarões', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'CAN', name: 'Canadá', rank: 1, points: 0, eliminated: false },
+      { code: 'BIH', name: 'Bósnia', rank: 2, points: 0, eliminated: false },
+      { code: 'QAT', name: 'Catar', rank: 3, points: 0, eliminated: false },
+      { code: 'SUI', name: 'Suíça', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo C',
     teams: [
-      { code: 'AR', name: 'Argentina', rank: 1, points: 7, eliminated: false },
-      { code: 'UY', name: 'Uruguai', rank: 2, points: 5, eliminated: false },
-      { code: 'CL', name: 'Chile', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'SA', name: 'Arábia S.', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'BRA', name: 'Brasil', rank: 1, points: 0, eliminated: false },
+      { code: 'MAR', name: 'Marrocos', rank: 2, points: 0, eliminated: false },
+      { code: 'HAI', name: 'Haiti', rank: 3, points: 0, eliminated: false },
+      { code: 'SCO', name: 'Escócia', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo D',
     teams: [
-      { code: 'FR', name: 'França', rank: 1, points: 7, eliminated: false },
-      { code: 'MA', name: 'Marrocos', rank: 2, points: 6, eliminated: true, eliminatedStage: 'Oitavas' },
-      { code: 'AT', name: 'Áustria', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'NG', name: 'Nigéria', rank: 4, points: 0, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'USA', name: 'EUA', rank: 1, points: 0, eliminated: false },
+      { code: 'PAR', name: 'Paraguai', rank: 2, points: 0, eliminated: false },
+      { code: 'AUS', name: 'Austrália', rank: 3, points: 0, eliminated: false },
+      { code: 'TUR', name: 'Turquia', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo E',
     teams: [
-      { code: 'ES', name: 'Espanha', rank: 1, points: 9, eliminated: false },
-      { code: 'JP', name: 'Japão', rank: 2, points: 4, eliminated: true, eliminatedStage: 'Oitavas' },
-      { code: 'EC', name: 'Equador', rank: 3, points: 2, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'EG', name: 'Egito', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'GER', name: 'Alemanha', rank: 1, points: 0, eliminated: false },
+      { code: 'CUW', name: 'Curaçao', rank: 2, points: 0, eliminated: false },
+      { code: 'CIV', name: 'Costa do M.', rank: 3, points: 0, eliminated: false },
+      { code: 'ECU', name: 'Equador', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo F',
     teams: [
-      { code: 'DE', name: 'Alemanha', rank: 1, points: 7, eliminated: false },
-      { code: 'BE', name: 'Bélgica', rank: 2, points: 5, eliminated: true, eliminatedStage: 'Quartas' },
-      { code: 'KR', name: 'Coreia do S.', rank: 3, points: 2, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'TN', name: 'Tunísia', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'NED', name: 'Holanda', rank: 1, points: 0, eliminated: false },
+      { code: 'JPN', name: 'Japão', rank: 2, points: 0, eliminated: false },
+      { code: 'SWE', name: 'Suécia', rank: 3, points: 0, eliminated: false },
+      { code: 'TUN', name: 'Tunísia', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo G',
     teams: [
-      { code: 'GB-ENG', name: 'Inglaterra', rank: 1, points: 7, eliminated: false },
-      { code: 'SN', name: 'Senegal', rank: 2, points: 4, eliminated: true, eliminatedStage: 'Oitavas' },
-      { code: 'IR', name: 'Irã', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'HN', name: 'Honduras', rank: 4, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'BEL', name: 'Bélgica', rank: 1, points: 0, eliminated: false },
+      { code: 'EGY', name: 'Egito', rank: 2, points: 0, eliminated: false },
+      { code: 'IRN', name: 'Irã', rank: 3, points: 0, eliminated: false },
+      { code: 'NZL', name: 'Nova Zelândia', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo H',
     teams: [
-      { code: 'PT', name: 'Portugal', rank: 1, points: 7, eliminated: false },
-      { code: 'TR', name: 'Turquia', rank: 2, points: 6, eliminated: true, eliminatedStage: 'Oitavas' },
-      { code: 'GH', name: 'Gana', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'PE', name: 'Peru', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'ESP', name: 'Espanha', rank: 1, points: 0, eliminated: false },
+      { code: 'CPV', name: 'Cabo Verde', rank: 2, points: 0, eliminated: false },
+      { code: 'KSA', name: 'Arábia S.', rank: 3, points: 0, eliminated: false },
+      { code: 'URU', name: 'Uruguai', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo I',
     teams: [
-      { code: 'IT', name: 'Itália', rank: 1, points: 7, eliminated: false },
-      { code: 'AU', name: 'Austrália', rank: 2, points: 4, eliminated: true, eliminatedStage: 'Oitavas' },
-      { code: 'DZ', name: 'Argélia', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'JM', name: 'Jamaica', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'FRA', name: 'França', rank: 1, points: 0, eliminated: false },
+      { code: 'SEN', name: 'Senegal', rank: 2, points: 0, eliminated: false },
+      { code: 'IRQ', name: 'Iraque', rank: 3, points: 0, eliminated: false },
+      { code: 'NOR', name: 'Noruega', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo J',
     teams: [
-      { code: 'NL', name: 'Holanda', rank: 1, points: 9, eliminated: false },
-      { code: 'HR', name: 'Croácia', rank: 2, points: 6, eliminated: true, eliminatedStage: 'Quartas' },
-      { code: 'GB-SCT', name: 'Escócia', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'ML', name: 'Mali', rank: 4, points: 0, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'ARG', name: 'Argentina', rank: 1, points: 0, eliminated: false },
+      { code: 'ALG', name: 'Argélia', rank: 2, points: 0, eliminated: false },
+      { code: 'AUT', name: 'Áustria', rank: 3, points: 0, eliminated: false },
+      { code: 'JOR', name: 'Jordânia', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo K',
     teams: [
-      { code: 'DK', name: 'Dinamarca', rank: 1, points: 7, eliminated: true, eliminatedStage: 'Oitavas' },
-      { code: 'CH', name: 'Suíça', rank: 2, points: 5, eliminated: true, eliminatedStage: 'Oitavas' },
-      { code: 'RS', name: 'Sérvia', rank: 3, points: 3, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'PA', name: 'Panamá', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'POR', name: 'Portugal', rank: 1, points: 0, eliminated: false },
+      { code: 'COD', name: 'Congo', rank: 2, points: 0, eliminated: false },
+      { code: 'UZB', name: 'Uzbequistão', rank: 3, points: 0, eliminated: false },
+      { code: 'COL', name: 'Colômbia', rank: 4, points: 0, eliminated: false }
     ]
   },
   {
     name: 'Grupo L',
     teams: [
-      { code: 'UA', name: 'Ucrânia', rank: 1, points: 6, eliminated: true, eliminatedStage: 'Oitavas' },
-      { code: 'SE', name: 'Suécia', rank: 2, points: 5, eliminated: true, eliminatedStage: 'Oitavas' },
-      { code: 'PL', name: 'Polônia', rank: 3, points: 4, eliminated: true, eliminatedStage: 'Fase de Grupos' },
-      { code: 'NZ', name: 'N. Zelândia', rank: 4, points: 1, eliminated: true, eliminatedStage: 'Fase de Grupos' }
+      { code: 'ENG', name: 'Inglaterra', rank: 1, points: 0, eliminated: false },
+      { code: 'CRO', name: 'Croácia', rank: 2, points: 0, eliminated: false },
+      { code: 'GHA', name: 'Gana', rank: 3, points: 0, eliminated: false },
+      { code: 'PAN', name: 'Panamá', rank: 4, points: 0, eliminated: false }
     ]
   }
 ];
@@ -829,6 +835,39 @@ function renderImport(container) {
   btnContainer.appendChild(btnDup);
   btnContainer.appendChild(btnMissing);
   wrapper.appendChild(btnContainer);
+
+  // Separador e Botão de Reset
+  const resetDivider = document.createElement('div');
+  resetDivider.className = 'border-t border-white/5 my-2';
+  wrapper.appendChild(resetDivider);
+
+  const btnReset = document.createElement('button');
+  btnReset.className = 'w-full px-4 py-2.5 bg-red-950/30 border border-red-900/50 hover:bg-red-900/30 hover:border-red-600 text-red-300 text-xs font-bold uppercase tracking-wider rounded-xl transition';
+  btnReset.textContent = "⚠️ Zerar / Resetar Álbum";
+  btnReset.onclick = () => {
+    const confirmationWord = "ZERAR";
+    const userConsent = prompt(
+      "ATENÇÃO: Você está prestes a apagar todas as figurinhas coladas e repetidas deste álbum!\n\n" +
+      "Esta ação é irreversível.\n" +
+      `Para confirmar que deseja prosseguir, digite "${confirmationWord}" abaixo:`
+    );
+    if (userConsent === confirmationWord) {
+      const albumId = storage.getCurrentAlbumId();
+      const albums = storage.getAlbums();
+      if (albumId && albums[albumId]) {
+        albums[albumId].stickers = {};
+        storage.setAlbums(albums);
+        alert("Álbum zerado com sucesso!");
+        const importArea = document.getElementById('importArea');
+        if (importArea) importArea.value = '';
+        location.hash = '#home';
+        route();
+      }
+    } else if (userConsent !== null) {
+      alert("Texto de confirmação incorreto. O álbum não foi alterado.");
+    }
+  };
+  wrapper.appendChild(btnReset);
 
   const back = document.createElement('button');
   back.className = 'w-full px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold uppercase text-gray-300 tracking-wider rounded-xl transition';

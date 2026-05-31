@@ -163,7 +163,7 @@ body {
 /* Card Back: Closed sticker (FUT styling) */
 .card-back {
   background: var(--fut-dark-gradient);
-  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border: 2px solid #ffffff;
   padding: 8px;
   justify-content: center;
   align-items: center;
