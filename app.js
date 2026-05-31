@@ -105,6 +105,30 @@ groupsData.forEach(g => {
   });
 });
 
+// Nomes de elenco e posições oficiais/fictícias da Panini
+const playerNames = {
+  1: "ESCUDO OFICIAL",
+  2: "SELEÇÃO POSADA",
+  3: "GOLEIRO TITULAR",
+  4: "LATERAL DIREITO",
+  5: "ZAGUEIRO CENTRAL",
+  6: "ZAGUEIRO LÍBERO",
+  7: "LATERAL ESQUERDO",
+  8: "VOLANTE MARCAÇÃO",
+  9: "MEIA ARMADOR",
+  10: "PONTA DIREITA",
+  11: "CENTROAVANTE",
+  12: "PONTA ESQUERDA",
+  13: "GOLEIRO RESERVA",
+  14: "ZAGUEIRO RESERVA",
+  15: "LATERAL RESERVA",
+  16: "MEIO-CAMPISTA",
+  17: "VOLANTE RESERVA",
+  18: "MEIA ATACANTE",
+  19: "PONTA RESERVA",
+  20: "ATACANTE RESERVA"
+};
+
 // Utilidades
 function generateId() {
   return 'alb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
@@ -689,69 +713,23 @@ function renderTeamPage(code, container) {
   const grid = document.createElement('div');
   grid.className = 'grid-fifa';
 
-  // Nomes de elenco e posições oficiais/fictícias da Panini
-  const playerNames = {
-    1: "ESCUDO OFICIAL",
-    2: "SELEÇÃO POSADA",
-    3: "GOLEIRO TITULAR",
-    4: "LATERAL DIREITO",
-    5: "ZAGUEIRO CENTRAL",
-    6: "ZAGUEIRO LÍBERO",
-    7: "LATERAL ESQUERDO",
-    8: "VOLANTE MARCAÇÃO",
-    9: "MEIA ARMADOR",
-    10: "PONTA DIREITA",
-    11: "CENTROAVANTE",
-    12: "PONTA ESQUERDA",
-    13: "GOLEIRO RESERVA",
-    14: "ZAGUEIRO RESERVA",
-    15: "LATERAL RESERVA",
-    16: "MEIO-CAMPISTA",
-    17: "VOLANTE RESERVA",
-    18: "MEIA ATACANTE",
-    19: "PONTA RESERVA",
-    20: "ATACANTE RESERVA"
-  };
-
   for (let i = 1; i <= 20; i++) {
     const key = `${code}-${i}`;
     const isSpecial = (i === 1 || i === 2); // Escudo e Time
 
     const card = document.createElement('div');
-    card.className = `sticker-card ${isSpecial ? 'special' : ''}`;
+    card.className = `sticker-card panini-sticker ${isSpecial ? 'special shiny-effect' : ''} relative flex flex-col justify-between p-2.5 overflow-hidden transition-all duration-500 ease-in-out`;
     card.id = `card-${key}`;
-
-    const inner = document.createElement('div');
-    inner.className = 'card-inner';
-
-    // 1. Verso (Não Possuído - FUT Card fechado)
-    const cardBack = document.createElement('div');
-    cardBack.className = 'card-back';
-    
-    const bgNum = document.createElement('div');
-    bgNum.className = 'fifa-logo-placeholder';
-    bgNum.textContent = '26';
-    cardBack.appendChild(bgNum);
-
-    const backNum = document.createElement('div');
-    backNum.className = 'card-back-number';
-    backNum.textContent = isSpecial ? (i === 1 ? '★ ESCUDO' : '★ TIME') : `${i}`;
-    cardBack.appendChild(backNum);
-    inner.appendChild(cardBack);
-
-    // 2. Frente (Possuído - Panini Cromo Estilizado)
-    const cardFront = document.createElement('div');
-    cardFront.className = `card-front panini-sticker ${isSpecial ? 'special shiny-effect' : ''} relative flex flex-col justify-between p-2 overflow-hidden`;
 
     // Silhueta do atleta de fundo
     const silhouette = document.createElement('div');
-    silhouette.className = 'absolute inset-0 flex items-center justify-center opacity-[0.08] pointer-events-none z-0';
+    silhouette.className = 'absolute inset-0 flex items-center justify-center pointer-events-none z-0';
     silhouette.innerHTML = `
-      <svg class="w-full h-24 text-white" viewBox="0 0 24 24" fill="currentColor">
+      <svg class="silhouette-svg w-full h-24 text-white" viewBox="0 0 24 24" fill="currentColor">
         <path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 10.2v3.8c0 .6.4 1 1 1s1-.4 1-1v-2.8l1.8-.8c.4-.2.6-.5.7-.9l.8-2.6 1.7 1.7v5.8h-2c-.6 0-1 .4-1 1s.4 1 1 1h5v-8.2l-2.1-2.1c-.4-.4-1-.5-1.5-.3l-3.3 1.5c-.7.3-1.1 1-1 1.7.1.5.5.9 1 1zM20 22h-1.5l-3-6.5h-1L16 22h-2l-1.6-7.5c-.1-.5-.5-.9-1-.9h-.9L9 22H7l1.7-9.5c.1-.5.5-.9 1-.9h3.6c.8 0 1.5.5 1.7 1.2L16.5 18h1L19 14.5c.2-.5.7-.9 1.3-.9h1.7v2H20l-1.5 3.5h1.5v3z"/>
       </svg>
     `;
-    cardFront.appendChild(silhouette);
+    card.appendChild(silhouette);
 
     // Frente superior (Código e mini escudo redondo da federação)
     const frontHeader = document.createElement('div');
@@ -771,28 +749,33 @@ function renderTeamPage(code, container) {
       this.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
     };
     frontHeader.appendChild(miniCrest);
-    cardFront.appendChild(frontHeader);
+    card.appendChild(frontHeader);
 
     // Frente centro (Número/Tipo de cromo)
     const frontNum = document.createElement('div');
-    frontNum.className = 'text-center font-black text-2xl py-1 my-auto tracking-tighter text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
+    frontNum.className = 'front-num text-center font-black text-2xl py-1 my-auto tracking-tighter text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
     frontNum.textContent = isSpecial ? (i === 1 ? '★ ESC' : '★ TIM') : i;
-    cardFront.appendChild(frontNum);
+    card.appendChild(frontNum);
 
-    // Rodapé Laranja/Coral da figurinha Panini contendo o número e nome do atleta
+    // Rodapé Laranja/Coral da figurinha Panini contendo o número e nome do atleta (ou código + número se não colada)
     const playerFooter = document.createElement('div');
-    playerFooter.className = 'bg-[#ff5e62] text-white text-[7.5px] font-black py-0.5 px-1.5 rounded flex justify-between items-center w-full z-10 border border-white/10 tracking-wide';
-    playerFooter.innerHTML = `<span>Nº ${i}</span> <span class="truncate uppercase max-w-[65px]">${playerNames[i]}</span>`;
-    cardFront.appendChild(playerFooter);
+    playerFooter.className = 'player-footer bg-[#ff5e62] text-white text-[7.5px] font-black py-0.5 px-1.5 rounded flex justify-between items-center w-full z-10 border border-white/10 tracking-wide';
+    
+    const footerNum = document.createElement('span');
+    footerNum.className = 'footer-num';
+    footerNum.textContent = `Nº ${i}`;
+    
+    const footerName = document.createElement('span');
+    footerName.className = 'footer-name truncate uppercase max-w-[75px]';
+
+    playerFooter.appendChild(footerNum);
+    playerFooter.appendChild(footerName);
+    card.appendChild(playerFooter);
 
     // Frente inferior (Ações)
     const frontActions = document.createElement('div');
     frontActions.className = 'card-actions z-10';
-    cardFront.appendChild(frontActions);
-
-    inner.appendChild(cardFront);
-    inner.appendChild(cardBack); // garante o preserve-3d
-    card.appendChild(inner);
+    card.appendChild(frontActions);
 
     // Clique no card
     card.onclick = (e) => {
@@ -895,7 +878,7 @@ function toggleDuplicate(key, increment) {
   storage.setAlbums(albums);
 }
 
-// Atualiza o estado visual da carta 3D e renderiza seus botões/badges
+// Atualiza o estado visual da carta e renderiza seus botões/badges
 function updateCard(card, key) {
   const albumId = storage.getCurrentAlbumId();
   const albums = storage.getAlbums();
@@ -906,14 +889,34 @@ function updateCard(card, key) {
   const isOwned = sticker && sticker.owned;
   const duplicates = sticker ? (sticker.duplicate || 0) : 0;
 
-  // 1. Aplica o Flip 3D
+  const parts = key.split('-');
+  const code = parts[0];
+  const index = parseInt(parts[1], 10);
+
+  // 1. Aplica classes de propriedade (Estado COLADA vs NÃO COLADA)
   if (isOwned) {
-    card.classList.add('is-flipped');
+    card.classList.add('is-owned');
+    card.classList.remove('is-not-owned');
   } else {
-    card.classList.remove('is-flipped');
+    card.classList.add('is-not-owned');
+    card.classList.remove('is-owned');
   }
 
-  // 2. Badge de repetida (FUT style)
+  // 2. Atualiza o texto do rodapé
+  const footerName = card.querySelector('.footer-name');
+  const footerNum = card.querySelector('.footer-num');
+  if (footerName) {
+    if (isOwned) {
+      footerName.textContent = playerNames[index] || "JOGADOR";
+      if (footerNum) footerNum.style.display = 'inline'; // Exibe "Nº i"
+    } else {
+      // Estado NÃO COLADA (Espelho em tons de cinza): exibe sigla da seleção + número
+      footerName.textContent = `${code} ${index}`;
+      if (footerNum) footerNum.style.display = 'none'; // Oculta "Nº i" para visual limpo
+    }
+  }
+
+  // 3. Badge de repetida (FUT style)
   let badge = card.querySelector('.rep-badge');
   if (isOwned && duplicates > 0) {
     if (!badge) {
@@ -926,38 +929,40 @@ function updateCard(card, key) {
     badge.remove();
   }
 
-  // 3. Botões de ação
+  // 4. Botões de ação (Somente se for possuído/colado)
   const actionsContainer = card.querySelector('.card-actions');
   if (actionsContainer) {
     actionsContainer.innerHTML = '';
 
-    const btnLeft = document.createElement('button');
-    btnLeft.className = `action-btn ${duplicates > 0 ? 'btn-minus' : 'btn-remove'}`;
-    btnLeft.innerHTML = duplicates > 0 ? '–' : '×';
-    btnLeft.title = duplicates > 0 ? 'Remover 1 repetida' : 'Remover do álbum';
-    btnLeft.onclick = (e) => {
-      e.stopPropagation();
-      if (duplicates > 0) {
-        toggleDuplicate(key, false);
-      } else {
-        toggleOwned(key);
-      }
-      updateCard(card, key);
-      updateTeamProgressLabel(key.split('-')[0]);
-    };
+    if (isOwned) {
+      const btnLeft = document.createElement('button');
+      btnLeft.className = `action-btn ${duplicates > 0 ? 'btn-minus' : 'btn-remove'}`;
+      btnLeft.innerHTML = duplicates > 0 ? '–' : '×';
+      btnLeft.title = duplicates > 0 ? 'Remover 1 repetida' : 'Remover do álbum';
+      btnLeft.onclick = (e) => {
+        e.stopPropagation();
+        if (duplicates > 0) {
+          toggleDuplicate(key, false);
+        } else {
+          toggleOwned(key);
+        }
+        updateCard(card, key);
+        updateTeamProgressLabel(code);
+      };
 
-    const btnRight = document.createElement('button');
-    btnRight.className = 'action-btn btn-add';
-    btnRight.innerHTML = '+';
-    btnRight.title = 'Adicionar repetida';
-    btnRight.onclick = (e) => {
-      e.stopPropagation();
-      toggleDuplicate(key, true);
-      updateCard(card, key);
-    };
+      const btnRight = document.createElement('button');
+      btnRight.className = 'action-btn btn-add';
+      btnRight.innerHTML = '+';
+      btnRight.title = 'Adicionar repetida';
+      btnRight.onclick = (e) => {
+        e.stopPropagation();
+        toggleDuplicate(key, true);
+        updateCard(card, key);
+      };
 
-    actionsContainer.appendChild(btnLeft);
-    actionsContainer.appendChild(btnRight);
+      actionsContainer.appendChild(btnLeft);
+      actionsContainer.appendChild(btnRight);
+    }
   }
 }
 

@@ -334,23 +334,84 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* Panini Sticker Styling (Rectangular, solid white borders, cyan/gold gradient bg) */
+/* Panini Sticker Styling (Rectangular, solid white borders, transitions) */
 .panini-sticker {
   clip-path: none !important;
   border-radius: 8px !important;
-  background: linear-gradient(135deg, #00d2ff 0%, #0066eb 100%) !important;
-  border: 2px solid #ffffff !important;
   box-shadow: 0 6px 16px rgba(0, 102, 235, 0.3) !important;
+  transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease, filter 0.4s ease, transform 0.3s ease;
 }
 
-/* Panini Shiny Gold Special cards styling */
-.panini-sticker.special {
+.panini-sticker:hover {
+  transform: translateY(-2px);
+}
+
+/* 1. Estado NÃO COLADA (Espelho em Tons de Cinza) */
+.panini-sticker.is-not-owned {
+  background: linear-gradient(135deg, #1e202c 0%, #10121a 100%) !important;
+  border: 2px dashed rgba(255, 255, 255, 0.25) !important;
+  box-shadow: none !important;
+}
+
+.panini-sticker.is-not-owned.special {
+  background: linear-gradient(135deg, #2c2d35 0%, #17181e 100%) !important;
+}
+
+.panini-sticker.is-not-owned .silhouette-svg {
+  fill: none !important;
+  stroke: rgba(255, 255, 255, 0.22) !important;
+  stroke-width: 0.8px !important;
+  opacity: 0.35 !important;
+  filter: grayscale(100%);
+  transition: all 0.4s ease;
+}
+
+.panini-sticker.is-not-owned .player-footer {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.4s ease;
+}
+
+.panini-sticker.is-not-owned .front-num {
+  color: rgba(255, 255, 255, 0.2) !important;
+  transition: color 0.4s ease;
+}
+
+/* 2. Estado COLADA (Colorida Completa) */
+.panini-sticker.is-owned {
+  background: linear-gradient(135deg, #00d2ff 0%, #0066eb 100%) !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 6px 16px rgba(0, 102, 235, 0.4) !important;
+}
+
+.panini-sticker.is-owned.special {
   background: linear-gradient(135deg, #ffe066 0%, #f5a623 50%, #f39c12 100%) !important;
   border: 2px solid #ffffff !important;
   box-shadow: 0 6px 16px rgba(245, 166, 35, 0.4) !important;
 }
 
-.panini-sticker.special::before {
+.panini-sticker.is-owned.special::before {
   clip-path: none !important;
   border-radius: 6px !important;
+}
+
+.panini-sticker.is-owned .silhouette-svg {
+  fill: currentColor !important;
+  stroke: none !important;
+  opacity: 0.08 !important;
+  filter: none;
+  transition: all 0.4s ease;
+}
+
+.panini-sticker.is-owned .player-footer {
+  background: #ff5e62 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  transition: all 0.4s ease;
+}
+
+.panini-sticker.is-owned .front-num {
+  color: #ffffff !important;
+  transition: color 0.4s ease;
 }
