@@ -354,22 +354,27 @@ body {
   justify-content: center;
   pointer-events: none;
   z-index: 1;
+  opacity: 0.18; /* Opacidade controlada no container para mesclar o logo e o código uniformemente */
+  transition: opacity 0.3s ease;
+}
+
+.card-back .card-logo-container {
+  filter: grayscale(100%);
+  opacity: 0.25; /* Um pouco mais visível em tons de cinza no verso (não possuído) */
+}
+
+.special .card-logo-container {
+  opacity: 0.28;
+}
+
+.sticker-card:hover .card-logo-container {
+  opacity: 0.32;
 }
 
 .card-logo-image {
   width: 80px;
   height: auto;
-  opacity: 0.15;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
-  transition: opacity 0.3s ease;
-}
-
-.special .card-logo-image {
-  opacity: 0.25;
-}
-
-.sticker-card:hover .card-logo-image {
-  opacity: 0.28;
 }
 
 .card-sticker-code {
@@ -377,21 +382,21 @@ body {
   top: calc(50% + 28px);
   font-family: 'Outfit', 'Inter', sans-serif;
   font-weight: 900;
-  font-size: 0.68rem;
-  color: #ffffff;
-  background-color: #090c1f; /* Fundo sólido para cobrir "FIFA" do logotipo */
-  padding: 1px 5px;
-  letter-spacing: 0.5px;
+  font-size: 0.65rem;
+  color: #000000; /* Texto escuro/preto para substituir o "FIFA" original da logo */
+  background-color: #ffffff; /* Fundo branco para cobrir a palavra FIFA e mesclar perfeitamente com o "6" da logo */
+  padding: 1px 4px;
+  letter-spacing: -0.2px;
   text-transform: uppercase;
   white-space: nowrap;
-  border-radius: 2px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  border-radius: 1px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   z-index: 2;
 }
 
 .card-sticker-code.extras-font-size {
-  font-size: 0.55rem;
-  letter-spacing: -0.2px;
+  font-size: 0.52rem;
+  letter-spacing: -0.4px;
   padding: 1px 3px;
 }
 
