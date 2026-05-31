@@ -590,6 +590,24 @@ function hasQualifiedTrade(key) {
   return matchFound;
 }
 
+// ---- Helper: resolve o nome real da figurinha a partir do albumData ----
+// Para pos 1  → "Escudo [SIGLA]", pos 13 → "Time [SIGLA]", resto → nome do jogador
+function getStickerDisplayName(code, num) {
+  if (code === 'EXTRAS') {
+    return legendsData[num - 1] ? legendsData[num - 1].name : `EXTRAS ${num}`;
+  }
+  if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][num - 1]) {
+    const entry = albumData[code][num - 1];
+    const baseName = entry.nome || '';
+    // Posição 1 = escudo do clube, posição 13 = foto do time
+    if (num === 1 || entry.tipo === 'brasao') return `Escudo ${code}`;
+    if (num === 13 || entry.tipo === 'time')  return `Time ${code}`;
+    return baseName;
+  }
+  // Fallback para genérico
+  return playerNames[num] || `${code} ${num}`;
+}
+
 // Captura de foto nativa usando base64
 function triggerCameraCapture(key, onComplete) {
   const input = document.createElement('input');
@@ -682,7 +700,22 @@ function triggerCameraCapture(key, onComplete) {
           album.stickers[key].photo = base64;
           storage.setAlbums(albums);
           console.log(`Cloud Sync: Photo for ${key} uploaded to global database.`);
-          
+
+          // --- Atualiza o nome real no label do card (NOVA LÓGICA) ---
+          const cardEl = document.getElementById(`card-${key}`);
+          if (cardEl) {
+            const nameLabel = cardEl.querySelector('.player-name-label');
+            if (nameLabel) {
+              const parts2 = key.split('-');
+              const realName = getStickerDisplayName(parts2[0], parseInt(parts2[1], 10));
+              nameLabel.textContent = realName;
+              // Ajuste de tamanho de fonte por comprimento
+              nameLabel.classList.remove('name-long', 'name-very-long');
+              if (realName.length > 20) nameLabel.classList.add('name-very-long');
+              else if (realName.length > 13) nameLabel.classList.add('name-long');
+            }
+          }
+
           // Animação de fade-out e remoção do overlay
           overlay.classList.add('transition-all', 'duration-500', 'opacity-0', 'scale-95');
           setTimeout(() => {
@@ -2221,7 +2254,7 @@ function updateCard(card, key) {
     if (alertIcon) alertIcon.remove();
   }
 
-  // 3. Renderiza foto customizada no fundo do cardFront
+  // 3. Renderiza foto customizada no fundo do cardFront + atualiza nome real
   const cardFront = card.querySelector('.card-front');
   if (cardFront) {
     let photoImg = cardFront.querySelector('.player-card-photo');
@@ -2231,10 +2264,21 @@ function updateCard(card, key) {
         photoImg.className = 'player-card-photo';
         photoImg.loading = 'lazy';
         photoImg.decoding = 'async';
-        cardFront.prepend(photoImg); // insere no fundo
+        cardFront.prepend(photoImg);
       }
       photoImg.src = sticker.photo;
       photoImg.style.display = 'block';
+
+      // Atualiza o nome real no label (caso o card seja recriado após foto)
+      const nameLabel = cardFront.querySelector('.player-name-label');
+      if (nameLabel) {
+        const num = parseInt(key.split('-')[1], 10);
+        const realName = getStickerDisplayName(code, num);
+        nameLabel.textContent = realName;
+        nameLabel.classList.remove('name-long', 'name-very-long');
+        if (realName.length > 20) nameLabel.classList.add('name-very-long');
+        else if (realName.length > 13) nameLabel.classList.add('name-long');
+      }
     } else if (photoImg) {
       photoImg.style.display = 'none';
     }
@@ -2317,6 +2361,44 @@ function updateCard(card, key) {
       actionsContainer.appendChild(btnLeft);
       actionsContainer.appendChild(btnCam);
       actionsContainer.appendChild(btnEye);
+
+      // Botão lixeira: apaga a foto escaneada (aparece só quando há foto)
+      if (sticker && sticker.photo) {
+        const btnDel = document.createElement('button');
+        btnDel.className = 'action-btn btn-remove';
+        btnDel.title = 'Apagar foto escaneada';
+        btnDel.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+          </svg>
+        `;
+        btnDel.onclick = (e) => {
+          e.stopPropagation();
+          const confirmDel = confirm('Deseja apagar a foto desta figurinha?\nO card voltará ao estado original.');
+          if (!confirmDel) return;
+          const albumId2 = storage.getCurrentAlbumId();
+          const albums2 = storage.getAlbums();
+          const album2 = albums2[albumId2];
+          if (album2 && album2.stickers[key]) {
+            delete album2.stickers[key].photo;
+            storage.setAlbums(albums2);
+            authDb.syncStickers(album2.stickers);
+            // Restaura o nome genérico no label
+            const nameLabel2 = card.querySelector('.player-name-label');
+            if (nameLabel2) {
+              const num2 = parseInt(key.split('-')[1], 10);
+              const genericName = playerNames[num2] || key;
+              nameLabel2.textContent = genericName;
+              nameLabel2.classList.remove('name-long', 'name-very-long');
+              if (genericName.length > 20) nameLabel2.classList.add('name-very-long');
+              else if (genericName.length > 13) nameLabel2.classList.add('name-long');
+            }
+            updateCard(card, key);
+          }
+        };
+        actionsContainer.appendChild(btnDel);
+      }
+
       actionsContainer.appendChild(btnRight);
     }
   }
