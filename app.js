@@ -1701,7 +1701,7 @@ function renderTeamPage(code, container) {
 
   for (let i = 1; i <= limit; i++) {
     const key = `${code}-${i}`;
-    const isSpecial = (code === 'EXTRAS' || i === 1 || i === 2); // Escudo, Time e Legends Premium
+    const isSpecial = (code === 'EXTRAS'); // Apenas Legends Premium são especiais
 
     const card = document.createElement('div');
     card.className = `sticker-card ${isSpecial ? 'special' : ''}`;
