@@ -46,9 +46,9 @@
         
         <!-- Linha superior do Header -->
         <div class="flex justify-between items-center w-full">
-          <div class="flex items-center gap-2">
+          <div onclick="if (location.hash === '#home') { document.getElementById('appRoot').scrollTop = 0; } else { location.hash = '#home'; }" class="flex items-center gap-2 cursor-pointer" title="Ir para Home / Topo">
             <!-- Imagem oficial do Logo da Copa 2026 baseada no anexo -->
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/2026_FIFA_World_Cup_Logo.svg/80px-2026_FIFA_World_Cup_Logo.svg.png" 
+            <img src="./logo2026.png" 
                  class="h-8 w-auto object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" 
                  alt="Logo FIFA 2026">
             <!-- Título do Aplicativo -->
