@@ -1567,17 +1567,9 @@ function renderTeamPage(code, container) {
   const infoSide = document.createElement('div');
   infoSide.className = 'flex items-center gap-3.5';
   
-  // Cabeçalho da página de seleção: Brasão ou fallback do logo cinza com bandeirinha
+  // Cabeçalho da página de seleção: Brasão ou fallback do logo cinza
   const crestWrapper = document.createElement('div');
-  crestWrapper.className = 'relative w-10 h-10 flex items-center justify-center';
-
-  const flagCode = (flagMap[code] || 'us').toLowerCase();
-  
-  // Bandeira de canto (mostrada se o brasão falhar e exibir o logo cinza)
-  const flagBadge = document.createElement('img');
-  flagBadge.src = `https://flagcdn.com/w40/${flagCode}.png`;
-  flagBadge.className = 'absolute bottom-0 right-0 w-5.5 h-3.5 object-cover border border-white/20 rounded shadow-md z-10';
-  flagBadge.style.display = 'none'; // oculta por padrão, mostra só se falhar
+  crestWrapper.className = 'w-10 h-10 flex items-center justify-center';
 
   const crest = document.createElement('img');
   if (code === 'FWC') {
@@ -1596,7 +1588,6 @@ function renderTeamPage(code, container) {
     crest.onerror = function() {
       this.src = './logo2026.png';
       this.className = 'w-10 h-10 object-contain grayscale opacity-60'; // Tom cinza/grayscale
-      flagBadge.style.display = 'block'; // mostra a bandeira no canto
     };
   }
   crest.alt = teamName;
@@ -1604,9 +1595,6 @@ function renderTeamPage(code, container) {
   crest.style.height = '40px';
   
   crestWrapper.appendChild(crest);
-  if (code !== 'FWC' && code !== 'CC' && code !== 'EXTRAS') {
-    crestWrapper.appendChild(flagBadge);
-  }
   infoSide.appendChild(crestWrapper);
 
   const textBlock = document.createElement('div');
@@ -1615,10 +1603,27 @@ function renderTeamPage(code, container) {
   teamTitle.id = 'teamTitleText';
   teamTitle.className = 'text-sm font-black uppercase tracking-wide flex items-center gap-1.5 flex-wrap';
   
-  const flagEmoji = flagEmojis[code] || '';
+  // Imagem real da bandeira em frente ao nome (evita bug de renderização de emojis no Windows)
+  if (code !== 'FWC' && code !== 'CC' && code !== 'EXTRAS') {
+    const flagImg = document.createElement('img');
+    const flagCode = (flagMap[code] || 'us').toLowerCase();
+    flagImg.src = `https://flagcdn.com/w40/${flagCode}.png`;
+    flagImg.className = 'w-5.5 h-3.5 object-cover border border-white/20 rounded shadow-sm inline-block mr-1 align-middle';
+    teamTitle.appendChild(flagImg);
+  }
+
+  // Nome do País
+  const nameSpan = document.createElement('span');
+  nameSpan.textContent = teamName;
+  teamTitle.appendChild(nameSpan);
+
+  // Estrelas dos Títulos
   const titleInfo = worldCupTitles[code];
-  const stars = titleInfo ? ' ⭐'.repeat(titleInfo.count) : '';
-  teamTitle.textContent = `${flagEmoji} ${teamName}${stars}`;
+  if (titleInfo) {
+    const starsSpan = document.createElement('span');
+    starsSpan.textContent = ' ' + '⭐'.repeat(titleInfo.count);
+    teamTitle.appendChild(starsSpan);
+  }
   
   const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
   const stats = getTeamProgress(code);
