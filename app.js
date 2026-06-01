@@ -1181,172 +1181,75 @@ function renderLogin(container) {
 
     const sub = document.createElement('p');
     sub.className = 'text-center text-xs text-gray-400 mb-6';
-    sub.textContent = isDemo ? 'Conecte um perfil simulado para testar trocas' : 'Faça login na sua conta em nuvem';
+    sub.textContent = 'Faça login com a sua conta Google para sincronizar seu álbum na nuvem e buscar trocas';
     wrapper.appendChild(sub);
-
-    // Entrada opcional de nome para customizar o login na demo
-    let nameInput = null;
-    if (isDemo) {
-      const form = document.createElement('div');
-      form.className = 'mb-6 space-y-1.5';
-      
-      const label = document.createElement('label');
-      label.className = 'text-[10px] font-black text-gray-400 uppercase tracking-wider';
-      label.textContent = 'Seu Nome de Colecionador';
-      form.appendChild(label);
-
-      nameInput = document.createElement('input');
-      nameInput.type = 'text';
-      nameInput.placeholder = 'Digite seu nome (ex: João)';
-      nameInput.className = 'w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-copaYellow transition';
-      form.appendChild(nameInput);
-      wrapper.appendChild(form);
-    }
 
     const grid = document.createElement('div');
     grid.className = 'flex flex-col gap-3';
 
-    // Seção de Login por E-mail (Magic Link)
-    const emailSection = document.createElement('div');
-    emailSection.className = 'space-y-2 border-b border-white/5 pb-4 mb-2';
-
-    const emailLabel = document.createElement('label');
-    emailLabel.className = 'text-[9px] font-black text-gray-400 uppercase tracking-widest block text-left';
-    emailLabel.textContent = 'Acesso por E-mail (Sem Senha)';
-    emailSection.appendChild(emailLabel);
-
-    const emailRow = document.createElement('div');
-    emailRow.className = 'flex gap-2';
-
-    const emailInput = document.createElement('input');
-    emailInput.type = 'email';
-    emailInput.id = 'emailLoginInput';
-    emailInput.placeholder = 'seu-email@exemplo.com';
-    emailInput.className = 'flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-copaGreen transition';
-    emailRow.appendChild(emailInput);
-
-    const btnEmail = document.createElement('button');
-    btnEmail.className = 'px-4 bg-copaGreen hover:bg-opacity-90 text-black font-black text-xs uppercase tracking-wide rounded-xl transition active:scale-95 flex items-center justify-center';
-    btnEmail.textContent = 'Entrar';
-    btnEmail.onclick = async () => {
-      const email = emailInput.value.trim();
-      if (!email || !email.includes('@')) {
-        alert('Por favor, insira um e-mail válido!');
-        return;
-      }
-      btnEmail.textContent = 'Enviando...';
-      btnEmail.disabled = true;
+    // Google Login Button (Fully active)
+    const btnGoogle = document.createElement('button');
+    btnGoogle.className = 'flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-red-500/30 transition duration-200 group w-full';
+    btnGoogle.onclick = async () => {
+      btnGoogle.innerHTML = '<span class="text-xs font-bold text-gray-400 mx-auto">Autenticando via Google...</span>';
       try {
-        await authDb.login('email', email);
-        if (authDb.isDemoMode()) {
-          renderHeader();
-          location.hash = '#home';
-        } else {
-          alert('Magic Link enviado! Verifique a sua caixa de entrada e clique no link para entrar.');
-          btnEmail.textContent = 'Entrar';
-          btnEmail.disabled = false;
-        }
-      } catch (err) {
-        alert('Erro ao enviar Magic Link: ' + err.message);
-        btnEmail.textContent = 'Entrar';
-        btnEmail.disabled = false;
+        await authDb.login('google');
+        renderHeader();
+        location.hash = '#home';
+      } catch (e) {
+        alert("Ocorreu um erro ao fazer o login com o Google. Veja o console.");
+        renderLogin(container);
       }
     };
-    emailRow.appendChild(btnEmail);
-    emailSection.appendChild(emailRow);
 
-    const emailDesc = document.createElement('p');
-    emailDesc.className = 'text-[9px] text-gray-500 text-left';
-    emailDesc.textContent = 'Enviaremos um link de acesso direto para o seu e-mail.';
-    emailSection.appendChild(emailDesc);
+    const googleLogo = document.createElement('span');
+    googleLogo.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg';
+    googleLogo.innerHTML = `<svg viewBox="0 0 24 24" class="w-6 h-6"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`;
+    btnGoogle.appendChild(googleLogo);
 
-    grid.appendChild(emailSection);
+    const googleLabel = document.createElement('span');
+    googleLabel.className = 'font-bold text-sm text-gray-200 group-hover:text-white flex-1 text-left';
+    googleLabel.textContent = 'Google Account';
+    btnGoogle.appendChild(googleLabel);
 
-    // Divisor para Redes Sociais
-    const divider = document.createElement('div');
-    divider.className = 'flex items-center gap-2 my-1';
-    divider.innerHTML = `
-      <div class="flex-1 h-px bg-white/5"></div>
-      <span class="text-[8px] font-black text-gray-500 uppercase tracking-widest">ou provedores</span>
-      <div class="flex-1 h-px bg-white/5"></div>
-    `;
-    grid.appendChild(divider);
+    const googleArrow = document.createElement('span');
+    googleArrow.className = 'text-gray-500 group-hover:text-copaYellow transition';
+    googleArrow.innerHTML = '➔';
+    btnGoogle.appendChild(googleArrow);
 
-    const methods = [
-      { 
-        id: 'google', 
-        color: 'hover:border-red-500/30',
-        logo: `<svg viewBox="0 0 24 24" class="w-6 h-6"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`
-      },
-      { 
-        id: 'apple', 
-        color: 'hover:border-gray-300/30',
-        logo: `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="white"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701z"/></svg>`
-      },
-      { 
-        id: 'android', 
-        color: 'hover:border-copaGreen/30',
-        logo: `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="#3DDC84"><path d="M17.523 15.341a.617.617 0 01-.633-.63.617.617 0 01.633-.63.617.617 0 01.633.63.617.617 0 01-.633.63m-11.046 0a.617.617 0 01-.633-.63.617.617 0 01.633-.63.617.617 0 01.633.63.617.617 0 01-.633.63M17.8 10.5l1.24-2.148a.258.258 0 00-.094-.353.258.258 0 00-.353.094L17.34 10.26A7.755 7.755 0 0012 8.864c-1.887 0-3.614.677-4.97 1.783l-1.254-2.17a.258.258 0 00-.353-.094.258.258 0 00-.094.353L6.574 10.87C4.44 12.183 3 14.489 3 17.127h18c0-2.638-1.44-4.944-3.2-6.627"/></svg>`
-      }
-    ];
+    grid.appendChild(btnGoogle);
 
-    methods.forEach(m => {
-      const btn = document.createElement('button');
-      btn.className = `flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition duration-200 group w-full ${m.color}`;
-      btn.onclick = async () => {
-        const username = nameInput ? nameInput.value.trim() : "";
-        btn.innerHTML = '<span class="text-xs font-bold text-gray-400 mx-auto">Autenticando...</span>';
-        
-        try {
-          const user = await authDb.login(m.id, username);
-          if (isDemo) {
-            // Sincroniza figurinhas atuais para a nuvem/demo
-            const activeAlbumId = storage.getCurrentAlbumId();
-            const albums = storage.getAlbums();
-            if (activeAlbumId && albums[activeAlbumId]) {
-              await authDb.syncStickers(albums[activeAlbumId].stickers);
-            }
-            renderHeader();
-            // Solicita GPS após login
-            navigator.geolocation.getCurrentPosition(
-              async (pos) => {
-                await authDb.updateLocation(pos.coords.latitude, pos.coords.longitude);
-                renderHeader();
-                location.hash = '#home';
-              },
-              (err) => {
-                console.warn("GPS negado durante o login, utilizando IP como localização padrão", err);
-                location.hash = '#home';
-              }
-            );
-          } else {
-            renderHeader();
-            location.hash = '#home';
-          }
-        } catch (e) {
-          alert("Ocorreu um erro ao fazer o login. Veja o console.");
-          renderLogin(container);
-        }
-      };
+    // Apple Login Button (Disabled / Temporariamente Indisponível)
+    const btnApple = document.createElement('button');
+    btnApple.className = 'flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 opacity-40 cursor-not-allowed pointer-events-none w-full';
+    
+    const appleLogo = document.createElement('span');
+    appleLogo.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg';
+    appleLogo.innerHTML = `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="white"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701z"/></svg>`;
+    btnApple.appendChild(appleLogo);
 
-      const logoEl = document.createElement('span');
-      logoEl.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg';
-      logoEl.innerHTML = m.logo;
-      btn.appendChild(logoEl);
+    const appleLabel = document.createElement('span');
+    appleLabel.className = 'font-bold text-sm text-gray-500 flex-1 text-left';
+    appleLabel.textContent = 'Apple ID (Indisponível)';
+    btnApple.appendChild(appleLabel);
 
-      const providerNames = { google: 'Google Account', apple: 'Apple ID', android: 'Android Device' };
-      const label = document.createElement('span');
-      label.className = 'font-bold text-sm text-gray-200 group-hover:text-white flex-1 text-left';
-      label.textContent = providerNames[m.id];
-      btn.appendChild(label);
+    grid.appendChild(btnApple);
 
-      const arrow = document.createElement('span');
-      arrow.className = 'text-gray-500 group-hover:text-copaYellow transition';
-      arrow.innerHTML = '➔';
-      btn.appendChild(arrow);
+    // Android Login Button (Disabled / Temporariamente Indisponível)
+    const btnAndroid = document.createElement('button');
+    btnAndroid.className = 'flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 opacity-40 cursor-not-allowed pointer-events-none w-full';
 
-      grid.appendChild(btn);
-    });
+    const androidLogo = document.createElement('span');
+    androidLogo.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg';
+    androidLogo.innerHTML = `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="#3DDC84"><path d="M17.523 15.341a.617.617 0 01-.633-.63.617.617 0 01.633-.63.617.617 0 01.633.63.617.617 0 01-.633.63m-11.046 0a.617.617 0 01-.633-.63.617.617 0 01.633-.63.617.617 0 01.633.63.617.617 0 01-.633.63M17.8 10.5l1.24-2.148a.258.258 0 00-.094-.353.258.258 0 00-.353.094L17.34 10.26A7.755 7.755 0 0012 8.864c-1.887 0-3.614.677-4.97 1.783l-1.254-2.17a.258.258 0 00-.353-.094.258.258 0 00-.094.353L6.574 10.87C4.44 12.183 3 14.489 3 17.127h18c0-2.638-1.44-4.944-3.2-6.627"/></svg>`;
+    btnAndroid.appendChild(androidLogo);
+
+    const androidLabel = document.createElement('span');
+    androidLabel.className = 'font-bold text-sm text-gray-500 flex-1 text-left';
+    androidLabel.textContent = 'Android Device (Indisponível)';
+    btnAndroid.appendChild(androidLabel);
+
+    grid.appendChild(btnAndroid);
 
     // Botão Fazer Depois (Pular / Ir para o Álbum)
     const btnLater = document.createElement('button');

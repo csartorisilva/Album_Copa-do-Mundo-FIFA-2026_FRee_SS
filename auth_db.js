@@ -6,7 +6,7 @@
   const SUPABASE_KEY = window.SUPABASE_KEY || "";
   
   let supabaseClient = null;
-  const isDemoMode = !SUPABASE_URL || !SUPABASE_KEY;
+  const isDemoMode = false;
 
   // Estado local do usuário autenticado
   let currentUser = null;
@@ -111,92 +111,7 @@
     console.log("Supabase não configurado. Rodando em Modo de Simulação (Demo).");
   }
 
-  // Banco de Dados Simulado da Comunidade (Usado apenas no Modo Demo)
-  const MOCK_COLLECTORS = [
-    {
-      uid: "mock-carlos",
-      name: "Carlos Silva",
-      photo_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80",
-      offsetLat: 0.008,
-      offsetLng: -0.005,
-      birthdate: "1990-05-15",
-      generateStickers: (userStickers) => {
-        const stickers = {};
-        for (let team of ['USA', 'MEX', 'CAN', 'BRA', 'ARG', 'URU', 'FRA', 'ENG', 'POR', 'EXTRAS']) {
-          for (let i = 1; i <= 20; i++) {
-            const key = `${team}-${i}`;
-            stickers[key] = { owned: true, duplicate: 0 };
-          }
-        }
-        Object.entries(userStickers).forEach(([key, val]) => {
-          if (val.duplicate > 0) {
-            stickers[key] = { owned: false, duplicate: 0 };
-          }
-        });
-        Object.entries(userStickers).forEach(([key, val]) => {
-          if (!val.owned) {
-            stickers[key] = { owned: true, duplicate: 1 };
-          }
-        });
-        return stickers;
-      }
-    },
-    {
-      uid: "mock-mariana",
-      name: "Mariana Costa",
-      photo_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&h=80&q=80",
-      offsetLat: -0.025,
-      offsetLng: 0.015,
-      birthdate: "1995-10-20",
-      generateStickers: (userStickers) => {
-        const stickers = {};
-        Object.entries(userStickers).forEach(([key, val]) => {
-          if (!val.owned) {
-            stickers[key] = { owned: true, duplicate: 1 };
-          } else {
-            stickers[key] = { owned: true, duplicate: 0 };
-          }
-        });
-        return stickers;
-      }
-    },
-    {
-      uid: "mock-felipe",
-      name: "Felipe Almeida",
-      photo_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&h=80&q=80",
-      offsetLat: 0.085,
-      offsetLng: -0.045,
-      birthdate: "2012-08-12",
-      generateStickers: (userStickers) => {
-        const stickers = {};
-        Object.entries(userStickers).forEach(([key, val]) => {
-          if (val.duplicate > 0) {
-            stickers[key] = { owned: false, duplicate: 0 };
-          } else {
-            stickers[key] = { owned: false, duplicate: 0 };
-          }
-        });
-        return stickers;
-      }
-    },
-    {
-      uid: "mock-julia",
-      name: "Júlia Mendes",
-      photo_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&h=80&q=80",
-      offsetLat: -0.185,
-      offsetLng: 0.125,
-      birthdate: "2013-03-04",
-      generateStickers: (userStickers) => {
-        const stickers = {};
-        for (let team of ['BRA', 'ARG']) {
-          for (let i = 1; i <= 10; i++) {
-            stickers[`${team}-${i}`] = { owned: true, duplicate: i === 1 ? 1 : 0 };
-          }
-        }
-        return stickers;
-      }
-    }
-  ];
+  // Banco de Dados Simulado da Comunidade removido (Modo Demo desativado)
 
   // Cálculo da distância entre coordenadas geográficas (Haversine)
   function getDistance(lat1, lon1, lat2, lon2) {
@@ -253,82 +168,25 @@
       return null;
     },
 
-    // Realiza login dependendo do modo (Demo ou Supabase Real)
+    // Realiza login via Supabase (Google OAuth)
     async login(provider, username = "", birthdate = "") {
-      if (isDemoMode) {
-        // Simulação de login no Modo Demo
-        const randomId = Math.random().toString(36).substring(2, 10);
-        let name = "Usuário Teste";
-        let photo = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&h=80&q=80";
+      try {
+        // Salva dados de idade localmente para recuperar pós-redirect
+        if (birthdate) {
+          localStorage.setItem("temp_birthdate", birthdate);
+        }
         
-        if (provider === "google") {
-          name = username || "Geraldo Google";
-          photo = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&h=80&q=80";
-        } else if (provider === "apple") {
-          name = username || "Adriano Apple";
-          photo = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&h=80&q=80";
-        } else if (provider === "android") {
-          name = username || "André Android";
-          photo = "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&h=80&q=80";
-        } else if (provider === "email") {
-          name = username.split('@')[0] || "Colecionador";
-          photo = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00e676&color=000`;
-        }
-
-        currentUser = {
-          uid: `demo-${randomId}`,
-          name: name,
-          photo_url: photo,
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
           provider: provider,
-          birthdate: birthdate,
-          latitude: null,
-          longitude: null,
-          last_seen: new Date().toISOString()
-        };
-
-        try {
-          const loc = await this.fetchLocationByIp();
-          if (loc) {
-            currentUser.latitude = loc.lat;
-            currentUser.longitude = loc.lng;
+          options: {
+            redirectTo: window.location.origin + window.location.pathname
           }
-        } catch (e) {
-          console.warn("Erro ao associar geolocalização de IP durante o login:", e);
-        }
-
-        localStorage.setItem(sessionKey, JSON.stringify(currentUser));
-        return currentUser;
-      } else {
-        // Fluxo Real Supabase (Chamada de Autenticação)
-        try {
-          // Salva dados de idade localmente para recuperar pós-redirect
-          if (birthdate) {
-            localStorage.setItem("temp_birthdate", birthdate);
-          }
-          
-          if (provider === "email") {
-            const { data, error } = await supabaseClient.auth.signInWithOtp({
-              email: username,
-              options: {
-                emailRedirectTo: window.location.origin + window.location.pathname
-              }
-            });
-            if (error) throw error;
-            return data;
-          } else {
-            const { data, error } = await supabaseClient.auth.signInWithOAuth({
-              provider: provider,
-              options: {
-                redirectTo: window.location.origin + window.location.pathname
-              }
-            });
-            if (error) throw error;
-            return data;
-          }
-        } catch (e) {
-          console.error("Erro no login Supabase:", e);
-          throw e;
-        }
+        });
+        if (error) throw error;
+        return data;
+      } catch (e) {
+        console.error("Erro no login Supabase:", e);
+        throw e;
       }
     },
 
@@ -411,87 +269,53 @@
     async getNearbyCollectors(lat, lng, radiusKm = 99999) {
       if (!currentUser) return [];
 
-      if (isDemoMode) {
-        const localAlbums = JSON.parse(localStorage.getItem('albums') || '{}');
-        const activeAlbumId = localStorage.getItem('currentAlbumId');
-        const activeAlbum = localAlbums[activeAlbumId] || { stickers: {} };
-        const userStickers = activeAlbum.stickers || {};
+      try {
+        const { data, error } = await supabaseClient
+          .from('profiles')
+          .select('*')
+          .neq('uid', currentUser.uid);
+        
+        if (error) throw error;
 
-        const results = MOCK_COLLECTORS.map(c => {
-          const collectorLat = lat + c.offsetLat;
-          const collectorLng = lng + c.offsetLng;
-          const dist = getDistance(lat, lng, collectorLat, collectorLng);
-          
-          return {
-            uid: c.uid,
-            name: c.name,
-            photo_url: c.photo_url,
-            latitude: collectorLat,
-            longitude: collectorLng,
-            distance: dist,
-            birthdate: c.birthdate,
-            stickers: c.generateStickers(userStickers),
-            last_seen: new Date(Date.now() - (dist * 120000)).toISOString()
-          };
-        });
+        const results = data
+          .filter(item => item.latitude !== null && item.longitude !== null)
+          .map(item => {
+            const dist = getDistance(lat, lng, item.latitude, item.longitude);
+            return {
+              ...item,
+              distance: dist
+            };
+          });
 
         return results.filter(c => c.distance <= radiusKm).sort((a, b) => a.distance - b.distance);
-      } else {
-        try {
-          const { data, error } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .neq('uid', currentUser.uid);
-          
-          if (error) throw error;
-
-          const results = data
-            .filter(item => item.latitude !== null && item.longitude !== null)
-            .map(item => {
-              const dist = getDistance(lat, lng, item.latitude, item.longitude);
-              return {
-                ...item,
-                distance: dist
-              };
-            });
-
-          return results.filter(c => c.distance <= radiusKm).sort((a, b) => a.distance - b.distance);
-        } catch (e) {
-          console.error("Erro ao buscar colecionadores no Supabase:", e);
-          return [];
-        }
+      } catch (e) {
+        console.error("Erro ao buscar colecionadores no Supabase:", e);
+        return [];
       }
     },
 
     // Carrega perfil de outro colecionador individual
     async getCollectorProfile(uid, lat = null, lng = null) {
-      if (isDemoMode) {
-        const userLat = lat || (currentUser ? currentUser.latitude : 0) || 0;
-        const userLng = lng || (currentUser ? currentUser.longitude : 0) || 0;
-        const list = await this.getNearbyCollectors(userLat, userLng);
-        return list.find(c => c.uid === uid) || null;
-      } else {
-        try {
-          const { data, error } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('uid', uid)
-            .single();
-          
-          if (error) throw error;
-          
-          let dist = null;
-          if (lat && lng && data.latitude && data.longitude) {
-            dist = getDistance(lat, lng, data.latitude, data.longitude);
-          }
-          return {
-            ...data,
-            distance: dist
-          };
-        } catch (e) {
-          console.error("Erro ao buscar perfil no Supabase:", e);
-          return null;
+      try {
+        const { data, error } = await supabaseClient
+          .from('profiles')
+          .select('*')
+          .eq('uid', uid)
+          .single();
+        
+        if (error) throw error;
+        
+        let dist = null;
+        if (lat && lng && data.latitude && data.longitude) {
+          dist = getDistance(lat, lng, data.latitude, data.longitude);
         }
+        return {
+          ...data,
+          distance: dist
+        };
+      } catch (e) {
+        console.error("Erro ao buscar perfil no Supabase:", e);
+        return null;
       }
     },
 
