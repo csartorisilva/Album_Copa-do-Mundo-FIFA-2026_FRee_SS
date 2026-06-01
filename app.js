@@ -969,6 +969,17 @@ function renderHeader() {
       authBtn.className = 'w-7 h-7 rounded-full border border-white/10 hover:border-copaYellow/40 bg-white/5 flex items-center justify-center text-xs overflow-hidden transition-all duration-200';
     }
   }
+
+  // Pulsar ícone de trocas no cabeçalho se houver repetidas
+  const tradesBtn = document.getElementById('headerTradesBtn');
+  if (tradesBtn) {
+    const stats = getAlbumStats();
+    if (stats.duplicates > 0) {
+      tradesBtn.classList.add('animate-pulse', 'border-copaYellow/50', 'shadow-[0_0_8px_rgba(255,199,38,0.45)]');
+    } else {
+      tradesBtn.classList.remove('animate-pulse', 'border-copaYellow/50', 'shadow-[0_0_8px_rgba(255,199,38,0.45)]');
+    }
+  }
 }
 
 // Troca de álbum ativo
@@ -1358,18 +1369,7 @@ function renderHome(container) {
 
   rootHome.appendChild(statsPanel);
 
-  // 2. Banner de Troca Qualificada (Simulado)
-  if (stats.duplicates > 0) {
-    const banner = document.createElement('div');
-    banner.className = 'bg-gradient-to-r from-copaYellow via-[#ffdd67] to-copaYellow text-black py-2 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider text-center flex items-center justify-center gap-2 border border-white/10 animate-pulse';
-    banner.innerHTML = `
-      <span class="w-1.5 h-1.5 bg-red-600 rounded-full animate-ping"></span>
-      Trocas Qualificadas Disponíveis na aba de repetidas!
-    `;
-    banner.onclick = () => location.hash = '#trades';
-    banner.style.cursor = 'pointer';
-    rootHome.appendChild(banner);
-  }
+  // 2. Banner de Troca Qualificada removido (ícone de troca do cabeçalho agora pulsa no lugar)
 
   // Helper de progresso local
   function getSpecialProgress(code) {
@@ -1520,7 +1520,7 @@ function renderHome(container) {
       code: 'FWC',
       limit: 19,
       prog: fwcProg,
-      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="6" fill="#0033A0"/><text x="24" y="30" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="14" fill="white">FIFA</text></svg>`),
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><text x="24" y="32" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="20" fill="#0033A0" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">FIFA</text></svg>`),
       grayscale: false
     },
     {
@@ -1528,7 +1528,7 @@ function renderHome(container) {
       code: 'ESCUDOS',
       limit: 48,
       prog: shProg,
-      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" fill="#FFC726" opacity="0.85"/><path d="M24 10L10 17v9c0 7.5 6 13.5 14 15 8-1.5 14-7.5 14-15v-9L24 10z" fill="#090a1a" opacity="0.3"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="9" fill="white">ESCUDO</text></svg>`),
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" fill="#FFC726" opacity="0.95" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="9" fill="#050814">ESCUDO</text></svg>`),
       grayscale: false
     },
     {
@@ -1536,7 +1536,7 @@ function renderHome(container) {
       code: 'CC',
       limit: 14,
       prog: ccProg,
-      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="6" fill="#E31E2D"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="7.5" fill="white">Coca-Cola</text></svg>`),
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><text x="24" y="28" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="10.5" fill="#E31E2D" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">Coca-Cola</text></svg>`),
       grayscale: false
     },
     {
@@ -1544,22 +1544,22 @@ function renderHome(container) {
       code: 'EXTRAS',
       limit: legendsData.length * 4,
       prog: premProg,
-      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="6" fill="#FFD700"/><polygon points="24,8 28,18 39,18 30,25 34,36 24,29 14,36 18,25 9,18 20,18" fill="#131735"/></svg>`),
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><polygon points="24,4 30.5,17.5 45.5,18.5 34,28 37.5,43 24,35 10.5,43 14,28 2.5,18.5 17.5,17.5" fill="#FFD700" filter="drop-shadow(0 2px 6px rgba(255,215,0,0.5))"/></svg>`),
       grayscale: false
     }
   ];
 
   specialItems.forEach(item => {
     const card = document.createElement('div');
-    card.className = 'cursor-pointer transition flex flex-col items-center justify-center gap-1 group relative py-1.5 px-0.5 hover:scale-105 mt-2 h-auto pb-2';
+    card.className = 'glass-panel cursor-pointer transition flex flex-col items-center justify-between group relative pt-9 pb-2.5 px-2 rounded-2xl hover:scale-105 border-white/5 h-24 mt-7 overflow-visible';
     card.onclick = () => location.hash = `#team-${item.code}`;
 
+    // Logo vaza por cima
     const crestWrapper = document.createElement('div');
-    crestWrapper.className = 'relative w-12 h-12 flex items-center justify-center';
+    crestWrapper.className = 'absolute -top-7 left-1/2 -translate-x-1/2 w-14 h-14 flex items-center justify-center z-20';
 
     const crestImg = document.createElement('img');
     if (item.code === 'ESCUDOS') {
-      // Inserir escudo padrão ou SVG
       crestImg.src = `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" fill="#FFC726" opacity="0.85"/><path d="M24 10L10 17v9c0 7.5 6 13.5 14 15 8-1.5 14-7.5 14-15v-9L24 10z" fill="#090a1a" opacity="0.3"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="9" fill="white">ESCUDO</text></svg>`);
     } else {
       crestImg.src = item.logo;
@@ -1567,27 +1567,45 @@ function renderHome(container) {
     crestImg.alt = item.name;
     crestImg.loading = 'lazy';
     crestImg.decoding = 'async';
-    crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]';
-    if (item.grayscale) {
-      crestImg.classList.add('grayscale', 'opacity-60');
-    }
+    crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]';
     crestWrapper.appendChild(crestImg);
     card.appendChild(crestWrapper);
 
     const name = document.createElement('div');
-    name.className = 'text-[9px] font-black uppercase tracking-wider text-gray-300 group-hover:text-white mt-1 text-center truncate w-full';
+    name.className = 'text-[10px] font-black uppercase tracking-wider text-gray-200 group-hover:text-white mt-1 text-center truncate w-full';
     name.textContent = item.name;
     card.appendChild(name);
 
-    const progSpan = document.createElement('span');
+    // Bottom Row
+    const bottomRow = document.createElement('div');
+    bottomRow.className = 'w-full flex items-end justify-between gap-1.5 mt-auto';
+
+    // Horizontal progress bar
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'flex-1 h-1 bg-white/10 rounded-full overflow-hidden mb-1.5';
+    const progressBar = document.createElement('div');
+    progressBar.className = 'h-full bg-gradient-to-r from-copaGreen to-emerald-400';
+    const percent = (item.prog.owned / item.limit) * 100;
+    progressBar.style.width = `${percent}%`;
+    progressContainer.appendChild(progressBar);
+    bottomRow.appendChild(progressContainer);
+
+    // Badge container
+    const badgeContainer = document.createElement('div');
+    badgeContainer.className = 'flex flex-col items-end gap-1';
+
+    const progBadge = document.createElement('span');
     if (item.prog.owned === item.limit) {
-      progSpan.className = 'text-[8px] font-black text-copaYellow';
-      progSpan.textContent = '✓ Completa';
+      progBadge.className = 'px-1.5 py-0.5 rounded border border-copaYellow/50 bg-[#1f1e09]/80 text-[8px] font-black text-copaYellow shadow-sm shadow-copaYellow/20';
+      progBadge.textContent = '✓';
     } else {
-      progSpan.className = 'text-[8px] font-semibold text-gray-500';
-      progSpan.textContent = `${item.prog.owned}/${item.limit}`;
+      progBadge.className = 'px-1.5 py-0.5 rounded border border-copaGreen/40 bg-[#091f16]/80 text-[8px] font-black text-white';
+      progBadge.textContent = `${item.prog.owned}/${item.limit}`;
     }
-    card.appendChild(progSpan);
+    badgeContainer.appendChild(progBadge);
+
+    bottomRow.appendChild(badgeContainer);
+    card.appendChild(bottomRow);
 
     specialsGrid.appendChild(card);
   });
@@ -1617,33 +1635,19 @@ function renderHome(container) {
     const sortedTeams = [...g.teams].sort((a, b) => a.rank - b.rank);
     sortedTeams.forEach(team => {
       const card = document.createElement('div');
-      card.className = 'cursor-pointer transition flex flex-col items-center justify-center gap-1 group relative py-1.5 px-0.5 hover:scale-105 mt-2 h-auto pb-2';
+      card.className = 'glass-panel cursor-pointer transition flex flex-col items-center justify-between group relative pt-9 pb-2.5 px-2 rounded-2xl hover:scale-105 border-white/5 h-24 mt-7 overflow-visible';
       card.onclick = () => location.hash = `#team-${team.code}`;
 
-      // Injeta o Balãozinho de Fase (FG, R16, etc. com cores dinâmicas)
+      // Injeta o Balãozinho de Fase (FG, R16, etc.) e o progresso numérico no canto inferior direito
       const cachedData = localStorage.getItem(STANDINGS_CACHE_KEY);
       const standings = cachedData ? JSON.parse(cachedData) : null;
       const phaseInfo = getPhaseInfo(team, standings);
-      if (phaseInfo) {
-        const balloon = document.createElement('span');
-        balloon.className = `phase-balloon border ${phaseInfo.color}`;
-        balloon.textContent = phaseInfo.label;
-        card.appendChild(balloon);
-      }
 
-      // FUT Layout: Escudo de tamanho w-12 h-12 com a bandeira no canto inferior direito
+      // FUT Layout: Escudo maior centralizado e vazando por cima
       const crestWrapper = document.createElement('div');
-      crestWrapper.className = 'relative w-12 h-12 flex items-center justify-center';
+      crestWrapper.className = 'absolute -top-7 left-1/2 -translate-x-1/2 w-14 h-14 flex items-center justify-center z-20';
 
       const flagCode = (flagMap[team.code] || 'us').toLowerCase();
-
-      // Bandeira compacta no canto inferior direito do escudo
-      const flagImg = document.createElement('img');
-      flagImg.src = `https://flagcdn.com/w40/${flagCode}.png`;
-      flagImg.alt = 'Bandeira';
-      flagImg.loading = 'lazy';
-      flagImg.decoding = 'async';
-      flagImg.className = 'absolute bottom-0 right-0 w-5.5 h-3.5 object-cover border border-white/10 rounded shadow-md pointer-events-none z-10';
 
       // Escudo real do Wikimedia
       const crestImg = document.createElement('img');
@@ -1651,37 +1655,65 @@ function renderHome(container) {
       crestImg.alt = team.name;
       crestImg.loading = 'lazy';
       crestImg.decoding = 'async';
-      crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]';
+      crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]';
       
-      // Fallback robusto se a imagem do brasão falhar (converte em logo 2026 cinza e mantém a bandeirinha)
+      // Fallback robusto se a imagem do brasão falhar (converte em logo 2026 cinza)
       crestImg.onerror = function() {
         this.src = './logo2026.png';
         this.className = 'max-w-full max-h-full object-contain grayscale opacity-60';
-        flagImg.style.display = 'block'; // mantém a bandeira no canto
       };
 
       crestWrapper.appendChild(crestImg);
-      crestWrapper.appendChild(flagImg);
       card.appendChild(crestWrapper);
 
-      // Nome do país centralizado abaixo do escudo
+      // Nome do país centralizado abaixo do escudo (em negrito)
       const name = document.createElement('div');
-      name.className = 'text-[9px] font-black uppercase tracking-wider text-gray-300 group-hover:text-white mt-1 text-center truncate w-full';
+      name.className = 'text-[10px] font-black uppercase tracking-wider text-gray-200 group-hover:text-white mt-1 text-center truncate w-full';
       name.textContent = team.name;
       card.appendChild(name);
 
-      // Progresso numérico e checkmark (sem fundo/borda)
+      // Linha inferior do Card contendo a barra discreta e os badges
+      const bottomRow = document.createElement('div');
+      bottomRow.className = 'w-full flex items-end justify-between gap-1.5 mt-auto';
+
       const limit = (team.code === 'FWC') ? 19 : (team.code === 'CC') ? 14 : 20;
       const teamStats = getTeamProgress(team.code);
-      const progSpan = document.createElement('span');
-      if (teamStats.owned === limit) {
-        progSpan.className = 'text-[8px] font-black text-copaYellow';
-        progSpan.textContent = '✓ Completa';
-      } else {
-        progSpan.className = 'text-[8px] font-semibold text-gray-500';
-        progSpan.textContent = `${teamStats.owned}/${limit}`;
+
+      // Barra de progresso horizontal fina
+      const progressContainer = document.createElement('div');
+      progressContainer.className = 'flex-1 h-1 bg-white/10 rounded-full overflow-hidden mb-1.5';
+      const progressBar = document.createElement('div');
+      progressBar.className = 'h-full bg-gradient-to-r from-copaGreen to-emerald-400';
+      const percent = (teamStats.owned / limit) * 100;
+      progressBar.style.width = `${percent}%`;
+      progressContainer.appendChild(progressBar);
+      bottomRow.appendChild(progressContainer);
+
+      // Container de badges no canto inferior direito
+      const badgeContainer = document.createElement('div');
+      badgeContainer.className = 'flex flex-col items-end gap-1';
+
+      // Badge de Fase da Copa (ex: FG, R16, etc.)
+      if (phaseInfo) {
+        const phaseBadge = document.createElement('span');
+        phaseBadge.className = `text-[7px] font-black px-1.5 py-0.2 rounded border uppercase tracking-wider ${phaseInfo.color}`;
+        phaseBadge.textContent = phaseInfo.label;
+        badgeContainer.appendChild(phaseBadge);
       }
-      card.appendChild(progSpan);
+
+      // Badge de Progresso (ex: 2/20) ou ✓ Completa
+      const progBadge = document.createElement('span');
+      if (teamStats.owned === limit) {
+        progBadge.className = 'px-1.5 py-0.5 rounded border border-copaYellow/50 bg-[#1f1e09]/80 text-[8px] font-black text-copaYellow shadow-sm shadow-copaYellow/20';
+        progBadge.textContent = '✓';
+      } else {
+        progBadge.className = 'px-1.5 py-0.5 rounded border border-copaGreen/40 bg-[#091f16]/80 text-[8px] font-black text-white';
+        progBadge.textContent = `${teamStats.owned}/${limit}`;
+      }
+      badgeContainer.appendChild(progBadge);
+
+      bottomRow.appendChild(badgeContainer);
+      card.appendChild(bottomRow);
 
       grid.appendChild(card);
     });
