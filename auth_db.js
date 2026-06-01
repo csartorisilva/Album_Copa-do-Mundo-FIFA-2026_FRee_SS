@@ -180,12 +180,14 @@
           throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
         }
         
-        const redirectUrl = window.location.origin + window.location.pathname;
-        
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: redirectUrl
+            redirectTo: 'https://csartorisilva.github.io/Album_Copa-do-Mundo-FIFA-2026_FRee_SS/',
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent'
+            }
           }
         });
         if (error) throw error;

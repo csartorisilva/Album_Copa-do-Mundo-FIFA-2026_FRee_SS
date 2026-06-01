@@ -991,7 +991,19 @@ function switchAlbum(id) {
 
 // Roteador baseado em Hash com efeito 3D Page Flip
 function route() {
-  const hash = location.hash || '#home';
+  const user = authDb.getCurrentUser();
+  const skipped = sessionStorage.getItem('skippedLogin') === 'true';
+  let hash = location.hash || '#home';
+
+  // Se não estiver logado e não tiver pulado o login, força ir para a tela de login
+  if (!user && !skipped) {
+    hash = '#login';
+    if (location.hash !== '#login') {
+      location.hash = '#login';
+      return;
+    }
+  }
+
   const root = document.getElementById('appRoot');
   if (!root) return;
   
@@ -1098,7 +1110,18 @@ function renderLogin(container) {
   async function iniciarLoginGoogle() {
     const googleBtn = container.querySelector('.google-login-btn');
     if (googleBtn) {
-      googleBtn.innerHTML = '<span class="text-xs font-bold text-gray-400 mx-auto">Autenticando via Google...</span>';
+      googleBtn.disabled = true;
+      googleBtn.style.opacity = '0.7';
+      googleBtn.style.cursor = 'not-allowed';
+      googleBtn.innerHTML = `
+        <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg">
+          <svg class="animate-spin h-5 w-5 text-copaYellow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </span>
+        <span class="font-bold text-sm text-gray-400 flex-1 text-left">🔄 Conectando ao Google...</span>
+      `;
     }
     try {
       await authDb.login('google');
@@ -1192,6 +1215,7 @@ function renderLogin(container) {
     btnLogout.className = 'w-full py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 font-bold text-xs transition duration-200';
     btnLogout.textContent = 'Sair da Conta / Logout';
     btnLogout.onclick = async () => {
+      sessionStorage.removeItem('skippedLogin');
       await authDb.logout();
       renderHeader();
       renderLogin(container);
@@ -1255,6 +1279,7 @@ function renderLogin(container) {
   const skipBtn = container.querySelector('.skip-login-btn');
   if (skipBtn) {
     skipBtn.addEventListener('click', () => {
+      sessionStorage.setItem('skippedLogin', 'true');
       location.hash = '#home';
     });
   }
@@ -4283,6 +4308,7 @@ function handleAuthHeaderClick() {
 
     sheet.querySelector('#btnLogoutPanel').onclick = () => {
       panel.remove();
+      sessionStorage.removeItem('skippedLogin');
       authDb.logout().then(() => {
         renderHeader();
         location.hash = '#home';
