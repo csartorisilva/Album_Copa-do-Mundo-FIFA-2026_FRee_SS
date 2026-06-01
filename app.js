@@ -1107,32 +1107,6 @@ function renderLogin(container) {
   const user = authDb.getCurrentUser();
   const isDemo = authDb.isDemoMode();
 
-  async function iniciarLoginGoogle() {
-    const googleBtn = container.querySelector('.google-login-btn');
-    if (googleBtn) {
-      googleBtn.disabled = true;
-      googleBtn.style.opacity = '0.7';
-      googleBtn.style.cursor = 'not-allowed';
-      googleBtn.innerHTML = `
-        <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg">
-          <svg class="animate-spin h-5 w-5 text-copaYellow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </span>
-        <span class="font-bold text-sm text-gray-400 flex-1 text-left">🔄 Conectando ao Google...</span>
-      `;
-    }
-    try {
-      await authDb.login('google');
-      renderHeader();
-      location.hash = '#home';
-    } catch (e) {
-      console.error("Erro ao autenticar com o Google:", e);
-      renderLogin(container);
-    }
-  }
-
   const wrapper = document.createElement('div');
   wrapper.className = 'max-w-md mx-auto my-8 glass-panel p-8 rounded-2xl border-white/5 relative overflow-hidden animate-fade-in';
   
@@ -1241,6 +1215,7 @@ function renderLogin(container) {
     // Google Login Button (Fully active)
     const btnGoogle = document.createElement('button');
     btnGoogle.className = 'flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-red-500/30 transition duration-200 group w-full google-login-btn';
+    btnGoogle.setAttribute('onclick', 'window.iniciarLoginGoogle()');
 
     const googleLogo = document.createElement('span');
     googleLogo.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg';
@@ -1271,11 +1246,6 @@ function renderLogin(container) {
   container.appendChild(wrapper);
 
   // Vincular eventos de clique após injetar no container
-  const googleBtn = container.querySelector('.google-login-btn');
-  if (googleBtn) {
-    googleBtn.addEventListener('click', iniciarLoginGoogle);
-  }
-
   const skipBtn = container.querySelector('.skip-login-btn');
   if (skipBtn) {
     skipBtn.addEventListener('click', () => {
