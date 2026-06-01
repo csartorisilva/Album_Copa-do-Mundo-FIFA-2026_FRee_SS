@@ -1091,6 +1091,7 @@ function getAlbumStats() {
 
 // ------------------- LOGIN -------------------
 function renderLogin(container) {
+  container.innerHTML = "";
   const user = authDb.getCurrentUser();
   const isDemo = authDb.isDemoMode();
 
@@ -1208,7 +1209,7 @@ function renderLogin(container) {
         renderHeader();
         location.hash = '#home';
       } catch (e) {
-        alert("Ocorreu um erro ao fazer o login com o Google. Veja o console.");
+        console.error("Erro ao autenticar com o Google:", e);
         renderLogin(container);
       }
     };
@@ -1229,38 +1230,6 @@ function renderLogin(container) {
     btnGoogle.appendChild(googleArrow);
 
     grid.appendChild(btnGoogle);
-
-    // Apple Login Button (Disabled / Temporariamente Indisponível)
-    const btnApple = document.createElement('button');
-    btnApple.className = 'flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 opacity-40 cursor-not-allowed pointer-events-none w-full';
-    
-    const appleLogo = document.createElement('span');
-    appleLogo.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg';
-    appleLogo.innerHTML = `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="white"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701z"/></svg>`;
-    btnApple.appendChild(appleLogo);
-
-    const appleLabel = document.createElement('span');
-    appleLabel.className = 'font-bold text-sm text-gray-500 flex-1 text-left';
-    appleLabel.textContent = 'Apple ID (Indisponível)';
-    btnApple.appendChild(appleLabel);
-
-    grid.appendChild(btnApple);
-
-    // Android Login Button (Disabled / Temporariamente Indisponível)
-    const btnAndroid = document.createElement('button');
-    btnAndroid.className = 'flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 opacity-40 cursor-not-allowed pointer-events-none w-full';
-
-    const androidLogo = document.createElement('span');
-    androidLogo.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg';
-    androidLogo.innerHTML = `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="#3DDC84"><path d="M17.523 15.341a.617.617 0 01-.633-.63.617.617 0 01.633-.63.617.617 0 01.633.63.617.617 0 01-.633.63m-11.046 0a.617.617 0 01-.633-.63.617.617 0 01.633-.63.617.617 0 01.633.63.617.617 0 01-.633.63M17.8 10.5l1.24-2.148a.258.258 0 00-.094-.353.258.258 0 00-.353.094L17.34 10.26A7.755 7.755 0 0012 8.864c-1.887 0-3.614.677-4.97 1.783l-1.254-2.17a.258.258 0 00-.353-.094.258.258 0 00-.094.353L6.574 10.87C4.44 12.183 3 14.489 3 17.127h18c0-2.638-1.44-4.944-3.2-6.627"/></svg>`;
-    btnAndroid.appendChild(androidLogo);
-
-    const androidLabel = document.createElement('span');
-    androidLabel.className = 'font-bold text-sm text-gray-500 flex-1 text-left';
-    androidLabel.textContent = 'Android Device (Indisponível)';
-    btnAndroid.appendChild(androidLabel);
-
-    grid.appendChild(btnAndroid);
 
     // Botão Fazer Depois (Pular / Ir para o Álbum)
     const btnLater = document.createElement('button');
@@ -1520,7 +1489,7 @@ function renderHome(container) {
       code: 'FWC',
       limit: 19,
       prog: fwcProg,
-      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><text x="24" y="32" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="20" fill="#0033A0" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">FIFA</text></svg>`),
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><text x="24" y="32" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="900" font-size="18" fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">FIFA</text></svg>`),
       grayscale: false
     },
     {
@@ -1528,7 +1497,7 @@ function renderHome(container) {
       code: 'ESCUDOS',
       limit: 48,
       prog: shProg,
-      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" fill="#FFC726" opacity="0.95" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="9" fill="#050814">ESCUDO</text></svg>`),
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" stroke="#00f5d4" stroke-width="2" fill="none" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"/><text x="24" y="28" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="900" font-size="8" fill="#ffffff">ESCUDOS</text></svg>`),
       grayscale: false
     },
     {
@@ -1536,7 +1505,7 @@ function renderHome(container) {
       code: 'CC',
       limit: 14,
       prog: ccProg,
-      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><text x="24" y="28" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="10.5" fill="#E31E2D" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">Coca-Cola</text></svg>`),
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><text x="24" y="28" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="9.5" fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">Coca-Cola</text></svg>`),
       grayscale: false
     },
     {
@@ -1544,45 +1513,37 @@ function renderHome(container) {
       code: 'EXTRAS',
       limit: legendsData.length * 4,
       prog: premProg,
-      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><polygon points="24,4 30.5,17.5 45.5,18.5 34,28 37.5,43 24,35 10.5,43 14,28 2.5,18.5 17.5,17.5" fill="#FFD700" filter="drop-shadow(0 2px 6px rgba(255,215,0,0.5))"/></svg>`),
+      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><polygon points="24,4 30.5,17.5 45.5,18.5 34,28 37.5,43 24,35 10.5,43 14,28 2.5,18.5 17.5,17.5" fill="#FFC726" filter="drop-shadow(0 2px 6px rgba(255,199,38,0.5))"/></svg>`),
       grayscale: false
     }
   ];
 
   specialItems.forEach(item => {
     const card = document.createElement('div');
-    card.className = 'glass-panel cursor-pointer transition flex flex-col items-center justify-between group relative pt-9 pb-2.5 px-2 rounded-2xl hover:scale-105 border-white/5 h-24 mt-7 overflow-visible';
+    card.className = 'selection-card-futz';
     card.onclick = () => location.hash = `#team-${item.code}`;
 
-    // Logo vaza por cima
-    const crestWrapper = document.createElement('div');
-    crestWrapper.className = 'absolute -top-7 left-1/2 -translate-x-1/2 w-14 h-14 flex items-center justify-center z-20';
-
+    // Logo vaza por cima com crest-floating
     const crestImg = document.createElement('img');
-    if (item.code === 'ESCUDOS') {
-      crestImg.src = `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" fill="#FFC726" opacity="0.85"/><path d="M24 10L10 17v9c0 7.5 6 13.5 14 15 8-1.5 14-7.5 14-15v-9L24 10z" fill="#090a1a" opacity="0.3"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="9" fill="white">ESCUDO</text></svg>`);
-    } else {
-      crestImg.src = item.logo;
-    }
+    crestImg.src = item.logo;
     crestImg.alt = item.name;
     crestImg.loading = 'lazy';
     crestImg.decoding = 'async';
-    crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]';
-    crestWrapper.appendChild(crestImg);
-    card.appendChild(crestWrapper);
+    crestImg.className = 'crest-floating';
+    card.appendChild(crestImg);
 
     const name = document.createElement('div');
-    name.className = 'text-[10px] font-black uppercase tracking-wider text-gray-200 group-hover:text-white mt-1 text-center truncate w-full';
+    name.className = 'card-title-name';
     name.textContent = item.name;
     card.appendChild(name);
 
     // Bottom Row
     const bottomRow = document.createElement('div');
-    bottomRow.className = 'w-full flex items-end justify-between gap-1.5 mt-auto';
+    bottomRow.className = 'card-bottom-row';
 
     // Horizontal progress bar
     const progressContainer = document.createElement('div');
-    progressContainer.className = 'flex-1 h-1 bg-white/10 rounded-full overflow-hidden mb-1.5';
+    progressContainer.className = 'flex-1 h-1 bg-white/10 rounded-full overflow-hidden';
     const progressBar = document.createElement('div');
     progressBar.className = 'h-full bg-gradient-to-r from-copaGreen to-emerald-400';
     const percent = (item.prog.owned / item.limit) * 100;
@@ -1590,21 +1551,16 @@ function renderHome(container) {
     progressContainer.appendChild(progressBar);
     bottomRow.appendChild(progressContainer);
 
-    // Badge container
-    const badgeContainer = document.createElement('div');
-    badgeContainer.className = 'flex flex-col items-end gap-1';
-
+    // Badge de Progresso Gamer no canto inferior direito
     const progBadge = document.createElement('span');
     if (item.prog.owned === item.limit) {
-      progBadge.className = 'px-1.5 py-0.5 rounded border border-copaYellow/50 bg-[#1f1e09]/80 text-[8px] font-black text-copaYellow shadow-sm shadow-copaYellow/20';
+      progBadge.className = 'badge-neon-gamer completed';
       progBadge.textContent = '✓';
     } else {
-      progBadge.className = 'px-1.5 py-0.5 rounded border border-copaGreen/40 bg-[#091f16]/80 text-[8px] font-black text-white';
+      progBadge.className = 'badge-neon-gamer';
       progBadge.textContent = `${item.prog.owned}/${item.limit}`;
     }
-    badgeContainer.appendChild(progBadge);
-
-    bottomRow.appendChild(badgeContainer);
+    card.appendChild(progBadge);
     card.appendChild(bottomRow);
 
     specialsGrid.appendChild(card);
@@ -1635,53 +1591,47 @@ function renderHome(container) {
     const sortedTeams = [...g.teams].sort((a, b) => a.rank - b.rank);
     sortedTeams.forEach(team => {
       const card = document.createElement('div');
-      card.className = 'glass-panel cursor-pointer transition flex flex-col items-center justify-between group relative pt-9 pb-2.5 px-2 rounded-2xl hover:scale-105 border-white/5 h-24 mt-7 overflow-visible';
+      card.className = 'selection-card-futz';
       card.onclick = () => location.hash = `#team-${team.code}`;
 
-      // Injeta o Balãozinho de Fase (FG, R16, etc.) e o progresso numérico no canto inferior direito
+      // Injeta o Balãozinho de Fase (FG, R16, etc.)
       const cachedData = localStorage.getItem(STANDINGS_CACHE_KEY);
       const standings = cachedData ? JSON.parse(cachedData) : null;
       const phaseInfo = getPhaseInfo(team, standings);
 
-      // FUT Layout: Escudo maior centralizado e vazando por cima
-      const crestWrapper = document.createElement('div');
-      crestWrapper.className = 'absolute -top-7 left-1/2 -translate-x-1/2 w-14 h-14 flex items-center justify-center z-20';
-
       const flagCode = (flagMap[team.code] || 'us').toLowerCase();
 
-      // Escudo real do Wikimedia
+      // Escudo real flutuante
       const crestImg = document.createElement('img');
       crestImg.src = crestsMap[team.code] || `https://flagcdn.com/w80/${flagCode}.png`; // fallback
       crestImg.alt = team.name;
       crestImg.loading = 'lazy';
       crestImg.decoding = 'async';
-      crestImg.className = 'max-w-full max-h-full object-contain filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]';
+      crestImg.className = 'crest-floating';
       
       // Fallback robusto se a imagem do brasão falhar (converte em logo 2026 cinza)
       crestImg.onerror = function() {
         this.src = './logo2026.png';
-        this.className = 'max-w-full max-h-full object-contain grayscale opacity-60';
+        this.className = 'crest-floating grayscale opacity-60';
       };
+      card.appendChild(crestImg);
 
-      crestWrapper.appendChild(crestImg);
-      card.appendChild(crestWrapper);
-
-      // Nome do país centralizado abaixo do escudo (em negrito)
+      // Nome do país centralizado abaixo do escudo
       const name = document.createElement('div');
-      name.className = 'text-[10px] font-black uppercase tracking-wider text-gray-200 group-hover:text-white mt-1 text-center truncate w-full';
+      name.className = 'card-title-name';
       name.textContent = team.name;
       card.appendChild(name);
 
-      // Linha inferior do Card contendo a barra discreta e os badges
+      // Linha inferior do Card contendo a barra discreta
       const bottomRow = document.createElement('div');
-      bottomRow.className = 'w-full flex items-end justify-between gap-1.5 mt-auto';
+      bottomRow.className = 'card-bottom-row';
 
       const limit = (team.code === 'FWC') ? 19 : (team.code === 'CC') ? 14 : 20;
       const teamStats = getTeamProgress(team.code);
 
       // Barra de progresso horizontal fina
       const progressContainer = document.createElement('div');
-      progressContainer.className = 'flex-1 h-1 bg-white/10 rounded-full overflow-hidden mb-1.5';
+      progressContainer.className = 'flex-1 h-1 bg-white/10 rounded-full overflow-hidden';
       const progressBar = document.createElement('div');
       progressBar.className = 'h-full bg-gradient-to-r from-copaGreen to-emerald-400';
       const percent = (teamStats.owned / limit) * 100;
@@ -1689,30 +1639,24 @@ function renderHome(container) {
       progressContainer.appendChild(progressBar);
       bottomRow.appendChild(progressContainer);
 
-      // Container de badges no canto inferior direito
-      const badgeContainer = document.createElement('div');
-      badgeContainer.className = 'flex flex-col items-end gap-1';
-
-      // Badge de Fase da Copa (ex: FG, R16, etc.)
+      // Badge de Fase da Copa (ex: FG, R16, etc.) se aplicável
       if (phaseInfo) {
         const phaseBadge = document.createElement('span');
-        phaseBadge.className = `text-[7px] font-black px-1.5 py-0.2 rounded border uppercase tracking-wider ${phaseInfo.color}`;
+        phaseBadge.className = `absolute top-3 left-3 text-[7px] font-black px-1.5 py-0.2 rounded border uppercase tracking-wider ${phaseInfo.color}`;
         phaseBadge.textContent = phaseInfo.label;
-        badgeContainer.appendChild(phaseBadge);
+        card.appendChild(phaseBadge);
       }
 
-      // Badge de Progresso (ex: 2/20) ou ✓ Completa
+      // Badge de Progresso Gamer no canto inferior direito
       const progBadge = document.createElement('span');
       if (teamStats.owned === limit) {
-        progBadge.className = 'px-1.5 py-0.5 rounded border border-copaYellow/50 bg-[#1f1e09]/80 text-[8px] font-black text-copaYellow shadow-sm shadow-copaYellow/20';
+        progBadge.className = 'badge-neon-gamer completed';
         progBadge.textContent = '✓';
       } else {
-        progBadge.className = 'px-1.5 py-0.5 rounded border border-copaGreen/40 bg-[#091f16]/80 text-[8px] font-black text-white';
+        progBadge.className = 'badge-neon-gamer';
         progBadge.textContent = `${teamStats.owned}/${limit}`;
       }
-      badgeContainer.appendChild(progBadge);
-
-      bottomRow.appendChild(badgeContainer);
+      card.appendChild(progBadge);
       card.appendChild(bottomRow);
 
       grid.appendChild(card);

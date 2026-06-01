@@ -177,9 +177,9 @@
         }
         
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
-          provider: provider,
+          provider: 'google',
           options: {
-            redirectTo: window.location.origin + window.location.pathname
+            redirectTo: 'https://efrkfthbosoeezrjxcpu.supabase.co/auth/v1/callback'
           }
         });
         if (error) throw error;

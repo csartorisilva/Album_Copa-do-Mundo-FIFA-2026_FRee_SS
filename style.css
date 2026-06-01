@@ -784,6 +784,120 @@ body {
   object-fit: contain;
 }
 
+/* Custom Glassmorphic Team Cards (3D Overflow) */
+.selection-card-futz {
+  position: relative;
+  margin-top: 35px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.01) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 55px 16px 16px 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  overflow: visible !important;
+  height: 135px;
+}
+
+.selection-card-futz:hover {
+  transform: scale(1.04) translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+}
+
+.crest-floating {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 75px;
+  height: auto;
+  z-index: 10;
+  filter: drop-shadow(0px 8px 12px rgba(0,0,0,0.5));
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.3s ease;
+}
+
+.selection-card-futz:hover .crest-floating {
+  transform: translateX(-50%) scale(1.08) translateY(-3px);
+  filter: drop-shadow(0px 12px 18px rgba(0,0,0,0.6));
+}
+
+.card-bottom-row {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  right: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.card-title-name {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #e2e8f0;
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 6px;
+}
+
+.badge-neon-gamer {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: #090c1f;
+  border: 2px solid #00f5d4;
+  box-shadow: 0 0 10px rgba(0, 245, 212, 0.45);
+  border-radius: 20px 8px 20px 8px;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 10px;
+  padding: 3px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  z-index: 15;
+}
+
+.badge-neon-gamer.completed {
+  border-color: #00e676;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.45);
+  color: #ffffff;
+}
+
+/* Responsividade para celulares */
+@media (max-width: 640px) {
+  .selection-card-futz {
+    margin-top: 25px;
+    padding: 40px 8px 8px 8px;
+    height: 110px;
+    border-radius: 12px;
+  }
+  .selection-card-futz .crest-floating {
+    width: 58px;
+    top: -22px;
+  }
+  .card-bottom-row {
+    bottom: 8px;
+    left: 8px;
+    right: 50px;
+  }
+  .badge-neon-gamer {
+    bottom: 8px;
+    right: 8px;
+  }
+}
+
 
 
 
