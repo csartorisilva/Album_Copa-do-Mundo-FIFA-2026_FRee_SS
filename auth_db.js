@@ -176,10 +176,16 @@
           localStorage.setItem("temp_birthdate", birthdate);
         }
         
+        if (!supabaseClient) {
+          throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
+        }
+        
+        const redirectUrl = window.location.origin + window.location.pathname;
+        
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: 'https://efrkfthbosoeezrjxcpu.supabase.co/auth/v1/callback'
+            redirectTo: redirectUrl
           }
         });
         if (error) throw error;
@@ -268,6 +274,10 @@
     // Retorna colecionadores próximos na comunidade com raio ajustável
     async getNearbyCollectors(lat, lng, radiusKm = 99999) {
       if (!currentUser) return [];
+      if (!supabaseClient) {
+        console.warn("Supabase client not initialized.");
+        return [];
+      }
 
       try {
         const { data, error } = await supabaseClient
@@ -296,6 +306,10 @@
 
     // Carrega perfil de outro colecionador individual
     async getCollectorProfile(uid, lat = null, lng = null) {
+      if (!supabaseClient) {
+        console.warn("Supabase client not initialized.");
+        return null;
+      }
       try {
         const { data, error } = await supabaseClient
           .from('profiles')

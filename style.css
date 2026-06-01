@@ -809,11 +809,13 @@ body {
 
 .crest-floating {
   position: absolute;
-  top: -30px;
+  top: -35px;
   left: 50%;
   transform: translateX(-50%);
-  width: 75px;
-  height: auto;
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
   z-index: 10;
   filter: drop-shadow(0px 8px 12px rgba(0,0,0,0.5));
   pointer-events: none;
@@ -850,6 +852,14 @@ body {
   margin-top: 6px;
 }
 
+.mobile-country-code {
+  display: none;
+}
+
+.full-country-name {
+  display: block;
+}
+
 .badge-neon-gamer {
   position: absolute;
   bottom: 12px;
@@ -875,17 +885,13 @@ body {
   color: #ffffff;
 }
 
-/* Responsividade para celulares */
+/* Responsividade para tablets e celulares em geral */
 @media (max-width: 640px) {
   .selection-card-futz {
     margin-top: 25px;
     padding: 40px 8px 8px 8px;
     height: 110px;
     border-radius: 12px;
-  }
-  .selection-card-futz .crest-floating {
-    width: 58px;
-    top: -22px;
   }
   .card-bottom-row {
     bottom: 8px;
@@ -895,6 +901,33 @@ body {
   .badge-neon-gamer {
     bottom: 8px;
     right: 8px;
+  }
+}
+
+/* Minimalismo extremo no celular (Telas até 600px) */
+@media (max-width: 600px) {
+  .selection-card-futz {
+    margin-top: 25px;
+    padding: 35px 6px 10px 6px;
+    height: 85px;
+    border-radius: 12px;
+  }
+  .card-bottom-row {
+    display: none !important;
+  }
+  .badge-neon-gamer {
+    display: none !important;
+  }
+  .card-phase-badge {
+    display: none !important;
+  }
+  .mobile-country-code {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+  }
+  .full-country-name {
+    display: none;
   }
 }
 

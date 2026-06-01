@@ -1095,6 +1095,21 @@ function renderLogin(container) {
   const user = authDb.getCurrentUser();
   const isDemo = authDb.isDemoMode();
 
+  async function iniciarLoginGoogle() {
+    const googleBtn = container.querySelector('.google-login-btn');
+    if (googleBtn) {
+      googleBtn.innerHTML = '<span class="text-xs font-bold text-gray-400 mx-auto">Autenticando via Google...</span>';
+    }
+    try {
+      await authDb.login('google');
+      renderHeader();
+      location.hash = '#home';
+    } catch (e) {
+      console.error("Erro ao autenticar com o Google:", e);
+      renderLogin(container);
+    }
+  }
+
   const wrapper = document.createElement('div');
   wrapper.className = 'max-w-md mx-auto my-8 glass-panel p-8 rounded-2xl border-white/5 relative overflow-hidden animate-fade-in';
   
@@ -1201,18 +1216,7 @@ function renderLogin(container) {
 
     // Google Login Button (Fully active)
     const btnGoogle = document.createElement('button');
-    btnGoogle.className = 'flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-red-500/30 transition duration-200 group w-full';
-    btnGoogle.onclick = async () => {
-      btnGoogle.innerHTML = '<span class="text-xs font-bold text-gray-400 mx-auto">Autenticando via Google...</span>';
-      try {
-        await authDb.login('google');
-        renderHeader();
-        location.hash = '#home';
-      } catch (e) {
-        console.error("Erro ao autenticar com o Google:", e);
-        renderLogin(container);
-      }
-    };
+    btnGoogle.className = 'flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-red-500/30 transition duration-200 group w-full google-login-btn';
 
     const googleLogo = document.createElement('span');
     googleLogo.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg';
@@ -1233,17 +1237,27 @@ function renderLogin(container) {
 
     // Botão Fazer Depois (Pular / Ir para o Álbum)
     const btnLater = document.createElement('button');
-    btnLater.className = 'w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaYellow/40 text-gray-500 hover:text-gray-300 font-bold text-xs transition duration-200 mt-3 flex items-center justify-center gap-1.5';
+    btnLater.className = 'w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaYellow/40 text-gray-500 hover:text-gray-300 font-bold text-xs transition duration-200 mt-3 flex items-center justify-center gap-1.5 skip-login-btn';
     btnLater.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Pular por agora (continuar sem login)`;
-    btnLater.onclick = () => {
-      location.hash = '#home';
-    };
     grid.appendChild(btnLater);
 
     wrapper.appendChild(grid);
   }
 
   container.appendChild(wrapper);
+
+  // Vincular eventos de clique após injetar no container
+  const googleBtn = container.querySelector('.google-login-btn');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', iniciarLoginGoogle);
+  }
+
+  const skipBtn = container.querySelector('.skip-login-btn');
+  if (skipBtn) {
+    skipBtn.addEventListener('click', () => {
+      location.hash = '#home';
+    });
+  }
 }
 
 // ------------------- HOME -------------------
@@ -1253,90 +1267,6 @@ function renderHome(container) {
   const rootHome = document.createElement('div');
   rootHome.className = 'space-y-6 py-2';
 
-  // 1. Painel de Estatísticas / Ultimate Progress
-  const statsPanel = document.createElement('div');
-  statsPanel.className = 'glass-panel p-5 rounded-2xl relative overflow-hidden flex flex-col gap-4 border-white/5';
-  
-  const statsGlow = document.createElement('div');
-  statsGlow.className = 'absolute right-0 top-0 w-48 h-48 bg-copaGreen/10 rounded-full blur-3xl pointer-events-none';
-  statsPanel.appendChild(statsGlow);
-
-  const progressSection = document.createElement('div');
-  progressSection.className = 'space-y-2';
-  
-  const progressHeader = document.createElement('div');
-  progressHeader.className = 'flex justify-between items-center text-xs font-black uppercase tracking-wider text-gray-400';
-  progressHeader.innerHTML = `<span>Progresso Geral</span> <span class="text-copaYellow font-bold">${stats.percent}%</span>`;
-  progressSection.appendChild(progressHeader);
-
-  const progressBarBg = document.createElement('div');
-  progressBarBg.className = 'h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/10';
-  const progressBarFill = document.createElement('div');
-  progressBarFill.className = 'h-full bg-gradient-to-r from-copaBlue via-copaGreen to-copaYellow rounded-full transition-all duration-500';
-  progressBarFill.style.width = `${stats.percent}%`;
-  progressBarBg.appendChild(progressBarFill);
-  progressSection.appendChild(progressBarBg);
-
-  const textStats = document.createElement('div');
-  textStats.className = 'flex justify-between mt-1 text-xs font-semibold text-gray-300';
-  textStats.innerHTML = `
-    <div><span class="text-base font-black text-white">${stats.owned}</span> / ${stats.total} Adquiridas</div>
-    <div><span class="text-base font-black text-copaYellow">${stats.duplicates}</span> Repetidas</div>
-  `;
-  progressSection.appendChild(textStats);
-
-  // Bloco de Compartilhamento (exibido abaixo das estatísticas sem o rótulo)
-  const shareBlock = document.createElement('div');
-  shareBlock.className = 'flex flex-col gap-2 mt-0.5 w-full';
-  
-  const shareButtonsContainer = document.createElement('div');
-  shareButtonsContainer.className = 'grid grid-cols-3 gap-2 w-full';
-
-  // 1. Possuo (Owned)
-  const btnShareOwned = document.createElement('button');
-  btnShareOwned.className = 'px-2 py-1 bg-white/5 hover:bg-copaGreen/10 border border-white/10 hover:border-copaGreen/30 rounded-lg text-white hover:text-copaGreen transition text-[9px] font-bold uppercase tracking-wider flex items-center gap-1';
-  btnShareOwned.title = 'Compartilhar figurinhas coladas';
-  btnShareOwned.innerHTML = `
-    <svg class="w-3 h-3 text-copaGreen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-    </svg>
-    Coladas
-  `;
-  btnShareOwned.onclick = () => shareOwnedList();
-  shareButtonsContainer.appendChild(btnShareOwned);
-
-  // 2. Faltam (Missing)
-  const btnShareMissing = document.createElement('button');
-  btnShareMissing.className = 'px-2 py-1 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 rounded-lg text-white hover:text-red-400 transition text-[9px] font-bold uppercase tracking-wider flex items-center gap-1';
-  btnShareMissing.title = 'Compartilhar figurinhas faltantes';
-  btnShareMissing.innerHTML = `
-    <svg class="w-3 h-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-    Faltam
-  `;
-  btnShareMissing.onclick = () => shareMissingList();
-  shareButtonsContainer.appendChild(btnShareMissing);
-
-  // 3. Repetidas (Duplicates)
-  const btnShareDuplicates = document.createElement('button');
-  btnShareDuplicates.className = 'px-2 py-1 bg-white/5 hover:bg-copaYellow/10 border border-white/10 hover:border-copaYellow/30 rounded-lg text-white hover:text-copaYellow transition text-[9px] font-bold uppercase tracking-wider flex items-center gap-1';
-  btnShareDuplicates.title = 'Compartilhar repetidas para troca';
-  btnShareDuplicates.innerHTML = `
-    <svg class="w-3 h-3 text-copaYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4" />
-    </svg>
-    Repetidas
-  `;
-  btnShareDuplicates.onclick = () => shareDuplicatesList();
-  shareButtonsContainer.appendChild(btnShareDuplicates);
-
-  shareBlock.appendChild(shareButtonsContainer);
-  
-  statsPanel.appendChild(progressSection);
-  statsPanel.appendChild(shareBlock);
-
-  rootHome.appendChild(statsPanel);
 
   // 2. Banner de Troca Qualificada removido (ícone de troca do cabeçalho agora pulsa no lugar)
 
@@ -1463,6 +1393,28 @@ function renderHome(container) {
   groupsHeaderRow.appendChild(tableLink);
   rootHome.appendChild(groupsHeaderRow);
 
+  // Barra de progresso principal (super simples, fina, posicionada abaixo do cabeçalho "Figurinhas")
+  const mainProgressContainer = document.createElement('div');
+  mainProgressContainer.className = 'w-full mt-2 mb-4 space-y-1.5';
+
+  const mainProgressBarBg = document.createElement('div');
+  mainProgressBarBg.className = 'h-1 bg-white/5 rounded-full overflow-hidden border border-white/10 w-full';
+  const mainProgressBarFill = document.createElement('div');
+  mainProgressBarFill.className = 'h-full bg-gradient-to-r from-copaBlue via-copaGreen to-copaYellow rounded-full transition-all duration-500';
+  mainProgressBarFill.style.width = `${stats.percent}%`;
+  mainProgressBarBg.appendChild(mainProgressBarFill);
+  mainProgressContainer.appendChild(mainProgressBarBg);
+
+  const mainProgressText = document.createElement('div');
+  mainProgressText.className = 'flex justify-between items-center text-xs font-semibold text-gray-300';
+  mainProgressText.innerHTML = `
+    <div><span class="text-sm font-black text-white">${stats.owned}</span> / ${stats.total} Adquiridas</div>
+    <div class="text-sm font-black text-white">${stats.percent}%</div>
+  `;
+  mainProgressContainer.appendChild(mainProgressText);
+
+  rootHome.appendChild(mainProgressContainer);
+
   // 5. LINHAS SEGUINTES: Cada grupo exibido abaixo do outro (Vertical)
   const groupsContainer = document.createElement('div');
   groupsContainer.className = 'space-y-5';
@@ -1533,9 +1485,14 @@ function renderHome(container) {
     card.appendChild(crestImg);
 
     const name = document.createElement('div');
-    name.className = 'card-title-name';
+    name.className = 'card-title-name full-country-name';
     name.textContent = item.name;
     card.appendChild(name);
+
+    const code = document.createElement('div');
+    code.className = 'card-title-name mobile-country-code';
+    code.textContent = item.code;
+    card.appendChild(code);
 
     // Bottom Row
     const bottomRow = document.createElement('div');
@@ -1618,9 +1575,14 @@ function renderHome(container) {
 
       // Nome do país centralizado abaixo do escudo
       const name = document.createElement('div');
-      name.className = 'card-title-name';
+      name.className = 'card-title-name full-country-name';
       name.textContent = team.name;
       card.appendChild(name);
+
+      const code = document.createElement('div');
+      code.className = 'card-title-name mobile-country-code';
+      code.textContent = team.code;
+      card.appendChild(code);
 
       // Linha inferior do Card contendo a barra discreta
       const bottomRow = document.createElement('div');
@@ -1642,7 +1604,7 @@ function renderHome(container) {
       // Badge de Fase da Copa (ex: FG, R16, etc.) se aplicável
       if (phaseInfo) {
         const phaseBadge = document.createElement('span');
-        phaseBadge.className = `absolute top-3 left-3 text-[7px] font-black px-1.5 py-0.2 rounded border uppercase tracking-wider ${phaseInfo.color}`;
+        phaseBadge.className = `card-phase-badge absolute top-3 left-3 text-[7px] font-black px-1.5 py-0.2 rounded border uppercase tracking-wider ${phaseInfo.color}`;
         phaseBadge.textContent = phaseInfo.label;
         card.appendChild(phaseBadge);
       }
@@ -2826,6 +2788,60 @@ function renderTrades(container) {
   headerRow.appendChild(title);
   headerRow.appendChild(btnBack);
   mainDiv.appendChild(headerRow);
+
+  // Bloco de Compartilhamento (filtros de COLADAS, FALTAM e REPETIDAS) transferido para a tela de Trocas
+  const shareBlock = document.createElement('div');
+  shareBlock.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-2.5 w-full mb-4';
+
+  const shareTitle = document.createElement('h3');
+  shareTitle.className = 'text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1';
+  shareTitle.textContent = 'Exportar / Compartilhar Listas';
+  shareBlock.appendChild(shareTitle);
+
+  const shareButtonsContainer = document.createElement('div');
+  shareButtonsContainer.className = 'grid grid-cols-3 gap-2 w-full';
+
+  // 1. Possuo (Owned)
+  const btnShareOwned = document.createElement('button');
+  btnShareOwned.className = 'px-2 py-2 bg-white/5 hover:bg-copaGreen/10 border border-white/10 hover:border-copaGreen/30 rounded-lg text-white hover:text-copaGreen transition text-[9px] font-bold uppercase tracking-wider flex items-center justify-center gap-1';
+  btnShareOwned.title = 'Compartilhar figurinhas coladas';
+  btnShareOwned.innerHTML = `
+    <svg class="w-3.5 h-3.5 text-copaGreen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+    </svg>
+    Coladas
+  `;
+  btnShareOwned.onclick = () => shareOwnedList();
+  shareButtonsContainer.appendChild(btnShareOwned);
+
+  // 2. Faltam (Missing)
+  const btnShareMissing = document.createElement('button');
+  btnShareMissing.className = 'px-2 py-2 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 rounded-lg text-white hover:text-red-400 transition text-[9px] font-bold uppercase tracking-wider flex items-center justify-center gap-1';
+  btnShareMissing.title = 'Compartilhar figurinhas faltantes';
+  btnShareMissing.innerHTML = `
+    <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+    Faltam
+  `;
+  btnShareMissing.onclick = () => shareMissingList();
+  shareButtonsContainer.appendChild(btnShareMissing);
+
+  // 3. Repetidas (Duplicates)
+  const btnShareDuplicates = document.createElement('button');
+  btnShareDuplicates.className = 'px-2 py-2 bg-white/5 hover:bg-copaYellow/10 border border-white/10 hover:border-copaYellow/30 rounded-lg text-white hover:text-copaYellow transition text-[9px] font-bold uppercase tracking-wider flex items-center justify-center gap-1';
+  btnShareDuplicates.title = 'Compartilhar repetidas para troca';
+  btnShareDuplicates.innerHTML = `
+    <svg class="w-3.5 h-3.5 text-copaYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4" />
+    </svg>
+    Repetidas
+  `;
+  btnShareDuplicates.onclick = () => shareDuplicatesList();
+  shareButtonsContainer.appendChild(btnShareDuplicates);
+
+  shareBlock.appendChild(shareButtonsContainer);
+  mainDiv.appendChild(shareBlock);
 
   const tabCard = document.createElement('div');
   tabCard.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
