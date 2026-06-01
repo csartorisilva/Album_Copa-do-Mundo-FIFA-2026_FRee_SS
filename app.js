@@ -76,7 +76,7 @@ const crestsMap = {
   IRQ: './crests/brasão da seleção iraque.png',
   NOR: './crests/brasão da seleção noruegua.png',
   FWC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png',
-  CC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png',
+  CC: './crests/Logo CocaZero Copa.png',
   // Enriquecidos com Wikimedia Commons estáveis
   JOR: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Jordan_Football_Association_logo.svg/120px-Jordan_Football_Association_logo.svg.png',
   COD: './crests/brasão da seleção congo.jpg',
@@ -1457,7 +1457,7 @@ function renderHome(container) {
       code: 'CC',
       limit: 14,
       prog: ccProg,
-      logo: `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><text x="24" y="28" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="9.5" fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">Coca-Cola</text></svg>`),
+      logo: './crests/Logo CocaZero Copa.png',
       grayscale: false
     },
     {
@@ -1969,7 +1969,7 @@ function renderTeamPage(code, container) {
     crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
     crest.className = 'w-10 h-10 object-contain rounded bg-white/5 p-1 border border-white/10';
   } else if (code === 'CC') {
-    crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png';
+    crest.src = './crests/Logo CocaZero Copa.png';
     crest.className = 'w-10 h-10 object-contain rounded bg-white/5 p-1 border border-white/10';
   } else if (code === 'EXTRAS') {
     crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/100px-Golden_Ball.svg.png';
@@ -2322,7 +2322,7 @@ function renderTeamPage(code, container) {
         miniCrest.className = 'w-5 h-5 object-contain bg-white/10 p-0.5 rounded border border-white/20';
       } else if (code === 'CC') {
         // Logo da coca-cola ao invés de bandeira
-        miniCrest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Coca-Cola_logo.svg/120px-Coca-Cola_logo.svg.png';
+        miniCrest.src = './crests/Logo CocaZero Copa.png';
         miniCrest.className = 'w-5 h-5 object-contain bg-white/10 p-0.5 rounded border border-white/20';
       } else {
         const flagCode = (flagMap[code] || 'us').toLowerCase();
