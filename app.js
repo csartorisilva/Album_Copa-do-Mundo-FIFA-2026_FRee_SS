@@ -1628,13 +1628,7 @@ function renderLogin(container) {
  
         const result = await authDb.loginOrRegister(emailOrUser, password);
         
-        if (result.action === 'login') {
-          showFeedback("Login realizado com sucesso!", 'success', feedbackMsgLogin);
-          setTimeout(() => { location.hash = '#home'; }, 1000);
-        } else {
-          showFeedback("Conta acessada com sucesso!", 'success', feedbackMsgLogin);
-          setTimeout(() => { location.hash = '#home'; }, 1000);
-        }
+        window.location.href = "album.html";
       } catch (err) {
         console.error("Erro na autenticação:", err);
         let msg = err.message || err;
@@ -1701,14 +1695,7 @@ function renderLogin(container) {
         const result = await authDb.loginOrRegister(email, password, username, birthdateYYYYMMDD);
         
         if (result.action === 'register') {
-          const age = calculateAge(birthdate);
-          if (age < 18) {
-            showMinorAlertModal(() => {
-              location.hash = '#home';
-            });
-          } else {
-            location.hash = '#home';
-          }
+          window.location.href = "album.html";
         }
       } catch (err) {
         console.error("Erro no cadastro:", err);

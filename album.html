@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      const div = document.createElement('div');
+      div.id = 'error-logger-div';
+      div.style.color = 'red';
+      div.style.background = 'white';
+      div.style.border = '5px solid red';
+      div.style.padding = '20px';
+      div.style.position = 'fixed';
+      div.style.top = '0';
+      div.style.left = '0';
+      div.style.width = '100%';
+      div.style.zIndex = '99999';
+      div.innerText = "JS_ERROR: " + message + " at " + source + ":" + lineno + ":" + colno;
+      document.body.appendChild(div);
+    };
+  </script>
+  <title>Álbum de Figurinhas FIFA 2026</title>
+  <meta name="description" content="Gerencie álbuns de figurinhas da Copa do Mundo FIFA 2026 – totalmente gratuito, mobile‑first, sem servidor." />
+  <!-- Apple/Mobile Web App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  
+  <!-- Favicon & PWA Manifest -->
+  <link rel="icon" type="image/png" sizes="192x192" href="./logo192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="./logo512.png" />
+  <link rel="apple-touch-icon" href="./logo192.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="./logo192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./logo192.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="./logo192.png" />
+  <link rel="manifest" href="./manifest.json" />
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            copaBlue: '#0033A0',   // azul escuro oficial
+            copaGreen: '#00e676',  // verde neon vibrante FUT
+            copaYellow: '#FFC726', // amarelo dourado oficial
+            darkBg: '#090a1a',
+            panelBg: 'rgba(19, 21, 56, 0.7)',
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-[#02040a] text-gray-100 font-sans min-h-screen flex justify-center items-stretch p-0 sm:p-4">
+
+  <!-- Container principal simulando formato de app móvel (Padrão Web App) -->
+  <div class="w-full max-w-full sm:max-w-[480px] md:max-w-[720px] lg:max-w-[960px] bg-[#050814] border-x border-white/5 flex flex-col min-h-screen sm:min-h-[90vh] sm:my-auto sm:rounded-2xl sm:overflow-hidden shadow-2xl relative">
+    <!-- Header compacto ajustado para Web App com Ações Rápidas -->
+    <header class="bg-[#070d1e]/95 border-b border-white/10 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
+      <div class="flex flex-col gap-2.5">
+        <!-- Linha superior do Header -->
+        <div class="flex justify-between items-center w-full">
+          <div onclick="if (location.hash === '#home') { document.getElementById('appRoot').scrollTop = 0; } else { location.hash = '#home'; }" class="flex items-center gap-2 cursor-pointer" title="Ir para Home / Topo">
+            <!-- Imagem oficial do Logo da Copa 2026 baseada no anexo -->
+            <img src="./logo2026.png"
+                 class="h-8 w-auto object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]"
+                 alt="Logo FIFA 2026" />
+            <!-- Título do Aplicativo -->
+            <h1 class="text-xs font-black uppercase leading-none font-sans flex flex-col justify-center">
+              <span class="text-copaYellow text-[8px] tracking-widest font-black mb-0.5">Ultimate Cromo</span>
+              <span class="text-white text-[11px] font-black tracking-tight">FIFA/Panini 2026</span>
+            </h1>
+          </div>
+          <!-- Seletor de Álbum e Perfil -->
+          <div class="flex items-center gap-2">
+            <select id="albumSelector"
+                    class="bg-[#131735] text-white border border-white/10 text-xs px-2 py-1 rounded-lg focus:outline-none focus:border-copaYellow cursor-pointer hover:bg-[#1a1e43] transition-colors"
+                    onchange="switchAlbum(this.value)">
+            </select>
+            <button id="authHeaderBtn" onclick="handleAuthHeaderClick()"
+                    class="w-7 h-7 rounded-full border border-white/10 hover:border-copaYellow/40 bg-white/5 flex items-center justify-center text-xs overflow-hidden transition-all duration-200"
+                    title="Minha Conta / Login">
+              👤
+            </button>
+          </div>
+        </div>
+        <!-- Linha inferior do Header: Links à esquerda e Ações Rápidas com ícones à direita -->
+        <div class="flex items-center justify-between border-t border-white/5 pt-2 text-[10px] text-gray-400 font-semibold">
+          <!-- Links externos requeridos -->
+          <div class="flex items-center gap-2.5">
+            <a href="https://www.fifa.com/fifaplus/pt/tournaments/mens/worldcup/canadamexicousa2026"
+               target="_blank" rel="noopener noreferrer"
+               class="hover:text-copaYellow transition-colors flex items-center gap-0.5">FIFA+</a>
+            <span class="text-white/10">|</span>
+            <a href="https://panini.com.br"
+               target="_blank" rel="noopener noreferrer"
+               class="hover:text-copaGreen transition-colors flex items-center gap-0.5">Panini</a>
+            <span class="text-white/10">|</span>
+            <a href="https://www.cbf.com.br/selecao-brasileira/noticias/selecao-masculina"
+               target="_blank" rel="noopener noreferrer"
+               class="hover:text-copaYellow transition-colors flex items-center gap-0.5">CBF</a>
+          </div>
+          <!-- Ações Rápidas Compactas baseadas em Ícones -->
+          <div class="flex items-center gap-2">
+            <!-- 1. Criar Novo Álbum -->
+            <button onclick="createNewAlbum()"
+                    class="flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/5 hover:border-copaYellow/30 w-7 h-7 rounded-lg text-white transition text-xs font-black"
+                    title="Iniciar nova coleção do zero">+</button>
+            <!-- 2. Importar Códigos (Seta para baixo azul) -->
+            <button onclick="location.hash = '#import'"
+                    class="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-blue-500/30 w-7 h-7 flex items-center justify-center rounded-lg text-white transition"
+                    title="Importar lista de figurinhas"><svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg></button>
+            <!-- 3. Trocas (Ícone de setas de troca) -->
+            <button id="headerTradesBtn" onclick="location.hash = '#trades'"
+                    class="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-copaGreen/30 w-7 h-7 flex items-center justify-center rounded-lg text-white transition-all duration-300"
+                    title="Trocas"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path class="text-copaYellow" stroke-linecap="round" stroke-linejoin="round" d="M16.5 3L21 7.5m0 0L16.5 12M21 7.5H7.5" /><path class="text-copaGreen" stroke-linecap="round" stroke-linejoin="round" d="M7.5 12L3 16.5m0 0L7.5 21M3 16.5h13.5" /></svg></button>
+            <!-- 5. Compartilhar Geral -->
+            <button onclick="shareApp()"
+                    class="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-copaYellow/30 w-7 h-7 flex items-center justify-center rounded-lg text-white transition"
+                    title="Compartilhar aplicativo"><svg class="w-3.5 h-3.5 text-copaYellow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935-2.186 2.25 2.25 0 00-3.935 2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" /></svg></button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- Main container do app (Rola de forma independente se exceder a altura) -->
+    <main id="appRoot" class="flex-1 p-4 overflow-y-auto w-full"></main>
+    <!-- Footer integrado -->
+    <footer class="bg-[#050814] border-t border-white/5 py-4 text-center text-[10px] text-gray-500 mt-auto">
+      <div class="px-4 flex flex-col items-center gap-3">
+        <p>© 2026 - Controle de figurinhas Copa do Mundo. v1.0.0</p>
+        <a href="https://instagram.com/freela_ss" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors">
+          <span>Produzido por</span>
+          <span class="inline-flex items-center justify-center p-1 rounded-md bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white">
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </span>
+          <strong class="text-white font-bold">@freela_ss</strong>
+        </a>
+      </div>
+    </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="supabase_config.js" defer></script>
+  <script src="auth_db.js" defer></script>
+  <script src="players_db.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
