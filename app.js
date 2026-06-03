@@ -1613,6 +1613,36 @@ function renderLogin(container) {
       document.body.appendChild(modalOverlay);
     };
 
+    const showErrorModal = (title, message) => {
+      const modalOverlay = document.createElement('div');
+      modalOverlay.className = 'fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[9999] p-4 animate-fade-in';
+      
+      const modalContainer = document.createElement('div');
+      modalContainer.className = 'bg-[#120e16] border border-red-500/30 rounded-2xl p-6 max-w-sm w-full text-center flex flex-col items-center gap-4 shadow-2xl shadow-red-500/10';
+      
+      modalContainer.innerHTML = `
+        <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/30 text-red-500 mb-1">
+          <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-sm uppercase tracking-wider">${title}</h3>
+        <p class="text-gray-300 text-xs leading-relaxed whitespace-pre-wrap">${message}</p>
+      `;
+      
+      const btnConfirm = document.createElement('button');
+      btnConfirm.className = 'w-full mt-2 py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-red-500/10 transition duration-200 cursor-pointer';
+      btnConfirm.textContent = 'Fechar';
+      
+      btnConfirm.onclick = () => {
+        document.body.removeChild(modalOverlay);
+      };
+      
+      modalContainer.appendChild(btnConfirm);
+      modalOverlay.appendChild(modalContainer);
+      document.body.appendChild(modalOverlay);
+    };
+
     // Submissão Login
     formLogin.onsubmit = async (e) => {
       e.preventDefault();
@@ -1637,6 +1667,7 @@ function renderLogin(container) {
       } catch (err) {
         console.error("Erro na autenticação:", err);
         showFeedback("Erro na autenticação: " + (err.message || err), 'error', feedbackMsgLogin);
+        showErrorModal("Erro de Autenticação", err.message || err);
       } finally {
         btnLoginSubmit.disabled = false;
         btnLoginSubmit.textContent = 'ENTRAR';
@@ -1648,7 +1679,9 @@ function renderLogin(container) {
       e.preventDefault();
 
       if (!consentCheckbox.checked) {
-        showFeedback("Você precisa aceitar os termos de proteção de dados para continuar.", 'error', feedbackMsgRegister);
+        const msg = "Você precisa aceitar os termos de proteção de dados para continuar.";
+        showFeedback(msg, 'error', feedbackMsgRegister);
+        showErrorModal("Termos de Proteção", msg);
         return;
       }
 
@@ -1660,13 +1693,17 @@ function renderLogin(container) {
       if (!email || !password || !username || !birthdate) return;
 
       if (birthdate.length < 10) {
-        showFeedback("Por favor, preencha a data de nascimento completa no formato DD/MM/AAAA.", 'error', feedbackMsgRegister);
+        const msg = "Por favor, preencha a data de nascimento completa no formato DD/MM/AAAA.";
+        showFeedback(msg, 'error', feedbackMsgRegister);
+        showErrorModal("Data Incompleta", msg);
         return;
       }
 
       const parts = birthdate.split('/');
       if (parts.length !== 3) {
-        showFeedback("Data de nascimento inválida. Use o formato DD/MM/AAAA.", 'error', feedbackMsgRegister);
+        const msg = "Data de nascimento inválida. Use o formato DD/MM/AAAA.";
+        showFeedback(msg, 'error', feedbackMsgRegister);
+        showErrorModal("Data Inválida", msg);
         return;
       }
 
@@ -1676,7 +1713,9 @@ function renderLogin(container) {
       const dateObj = new Date(year, month, day);
 
       if (isNaN(dateObj.getTime()) || dateObj.getFullYear() !== year || dateObj.getMonth() !== month || dateObj.getDate() !== day) {
-        showFeedback("Por favor, insira uma data de nascimento válida.", 'error', feedbackMsgRegister);
+        const msg = "Por favor, insira uma data de nascimento válida.";
+        showFeedback(msg, 'error', feedbackMsgRegister);
+        showErrorModal("Data Inválida", msg);
         return;
       }
 
@@ -1706,6 +1745,7 @@ function renderLogin(container) {
       } catch (err) {
         console.error("Erro no cadastro:", err);
         showFeedback("Erro no cadastro: " + (err.message || err), 'error', feedbackMsgRegister);
+        showErrorModal("Erro no Cadastro", err.message || err);
       } finally {
         btnRegisterSubmit.disabled = false;
         btnRegisterSubmit.textContent = 'FINALIZAR CADASTRO';
