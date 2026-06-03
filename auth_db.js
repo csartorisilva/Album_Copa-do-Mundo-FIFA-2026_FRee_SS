@@ -49,8 +49,9 @@
           let stickers = {};
           let latitude = currentUser ? currentUser.latitude : null;
           let longitude = currentUser ? currentUser.longitude : null;
-          let birthdate = currentUser ? currentUser.birthdate : "";
-
+          let displayName = user.user_metadata.username || user.user_metadata.full_name || user.user_metadata.name || "Colecionador";
+          let userBirthdate = user.user_metadata.birthdate || "";
+ 
           // Sincroniza dados do perfil na nuvem
           try {
             const { data: profile, error } = await supabaseClient
@@ -58,11 +59,13 @@
               .select('*')
               .eq('uid', user.id)
               .maybeSingle();
-
+ 
             if (profile) {
               stickers = profile.stickers || {};
               if (profile.latitude !== null && profile.latitude !== undefined) latitude = profile.latitude;
               if (profile.longitude !== null && profile.longitude !== undefined) longitude = profile.longitude;
+              if (profile.username) displayName = profile.username;
+              if (profile.birthdate) userBirthdate = profile.birthdate;
               
               // Sincroniza o álbum local se o perfil na nuvem tiver figurinhas
               if (profile.stickers && Object.keys(profile.stickers).length > 0) {
@@ -77,8 +80,10 @@
               // Se o perfil do usuário não existe na tabela profiles, cria um novo
               await supabaseClient.from('profiles').insert({
                 uid: user.id,
-                name: user.user_metadata.full_name || user.user_metadata.name || "Colecionador",
+                name: displayName,
                 photo_url: user.user_metadata.avatar_url || "",
+                username: user.user_metadata.username || "",
+                birthdate: userBirthdate || null,
                 latitude: latitude,
                 longitude: longitude,
                 last_seen: new Date().toISOString()
@@ -87,18 +92,18 @@
           } catch (profileError) {
             console.error("Erro ao sincronizar perfil do Supabase:", profileError);
           }
-
+ 
           currentUser = {
             uid: user.id,
-            name: user.user_metadata.full_name || user.user_metadata.name || "Colecionador",
+            name: displayName,
             photo_url: user.user_metadata.avatar_url || "",
-            provider: user.app_metadata.provider || "oauth",
-            birthdate: birthdate,
+            provider: user.app_metadata.provider || "email",
+            birthdate: userBirthdate,
             latitude: latitude,
             longitude: longitude,
             last_seen: new Date().toISOString()
           };
-
+ 
           localStorage.setItem(sessionKey, JSON.stringify(currentUser));
           
           // Recarrega cabeçalho e redireciona se o usuário estiver na tela de login
@@ -183,54 +188,66 @@
       return null;
     },
 
-    // Realiza login via Supabase (Google OAuth)
-    async login(provider, username = "", birthdate = "") {
+    // Login ou Cadastro unificado via E-mail e Senha
+    async loginOrRegister(email, password, username = "", birthdate = "") {
+      if (!supabaseClient) {
+        throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
+      }
+
+      // 1. Tenta fazer login primeiro
       try {
-        // Salva dados de idade localmente para recuperar pós-redirect
-        if (birthdate) {
-          localStorage.setItem("temp_birthdate", birthdate);
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (!error && data.session) {
+          return { action: 'login', data };
         }
         
-        if (!supabaseClient) {
-          throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
+        // Se o erro for de rede ou diferente de credenciais inválidas, propaga
+        if (error && error.status !== 400 && !error.message.includes("Invalid login credentials") && !error.message.includes("invalid_credentials")) {
+          throw error;
         }
-        
-        const { data, error } = await supabaseClient.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: 'https://csartorisilva.github.io/Album_Copa-do-Mundo-FIFA-2026_FRee_SS/',
-            queryParams: {
-              access_type: 'offline',
-              prompt: 'consent'
-            }
-          }
-        });
-        if (error) throw error;
-        return data;
       } catch (e) {
-        console.error("Erro no login Supabase:", e);
-        throw e;
+        if (e.message && !e.message.includes("Invalid login credentials") && !e.message.includes("invalid_credentials")) {
+          throw e;
+        }
       }
-    },
 
-    // Cadastro via E-mail e Senha
-    async signUpEmail(email, password) {
-      if (!supabaseClient) {
-        throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
+      // Se o login falhou, consideramos que pode ser um novo cadastro.
+      // O nome de usuário e a data de nascimento passam a ser obrigatórios.
+      if (!username || !birthdate) {
+        throw new Error("Credenciais inválidas. Se você deseja criar uma nova conta, preencha também o Nome de Usuário e a Data de Nascimento.");
       }
-      const { data, error } = await supabaseClient.auth.signUp({ email, password });
-      if (error) throw error;
-      return data;
-    },
 
-    // Login via E-mail e Senha
-    async signInEmail(email, password) {
-      if (!supabaseClient) {
-        throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
+      // Validamos se o username é único antes de prosseguir
+      const { data: checkUser } = await supabaseClient
+        .from('profiles')
+        .select('uid')
+        .eq('username', username)
+        .maybeSingle();
+      if (checkUser) {
+        throw new Error("Este Nome de Usuário já está em uso. Por favor, escolha outro.");
       }
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      return data;
+
+      // Tenta realizar o cadastro
+      const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: username,
+            birthdate: birthdate
+          }
+        }
+      });
+
+      if (signUpError) {
+        // Se o e-mail já estiver cadastrado, a senha do login acima estava incorreta
+        if (signUpError.message && (signUpError.message.includes("already registered") || signUpError.message.includes("already exists"))) {
+          throw new Error("Senha incorreta para este e-mail.");
+        }
+        throw signUpError;
+      }
+
+      return { action: 'register', data: signUpData };
     },
 
     // Logout da conta
@@ -395,55 +412,4 @@
     }
   };
 
-  window.iniciarLoginGoogle = async function() {
-    try {
-      const btn = document.querySelector('.google-login-btn');
-      if (btn) {
-        btn.innerHTML = `<span class="text-xs font-bold text-gray-400 mx-auto">🔄 Conectando ao Google...</span>`;
-        btn.disabled = true;
-      }
-      
-      if (!supabaseClient) {
-        if (supabaseInitError) {
-          throw supabaseInitError;
-        } else if (typeof supabase === 'undefined') {
-          throw new Error("A biblioteca global do Supabase não foi carregada no window.");
-        } else {
-          throw new Error("Cliente Supabase não inicializado.");
-        }
-      }
-      
-      const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: 'https://csartorisilva.github.io/Album_Copa-do-Mundo-FIFA-2026_FRee_SS/'
-        }
-      });
-      
-      if (error) throw error;
-    } catch (err) {
-      console.error("Erro na autenticação:", err);
-      alert("Erro detectado no Supabase: " + (err.message || err));
-      const btn = document.querySelector('.google-login-btn');
-      if (btn) {
-        btn.classList.add('error-border'); // se quiser manter o feedback visual
-        btn.innerHTML = `
-          <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg">
-            <svg viewBox="0 0 24 24" class="w-6 h-6"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          </span>
-          <span class="font-bold text-sm text-gray-200 group-hover:text-white flex-1 text-left">Google Account</span>
-          <span class="text-gray-500 group-hover:text-copaYellow transition">➔</span>
-        `;
-        btn.disabled = false;
-      }
-    }
-  }
-
-  // Recupera idade salva após retorno do redirect de login
-  const tempBirthdate = localStorage.getItem("temp_birthdate");
-  if (tempBirthdate && currentUser) {
-    currentUser.birthdate = tempBirthdate;
-    localStorage.setItem(sessionKey, JSON.stringify(currentUser));
-    localStorage.removeItem("temp_birthdate");
-  }
 })();

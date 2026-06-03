@@ -12,6 +12,8 @@ create table if not exists public.profiles (
   uid uuid references auth.users on delete cascade primary key,
   name text not null,
   photo_url text,
+  username text unique, -- Nome de usuário único
+  birthdate date,       -- Data de nascimento para regras de menores
   latitude double precision,
   longitude double precision,
   stickers jsonb default '{}'::jsonb,
@@ -54,18 +56,20 @@ create policy "Usuários podem criar apenas seu próprio perfil"
   with check (auth.uid() = uid);
 
 -- =========================================================================
--- 4. TRIGGER E FUNÇÃO DE CRIAÇÃO AUTOMÁTICA DE PERFIL NO CADASTRO (OAUTH)
+-- 4. TRIGGER E FUNÇÃO DE CRIAÇÃO AUTOMÁTICA DE PERFIL NO CADASTRO
 -- =========================================================================
 -- Cria automaticamente uma linha na tabela profiles quando um novo usuário
--- se cadastra usando Google, Apple ou Android no Supabase Auth.
+-- se cadastra usando o Supabase Auth.
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (uid, name, photo_url, stickers)
+  insert into public.profiles (uid, name, photo_url, username, birthdate, stickers)
   values (
     new.id,
-    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'Colecionador'),
+    coalesce(new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'Colecionador'),
     coalesce(new.raw_user_meta_data->>'avatar_url', ''),
+    new.raw_user_meta_data->>'username',
+    cast(new.raw_user_meta_data->>'birthdate' as date),
     '{}'::jsonb
   );
   return new;
@@ -77,3 +81,4 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+

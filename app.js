@@ -1203,147 +1203,124 @@ function renderLogin(container) {
     title.className = 'text-2xl font-black text-center mb-1 uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400';
     title.textContent = 'Acessar Coleções';
     wrapper.appendChild(title);
-
+ 
     const sub = document.createElement('p');
     sub.className = 'text-center text-xs text-gray-400 mb-6';
-    sub.textContent = 'Acesse com e-mail/senha ou sua conta Google para sincronizar na nuvem e buscar trocas';
+    sub.textContent = 'Digite seu e-mail e senha para entrar. Para novas contas, preencha também o Nome de Usuário e a Data de Nascimento.';
     wrapper.appendChild(sub);
-
-    // Toggle de Abas: Entrar vs Criar Conta
-    let isSignUpMode = false;
-
-    const toggleContainer = document.createElement('div');
-    toggleContainer.className = 'flex border-b border-white/10 mb-4 text-xs font-bold text-center';
-    
-    const tabLogin = document.createElement('button');
-    tabLogin.className = 'flex-1 py-2.5 text-copaYellow border-b-2 border-copaYellow transition';
-    tabLogin.textContent = 'Entrar';
-    
-    const tabRegister = document.createElement('button');
-    tabRegister.className = 'flex-1 py-2.5 text-gray-400 hover:text-white transition border-b-2 border-transparent';
-    tabRegister.textContent = 'Criar Conta';
-
-    toggleContainer.appendChild(tabLogin);
-    toggleContainer.appendChild(tabRegister);
-    wrapper.appendChild(toggleContainer);
-
-    // Formulário de E-mail e Senha
+ 
+    // Formulário Unificado
     const form = document.createElement('form');
-    form.className = 'flex flex-col gap-3.5 mb-5';
-
+    form.className = 'flex flex-col gap-4 mb-5';
+ 
+    // 1. Campo E-mail
+    const emailGroup = document.createElement('div');
+    emailGroup.className = 'flex flex-col gap-1.5';
+    const emailLabel = document.createElement('label');
+    emailLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
+    emailLabel.textContent = 'E-mail';
     const emailInput = document.createElement('input');
     emailInput.type = 'email';
-    emailInput.placeholder = 'Seu e-mail';
+    emailInput.placeholder = 'exemplo@email.com';
     emailInput.required = true;
-    emailInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
-    form.appendChild(emailInput);
-    
+    emailInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    emailGroup.appendChild(emailLabel);
+    emailGroup.appendChild(emailInput);
+    form.appendChild(emailGroup);
+ 
+    // 2. Campo Senha
+    const passwordGroup = document.createElement('div');
+    passwordGroup.className = 'flex flex-col gap-1.5';
+    const passwordLabel = document.createElement('label');
+    passwordLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
+    passwordLabel.textContent = 'Senha';
     const passwordInput = document.createElement('input');
     passwordInput.type = 'password';
     passwordInput.placeholder = 'Sua senha';
     passwordInput.required = true;
-    passwordInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
-    form.appendChild(passwordInput);
-
+    passwordInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    passwordGroup.appendChild(passwordLabel);
+    passwordGroup.appendChild(passwordInput);
+    form.appendChild(passwordGroup);
+ 
+    // 3. Campo Nome de Usuário (Username)
+    const usernameGroup = document.createElement('div');
+    usernameGroup.className = 'flex flex-col gap-1.5';
+    const usernameLabel = document.createElement('label');
+    usernameLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
+    usernameLabel.textContent = 'Nome de Usuário (Exclusivo para novos cadastros)';
+    const usernameInput = document.createElement('input');
+    usernameInput.type = 'text';
+    usernameInput.placeholder = 'ex: colecionador_hexa';
+    usernameInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    usernameGroup.appendChild(usernameLabel);
+    usernameGroup.appendChild(usernameInput);
+    form.appendChild(usernameGroup);
+ 
+    // 4. Campo Data de Nascimento
+    const birthdateGroup = document.createElement('div');
+    birthdateGroup.className = 'flex flex-col gap-1.5';
+    const birthdateLabel = document.createElement('label');
+    birthdateLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
+    birthdateLabel.textContent = 'Data de Nascimento (Exclusiva para novos cadastros)';
+    const birthdateInput = document.createElement('input');
+    birthdateInput.type = 'date';
+    birthdateInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    birthdateGroup.appendChild(birthdateLabel);
+    birthdateGroup.appendChild(birthdateInput);
+    form.appendChild(birthdateGroup);
+ 
+    // Botão de Ação Unificado: "Entrar / Criar Conta"
     const btnSubmit = document.createElement('button');
     btnSubmit.type = 'submit';
-    btnSubmit.className = 'w-full py-3 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-darkBg font-black text-xs uppercase tracking-wider shadow-lg shadow-copaYellow/10 hover:shadow-copaYellow/25 transition duration-200 flex items-center justify-center gap-2';
-    btnSubmit.textContent = 'Entrar';
+    btnSubmit.className = 'w-full py-3.5 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-darkBg font-black text-xs uppercase tracking-wider shadow-lg shadow-copaYellow/10 hover:shadow-copaYellow/25 transition duration-200 flex items-center justify-center gap-2 mt-2';
+    btnSubmit.textContent = 'Entrar / Criar Conta';
     form.appendChild(btnSubmit);
-
+ 
     wrapper.appendChild(form);
-
-    // Ações dos botões de Aba
-    tabLogin.onclick = (e) => {
-      e.preventDefault();
-      isSignUpMode = false;
-      tabLogin.className = 'flex-1 py-2.5 text-copaYellow border-b-2 border-copaYellow transition';
-      tabRegister.className = 'flex-1 py-2.5 text-gray-400 hover:text-white transition border-b-2 border-transparent';
-      btnSubmit.textContent = 'Entrar';
-      passwordInput.placeholder = 'Sua senha';
-    };
-
-    tabRegister.onclick = (e) => {
-      e.preventDefault();
-      isSignUpMode = true;
-      tabRegister.className = 'flex-1 py-2.5 text-copaYellow border-b-2 border-copaYellow transition';
-      tabLogin.className = 'flex-1 py-2.5 text-gray-400 hover:text-white transition border-b-2 border-transparent';
-      btnSubmit.textContent = 'Criar Conta / Cadastrar';
-      passwordInput.placeholder = 'Sua senha (mín. 6 caracteres)';
-    };
-
+ 
     // Submissão do formulário
     form.onsubmit = async (e) => {
       e.preventDefault();
       const email = emailInput.value.trim();
       const password = passwordInput.value;
-
+      const username = usernameInput.value.trim();
+      const birthdate = birthdateInput.value;
+ 
       if (!email || !password) return;
-
+ 
       try {
         btnSubmit.disabled = true;
-        btnSubmit.textContent = isSignUpMode ? '🔄 Cadastrando...' : '🔄 Entrando...';
-
-        if (isSignUpMode) {
-          const data = await authDb.signUpEmail(email, password);
-          if (data && !data.session) {
-            alert("Cadastro solicitado! Verifique seu e-mail para confirmar a conta.");
+        btnSubmit.textContent = '🔄 Processando...';
+ 
+        const result = await authDb.loginOrRegister(email, password, username, birthdate);
+        
+        if (result.action === 'register') {
+          if (result.data && !result.data.session) {
+            alert("Cadastro realizado! Por favor, verifique seu e-mail para confirmar a conta e poder entrar.");
           } else {
             alert("Conta criada e autenticada com sucesso!");
             location.hash = '#home';
           }
-        } else {
-          await authDb.signInEmail(email, password);
+        } else if (result.action === 'login') {
           alert("Login realizado com sucesso!");
           location.hash = '#home';
         }
       } catch (err) {
-        console.error("Erro na autenticação por e-mail:", err);
+        console.error("Erro na autenticação:", err);
         alert("Erro na autenticação: " + (err.message || err));
       } finally {
         btnSubmit.disabled = false;
-        btnSubmit.textContent = isSignUpMode ? 'Criar Conta / Cadastrar' : 'Entrar';
+        btnSubmit.textContent = 'Entrar / Criar Conta';
       }
     };
-
-    // Divisor
-    const divider = document.createElement('div');
-    divider.className = 'flex items-center gap-3 my-4';
-    divider.innerHTML = `
-      <hr class="flex-1 border-white/10">
-      <span class="text-[10px] uppercase font-bold text-gray-500 tracking-wider">ou</span>
-      <hr class="flex-1 border-white/10">
-    `;
-    wrapper.appendChild(divider);
-
+ 
     const grid = document.createElement('div');
     grid.className = 'flex flex-col gap-3';
-
-    // Google Login Button (Fully active)
-    const btnGoogle = document.createElement('button');
-    btnGoogle.className = 'flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-red-500/30 transition duration-200 group w-full google-login-btn';
-    btnGoogle.setAttribute('onclick', 'window.iniciarLoginGoogle()');
-
-    const googleLogo = document.createElement('span');
-    googleLogo.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg';
-    googleLogo.innerHTML = `<svg viewBox="0 0 24 24" class="w-6 h-6"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`;
-    btnGoogle.appendChild(googleLogo);
-
-    const googleLabel = document.createElement('span');
-    googleLabel.className = 'font-bold text-sm text-gray-200 group-hover:text-white flex-1 text-left';
-    googleLabel.textContent = 'Google Account';
-    btnGoogle.appendChild(googleLabel);
-
-    const googleArrow = document.createElement('span');
-    googleArrow.className = 'text-gray-500 group-hover:text-copaYellow transition';
-    googleArrow.innerHTML = '➔';
-    btnGoogle.appendChild(googleArrow);
-
-    grid.appendChild(btnGoogle);
-
+ 
     // Botão Fazer Depois (Pular / Ir para o Álbum)
     const btnLater = document.createElement('button');
-    btnLater.className = 'w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaYellow/40 text-gray-500 hover:text-gray-300 font-bold text-xs transition duration-200 mt-3 flex items-center justify-center gap-1.5 skip-login-btn';
+    btnLater.className = 'w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaYellow/40 text-gray-500 hover:text-gray-300 font-bold text-xs transition duration-200 mt-2 flex items-center justify-center gap-1.5 skip-login-btn';
     btnLater.innerHTML = `
       <svg class="w-3.5 h-3.5 text-copaYellow animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
@@ -1351,13 +1328,13 @@ function renderLogin(container) {
       Pular por agora (continuar sem login)
     `;
     grid.appendChild(btnLater);
-
+ 
     // Nota de texto em destaque dizendo exatamente: "Nota: Seu álbum e suas figurinhas não ficarão salvos."
     const warningNote = document.createElement('p');
     warningNote.className = 'text-[10px] font-bold text-red-500 text-center mt-2.5 opacity-90 leading-tight';
     warningNote.textContent = 'Nota: Seu álbum e suas figurinhas não ficarão salvos.';
     grid.appendChild(warningNote);
-
+ 
     wrapper.appendChild(grid);
   }
 
