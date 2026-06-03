@@ -1,6 +1,42 @@
 // app.js – lógica principal do álbum de figurinhas FIFA 2026
 // Tema Ultimate FIFA - Modo Escuro & Glassmorphism com Card Flip 3D
 
+// Override do alert() nativo do navegador com um modal customizado, responsivo e elegante
+window.alert = function(message) {
+  const existingAlert = document.getElementById('custom-global-alert');
+  if (existingAlert) {
+    existingAlert.remove();
+  }
+
+  const overlay = document.createElement('div');
+  overlay.id = 'custom-global-alert';
+  overlay.className = 'fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[10000] p-4 animate-fade-in';
+  
+  const container = document.createElement('div');
+  container.className = 'bg-[#120e16] border border-copaYellow/20 rounded-2xl p-6 max-w-sm w-full text-center flex flex-col items-center gap-4 shadow-2xl shadow-copaYellow/5';
+  
+  container.innerHTML = `
+    <div class="w-12 h-12 rounded-full bg-copaYellow/10 flex items-center justify-center border border-copaYellow/30 text-copaYellow mb-1">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <h3 class="text-white font-bold text-sm uppercase tracking-wider">Aviso</h3>
+    <p class="text-gray-300 text-xs leading-relaxed text-center font-sans whitespace-pre-wrap">${message}</p>
+  `;
+  
+  const btn = document.createElement('button');
+  btn.className = 'w-full mt-2 py-3 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-darkBg font-black text-xs uppercase tracking-wider shadow-lg shadow-copaYellow/10 transition duration-200 cursor-pointer';
+  btn.textContent = 'Ok';
+  btn.onclick = () => {
+    overlay.remove();
+  };
+  
+  container.appendChild(btn);
+  overlay.appendChild(container);
+  document.body.appendChild(overlay);
+};
+
 const PALLETE = {
   blue: '#0033A0',
   green: '#00e676', // verde neon FUT
@@ -1293,6 +1329,20 @@ function renderLogin(container) {
     btnSubmit.textContent = 'Entrar / Criar Conta';
     form.appendChild(btnSubmit);
  
+    // Elemento para mensagens de feedback (erro / sucesso)
+    const feedbackMsg = document.createElement('div');
+    feedbackMsg.className = 'text-xs text-center font-semibold mt-3 hidden';
+    form.appendChild(feedbackMsg);
+
+    const showFeedback = (message, type = 'error') => {
+      feedbackMsg.textContent = message;
+      feedbackMsg.className = `text-xs text-center font-semibold mt-3 p-3 rounded-xl animate-fade-in block ${
+        type === 'error' 
+          ? 'bg-red-500/10 border border-red-500/20 text-red-400' 
+          : 'bg-green-500/10 border border-green-500/20 text-green-400'
+      }`;
+    };
+ 
     wrapper.appendChild(form);
  
     // Funções auxiliares para validação de idade e modal de menor de idade
@@ -1346,7 +1396,7 @@ function renderLogin(container) {
       e.preventDefault();
 
       if (!consentCheckbox.checked) {
-        alert("Você precisa aceitar os termos de proteção de dados para continuar.");
+        showFeedback("Você precisa aceitar os termos de proteção de dados para continuar.", 'error');
         return;
       }
 
@@ -1360,6 +1410,7 @@ function renderLogin(container) {
       try {
         btnSubmit.disabled = true;
         btnSubmit.textContent = 'PROCESSANDO...';
+        feedbackMsg.className = 'text-xs text-center font-semibold mt-3 hidden';
  
         const result = await authDb.loginOrRegister(email, password, username, birthdate);
         
@@ -1368,27 +1419,27 @@ function renderLogin(container) {
           if (age < 18) {
             showMinorAlertModal(() => {
               if (result.data && !result.data.session) {
-                alert("Cadastro realizado! Por favor, verifique seu e-mail para confirmar a conta e poder entrar.");
+                showFeedback("Cadastro realizado! Por favor, verifique seu e-mail para confirmar a conta.", 'success');
               } else {
-                alert("Conta criada e autenticada com sucesso!");
-                location.hash = '#home';
+                showFeedback("Conta criada e autenticada com sucesso!", 'success');
+                setTimeout(() => { location.hash = '#home'; }, 1500);
               }
             });
           } else {
             if (result.data && !result.data.session) {
-              alert("Cadastro realizado! Por favor, verifique seu e-mail para confirmar a conta e poder entrar.");
+              showFeedback("Cadastro realizado! Por favor, verifique seu e-mail para confirmar a conta.", 'success');
             } else {
-              alert("Conta criada e autenticada com sucesso!");
-              location.hash = '#home';
+              showFeedback("Conta criada e autenticada com sucesso!", 'success');
+              setTimeout(() => { location.hash = '#home'; }, 1500);
             }
           }
         } else if (result.action === 'login') {
-          alert("Login realizado com sucesso!");
-          location.hash = '#home';
+          showFeedback("Login realizado com sucesso!", 'success');
+          setTimeout(() => { location.hash = '#home'; }, 1000);
         }
       } catch (err) {
         console.error("Erro na autenticação:", err);
-        alert("Erro na autenticação: " + (err.message || err));
+        showFeedback("Erro na autenticação: " + (err.message || err), 'error');
       } finally {
         btnSubmit.disabled = false;
         btnSubmit.textContent = 'Entrar / Criar Conta';
