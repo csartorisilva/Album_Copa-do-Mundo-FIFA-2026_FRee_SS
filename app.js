@@ -1079,6 +1079,11 @@ function renderHeader() {
       }
     }
   }
+
+  // Inicializa a barra de busca no cabeçalho de forma estática
+  if (typeof initHeaderSearchBar === 'function') {
+    initHeaderSearchBar();
+  }
 }
 
 // Troca de álbum ativo
@@ -1854,205 +1859,7 @@ function renderHome(container) {
     }
   ];
 
-  // Campo de Busca Inteligente e Fixo
-  const searchStickyContainer = document.createElement('div');
-  searchStickyContainer.className = 'sticky top-[-16px] z-[40] bg-[#050814]/95 backdrop-blur-md pt-3 pb-3 border-b border-white/5 w-full';
-
-  const searchInputWrapper = document.createElement('div');
-  searchInputWrapper.className = 'relative w-full';
-
-  const searchBox = document.createElement('div');
-  searchBox.className = 'flex items-center bg-[#131735] border border-white/10 rounded-xl px-3.5 py-2.5 focus-within:border-copaYellow transition-all duration-200';
-
-  searchBox.innerHTML = `
-    <svg class="w-4 h-4 text-gray-400 mr-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-  `;
-
-  const searchInput = document.createElement('input');
-  searchInput.type = 'text';
-  searchInput.id = 'albumSearchInput';
-  searchInput.placeholder = 'Buscar país (ex: Brasil) ou figurinha faltante (ex: BRA 13)...';
-  searchInput.className = 'bg-transparent text-white placeholder-gray-400 text-xs w-full focus:outline-none font-medium';
-  searchBox.appendChild(searchInput);
-  searchInputWrapper.appendChild(searchBox);
-
-  // Suggestions container
-  const suggestionsBox = document.createElement('div');
-  suggestionsBox.id = 'searchSuggestions';
-  suggestionsBox.className = 'absolute left-0 right-0 mt-1.5 bg-[#0e112a] border border-white/10 rounded-xl shadow-2xl overflow-y-auto max-h-60 hidden z-[110] divide-y divide-white/5';
-  searchInputWrapper.appendChild(suggestionsBox);
-
-  searchStickyContainer.appendChild(searchInputWrapper);
-  rootHome.appendChild(searchStickyContainer);
-
-  function updateSearchSuggestions(query) {
-    suggestionsBox.innerHTML = '';
-    if (!query.trim()) {
-      suggestionsBox.classList.add('hidden');
-      return;
-    }
-
-    const cleanQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-    const suggestions = [];
-
-    const albumId = storage.getCurrentAlbumId();
-    const albums = storage.getAlbums();
-    const album = albums[albumId];
-    const stickers = album ? album.stickers : {};
-
-    // 1. Buscar correspondência nos países / seleções
-    const specials = [
-      { name: 'FIFA', code: 'FWC' },
-      { name: 'Escudos', code: 'ESCUDOS' },
-      { name: 'Coca-Cola', code: 'CC' },
-      { name: 'Premium (Lendários)', code: 'EXTRAS' }
-    ];
-    
-    specials.forEach(s => {
-      const matchName = s.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const matchCode = s.code.toLowerCase();
-      if (matchName.includes(cleanQuery) || matchCode.includes(cleanQuery)) {
-        suggestions.push({
-          type: 'country',
-          name: s.name,
-          code: s.code,
-          label: `País: ${s.name} (${s.code})`
-        });
-      }
-    });
-
-    groupsData.forEach(g => {
-      g.teams.forEach(t => {
-        const matchName = t.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        const matchCode = t.code.toLowerCase();
-        if (matchName.includes(cleanQuery) || matchCode.includes(cleanQuery)) {
-          suggestions.push({
-            type: 'country',
-            name: t.name,
-            code: t.code,
-            label: `País: ${t.name} (${t.code})`
-          });
-        }
-      });
-    });
-
-    // 2. Buscar correspondência em figurinhas FALTANTES
-    const numMatch = cleanQuery.match(/\d+/);
-    const hasNum = numMatch !== null;
-    const searchNum = hasNum ? parseInt(numMatch[0]) : null;
-    const textQuery = cleanQuery.replace(/\d+/g, '').trim();
-
-    const groupsToCheck = [];
-    groupsData.forEach(g => g.teams.forEach(t => groupsToCheck.push({ code: t.code, name: t.name, limit: 20 })));
-    groupsToCheck.push({ code: 'FWC', name: 'FIFA', limit: 19 });
-    groupsToCheck.push({ code: 'CC', name: 'Coca-Cola', limit: 14 });
-
-    groupsToCheck.forEach(group => {
-      const matchName = group.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const matchCode = group.code.toLowerCase();
-      
-      const textMatches = textQuery === '' || matchName.includes(textQuery) || matchCode.includes(textQuery);
-      
-      if (textMatches) {
-        for (let i = 1; i <= group.limit; i++) {
-          const key = `${group.code}-${i}`;
-          const isOwned = stickers[key]?.owned;
-          
-          if (!isOwned) {
-            if (hasNum && i !== searchNum) {
-              continue;
-            }
-            
-            suggestions.push({
-              type: 'sticker',
-              code: group.code,
-              number: i,
-              key: key,
-              label: `Figurinha Faltante: ${group.code} ${i} (${group.name})`
-            });
-          }
-        }
-      }
-    });
-
-    // Legends (EXTRAS)
-    const matchExtras = 'legends'.includes(cleanQuery) || 'extras'.includes(cleanQuery) || 'premium'.includes(cleanQuery) || textQuery === '';
-    if (matchExtras) {
-      const variants = ['ouro', 'prata', 'bronze', 'bordo'];
-      legendsData.forEach((legend, idx) => {
-        const matchLegendName = legend.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        if (textQuery === '' || matchLegendName.includes(textQuery)) {
-          variants.forEach(variant => {
-            const key = `EXTRAS-${idx + 1}-${variant}`;
-            const isOwned = stickers[key]?.owned;
-            if (!isOwned) {
-              if (hasNum && (idx + 1) !== searchNum) {
-                return;
-              }
-              suggestions.push({
-                type: 'sticker',
-                code: 'EXTRAS',
-                key: key,
-                label: `Lendário Faltante: ${legend.name} (${variant.toUpperCase()})`
-              });
-            }
-          });
-        }
-      });
-    }
-
-    const limitedSuggestions = suggestions.slice(0, 30);
-
-    if (limitedSuggestions.length === 0) {
-      const emptyDiv = document.createElement('div');
-      emptyDiv.className = 'p-3 text-xs text-gray-500 text-center';
-      emptyDiv.textContent = 'Nenhuma correspondência ou figurinha faltante encontrada';
-      suggestionsBox.appendChild(emptyDiv);
-    } else {
-      limitedSuggestions.forEach(item => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'p-3 text-xs hover:bg-[#1a1e43] text-gray-200 cursor-pointer flex justify-between items-center transition duration-150 border-b border-white/5';
-        itemDiv.textContent = item.label;
-
-        itemDiv.onclick = () => {
-          suggestionsBox.classList.add('hidden');
-          searchInput.value = '';
-          
-          if (item.type === 'country') {
-            const cardId = `country-card-${item.code}`;
-            const el = document.getElementById(cardId);
-            if (el) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              el.classList.add('pulse-highlight');
-              setTimeout(() => el.classList.remove('pulse-highlight'), 3000);
-            }
-          } else if (item.type === 'sticker') {
-            sessionStorage.setItem('scrollTargetSticker', `card-${item.key}`);
-            location.hash = `#team-${item.code}`;
-          }
-        };
-        suggestionsBox.appendChild(itemDiv);
-      });
-    }
-
-    suggestionsBox.classList.remove('hidden');
-  }
-
-  searchInput.addEventListener('input', (e) => {
-    updateSearchSuggestions(e.target.value);
-  });
-
-  searchInput.addEventListener('focus', (e) => {
-    updateSearchSuggestions(e.target.value);
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!searchStickyContainer.contains(e.target)) {
-      suggestionsBox.classList.add('hidden');
-    }
-  });
+  // A barra de busca foi movida para o cabeçalho de forma estática e global.
 
   // 4. Divisor de Título Grupos + Link Classificação Geral (Movido para cá)
   const groupsHeaderRow = document.createElement('div');
@@ -5313,3 +5120,272 @@ window.handleAuthHeaderClick = handleAuthHeaderClick;
 // Inicialização por DOMContentLoaded
 window.addEventListener('DOMContentLoaded', initApp);
 window.addEventListener('hashchange', route);
+
+// ==========================================
+// BUSCA INTELIGENTE E AUTOCOMPLETE NO CABEÇALHO
+// ==========================================
+
+function initHeaderSearchBar() {
+  const container = document.getElementById('headerSearchContainer');
+  if (!container) return;
+  
+  if (container.querySelector('#headerSearchInput')) {
+    return;
+  }
+  
+  container.innerHTML = `
+    <div class="relative w-full">
+      <div class="flex items-center bg-[#131735] border border-white/10 rounded-xl px-3 py-1.5 focus-within:border-copaYellow transition-all duration-200">
+        <svg class="w-3.5 h-3.5 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input type="text" id="headerSearchInput" placeholder="Buscar país ou figurinha faltante..." class="bg-transparent text-white placeholder-gray-400 text-xs w-full focus:outline-none font-medium" />
+      </div>
+      <div id="headerSearchSuggestions" class="absolute left-0 right-0 mt-1.5 bg-[#0e112a]/95 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl overflow-y-auto max-h-60 hidden z-[110] divide-y divide-white/5"></div>
+    </div>
+  `;
+
+  const searchInput = document.getElementById('headerSearchInput');
+  const suggestionsBox = document.getElementById('headerSearchSuggestions');
+
+  if (!searchInput || !suggestionsBox) return;
+
+  searchInput.addEventListener('input', (e) => {
+    updateHeaderSearchSuggestions(e.target.value);
+  });
+
+  searchInput.addEventListener('focus', (e) => {
+    updateHeaderSearchSuggestions(e.target.value);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!container.contains(e.target)) {
+      suggestionsBox.classList.add('hidden');
+    }
+  });
+}
+
+function updateHeaderSearchSuggestions(query) {
+  const suggestionsBox = document.getElementById('headerSearchSuggestions');
+  const searchInput = document.getElementById('headerSearchInput');
+  if (!suggestionsBox) return;
+
+  suggestionsBox.innerHTML = '';
+  if (!query.trim()) {
+    suggestionsBox.classList.add('hidden');
+    return;
+  }
+
+  const cleanQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  const numMatch = cleanQuery.match(/\d+/);
+  const hasNum = numMatch !== null;
+  const searchNum = hasNum ? parseInt(numMatch[0]) : null;
+  const textQuery = cleanQuery.replace(/\d+/g, '').trim();
+
+  const albumId = storage.getCurrentAlbumId();
+  const albums = storage.getAlbums();
+  const album = albums[albumId];
+  const stickers = album ? album.stickers : {};
+
+  const groupedSuggestions = {};
+
+  // 1. Verificar grupos especiais (FWC, CC)
+  const specials = [
+    { name: 'FIFA', code: 'FWC', limit: 19 },
+    { name: 'Coca-Cola', code: 'CC', limit: 14 }
+  ];
+
+  specials.forEach(group => {
+    const matchName = group.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const matchCode = group.code.toLowerCase();
+    const textMatches = textQuery === '' || matchName.includes(textQuery) || matchCode.includes(textQuery);
+
+    if (textMatches) {
+      for (let i = 1; i <= group.limit; i++) {
+        const key = `${group.code}-${i}`;
+        const isOwned = stickers[key]?.owned;
+
+        if (!isOwned) {
+          if (hasNum && i !== searchNum) continue;
+
+          if (!groupedSuggestions[group.code]) {
+            groupedSuggestions[group.code] = {
+              name: group.name,
+              code: group.code,
+              flag: flagEmojis[group.code] || '🏳️',
+              stickers: []
+            };
+          }
+          groupedSuggestions[group.code].stickers.push({
+            key: key,
+            label: `${group.code} ${i}`,
+            number: i
+          });
+        }
+      }
+    }
+  });
+
+  // 2. Verificar seleções em de gruposData
+  groupsData.forEach(g => {
+    g.teams.forEach(t => {
+      const matchName = t.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const matchCode = t.code.toLowerCase();
+      const textMatches = textQuery === '' || matchName.includes(textQuery) || matchCode.includes(textQuery);
+
+      if (textMatches) {
+        for (let i = 1; i <= 20; i++) {
+          const key = `${t.code}-${i}`;
+          const isOwned = stickers[key]?.owned;
+
+          if (!isOwned) {
+            if (hasNum && i !== searchNum) continue;
+
+            if (!groupedSuggestions[t.code]) {
+              groupedSuggestions[t.code] = {
+                name: t.name,
+                code: t.code,
+                flag: flagEmojis[t.code] || '🏳️',
+                stickers: []
+              };
+            }
+            groupedSuggestions[t.code].stickers.push({
+              key: key,
+              label: `${t.code} ${i}`,
+              number: i
+            });
+          }
+        }
+      }
+    });
+  });
+
+  // 3. Verificar Lendários (EXTRAS)
+  const matchExtras = 'legends'.includes(cleanQuery) || 'extras'.includes(cleanQuery) || 'premium'.includes(cleanQuery) || 'lendarios'.includes(cleanQuery) || textQuery === '';
+  if (matchExtras) {
+    const variants = ['ouro', 'prata', 'bronze', 'bordo'];
+    const capVariants = { ouro: 'Ouro', prata: 'Prata', bronze: 'Bronze', bordo: 'Bordo' };
+    
+    legendsData.forEach((legend, idx) => {
+      const matchLegendName = legend.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (textQuery === '' || matchLegendName.includes(textQuery)) {
+        variants.forEach(variant => {
+          const key = `EXTRAS-${idx + 1}-${variant}`;
+          const isOwned = stickers[key]?.owned;
+
+          if (!isOwned) {
+            if (hasNum && (idx + 1) !== searchNum) return;
+
+            if (!groupedSuggestions['EXTRAS']) {
+              groupedSuggestions['EXTRAS'] = {
+                name: 'Premium',
+                code: 'EXTRAS',
+                flag: flagEmojis['EXTRAS'] || '✨',
+                stickers: []
+              };
+            }
+            groupedSuggestions['EXTRAS'].stickers.push({
+              key: key,
+              label: `LEG ${idx + 1}-${capVariants[variant]}`,
+              number: idx + 1
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // 4. Se a busca for "escudos" ou "escudo"
+  const matchEscudos = 'escudos'.includes(cleanQuery) || 'escudo'.includes(cleanQuery);
+  if (matchEscudos) {
+    if (!groupedSuggestions['ESCUDOS']) {
+      groupedSuggestions['ESCUDOS'] = {
+        name: 'Escudos',
+        code: 'ESCUDOS',
+        flag: '🛡️',
+        stickers: [],
+        isSpecialLink: true,
+        hash: '#team-ESCUDOS'
+      };
+    }
+  }
+
+  const list = Object.values(groupedSuggestions);
+
+  if (list.length === 0) {
+    const emptyDiv = document.createElement('div');
+    emptyDiv.className = 'p-3 text-xs text-gray-500 text-center';
+    emptyDiv.textContent = 'Nenhuma correspondência ou figurinha faltante encontrada';
+    suggestionsBox.appendChild(emptyDiv);
+  } else {
+    list.forEach(group => {
+      const itemRow = document.createElement('div');
+      itemRow.className = 'flex items-center justify-between gap-3 p-2.5 hover:bg-[#131735]/40 transition duration-150 border-b border-white/5 w-full';
+
+      // Lado esquerdo: Bandeira + Nome
+      const leftDiv = document.createElement('div');
+      leftDiv.className = 'flex items-center gap-1.5 flex-shrink-0 cursor-pointer text-gray-300 hover:text-white transition duration-150';
+      leftDiv.innerHTML = `
+        <span class="text-sm select-none">${group.flag}</span>
+        <span class="text-xs font-bold tracking-tight">${group.name}</span>
+      `;
+      leftDiv.onclick = () => {
+        suggestionsBox.classList.add('hidden');
+        searchInput.value = '';
+        if (group.isSpecialLink) {
+          location.hash = group.hash;
+        } else {
+          location.hash = `#team-${group.code}`;
+        }
+      };
+      itemRow.appendChild(leftDiv);
+
+      // Lado direito: Figurinhas
+      const rightDiv = document.createElement('div');
+      rightDiv.className = 'flex items-center gap-1.5 overflow-x-auto py-0.5 flex-1 justify-end';
+      rightDiv.style.scrollbarWidth = 'none';
+      rightDiv.style.msOverflowStyle = 'none';
+
+      if (group.isSpecialLink) {
+        const linkBtn = document.createElement('button');
+        linkBtn.className = 'bg-copaGreen/10 hover:bg-copaGreen hover:text-darkBg text-copaGreen border border-copaGreen/30 hover:border-copaGreen text-[10px] font-bold px-2 py-0.5 rounded transition duration-150 flex-shrink-0 cursor-pointer';
+        linkBtn.textContent = 'Ver Escudos';
+        linkBtn.onclick = () => {
+          suggestionsBox.classList.add('hidden');
+          searchInput.value = '';
+          location.hash = group.hash;
+        };
+        rightDiv.appendChild(linkBtn);
+      } else {
+        group.stickers.forEach(st => {
+          const pill = document.createElement('button');
+          pill.className = 'bg-[#1a1e43]/60 hover:bg-copaYellow hover:text-darkBg text-copaYellow border border-copaYellow/30 hover:border-copaYellow text-[10px] font-bold px-2 py-0.5 rounded transition duration-150 flex-shrink-0 cursor-pointer';
+          pill.textContent = `[${st.label}]`;
+          pill.onclick = () => {
+            suggestionsBox.classList.add('hidden');
+            searchInput.value = '';
+
+            const currentHash = location.hash || '#home';
+            if (currentHash === `#team-${group.code}`) {
+              const el = document.getElementById(`card-${st.key}`);
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('pulse-highlight');
+                setTimeout(() => el.classList.remove('pulse-highlight'), 3000);
+              }
+            } else {
+              sessionStorage.setItem('scrollTargetSticker', `card-${st.key}`);
+              location.hash = `#team-${group.code}`;
+            }
+          };
+          rightDiv.appendChild(pill);
+        });
+      }
+
+      itemRow.appendChild(rightDiv);
+      suggestionsBox.appendChild(itemRow);
+    });
+  }
+
+  suggestionsBox.classList.remove('hidden');
+}

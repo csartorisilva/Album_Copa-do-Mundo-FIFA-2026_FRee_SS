@@ -30,6 +30,25 @@
       if (!SUPABASE_URL || !SUPABASE_KEY) {
         throw new Error(`Credenciais do Supabase ausentes ou vazias no supabase_config.js. URL: '${SUPABASE_URL || ""}', Key: '${SUPABASE_KEY ? "configurada (tamanho: " + SUPABASE_KEY.length + ")" : "ausente"}'`);
       }
+
+      // Validação estrita para impedir o uso da service_role key no front-end
+      const jwtRole = (function(token) {
+        try {
+          const parts = token.split('.');
+          if (parts.length === 3) {
+            const payload = parts[1];
+            const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+            const claims = JSON.parse(decoded);
+            return claims.role || null;
+          }
+        } catch (e) {}
+        return null;
+      })(SUPABASE_KEY);
+
+      if (jwtRole === 'service_role') {
+        throw new Error("ERRO DE CONFIGURAÇÃO CRÍTICO: A chave 'service_role' (com privilégios de super-usuário) foi detectada no front-end. Remova-a imediatamente do seu supabase_config.js ou do GitHub Repository Secrets e utilize apenas a chave pública 'anon public'. Isso previne o bypass de confirmação de e-mail e garante a segurança do seu banco de dados.");
+      }
+
       supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
         auth: {
           persistSession: true,
