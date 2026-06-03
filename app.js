@@ -5325,8 +5325,23 @@ function updateHeaderSearchSuggestions(query) {
       // Lado esquerdo: Bandeira + Nome
       const leftDiv = document.createElement('div');
       leftDiv.className = 'flex items-center gap-1.5 flex-shrink-0 cursor-pointer text-gray-300 hover:text-white transition duration-150';
+      
+      let flagHtml = '';
+      if (group.code === 'FWC') {
+        flagHtml = `<span class="text-sm select-none">🏆</span>`;
+      } else if (group.code === 'CC') {
+        flagHtml = `<span class="text-sm select-none">🥤</span>`;
+      } else if (group.code === 'EXTRAS') {
+        flagHtml = `<span class="text-sm select-none">✨</span>`;
+      } else if (group.code === 'ESCUDOS') {
+        flagHtml = `<span class="text-sm select-none">🛡️</span>`;
+      } else {
+        const flagCode = (flagMap[group.code] || 'us').toLowerCase();
+        flagHtml = `<img src="https://flagcdn.com/w40/${flagCode}.png" class="w-5 h-3.5 object-cover border border-white/20 rounded shadow-sm flex-shrink-0" loading="lazy" alt="Bandeira" />`;
+      }
+
       leftDiv.innerHTML = `
-        <span class="text-sm select-none">${group.flag}</span>
+        ${flagHtml}
         <span class="text-xs font-bold tracking-tight">${group.name}</span>
       `;
       leftDiv.onclick = () => {
