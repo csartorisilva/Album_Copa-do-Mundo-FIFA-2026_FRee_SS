@@ -88,43 +88,43 @@ const storage = {
 // Mapeamento de URLs estáveis e públicas de brasões/logos das federações de futebol reais (Wikimedia Commons)
 const crestsMap = {
   USA: './crests/brasão da seleção USA.png',
-  MEX: './crests/brasão da seleção mexico.png',
+  MEX: './crests/brasao_mexico.png',
   CAN: './crests/brasão da seleção canada.png',
   BRA: './crests/brasão da seleção brasil.png',
   COL: './crests/brasão da seleção colombia.webp',
   PAR: './crests/brasão da seleção paraguai.png',
-  ARG: './crests/brasão da seleção argentina.png',
+  ARG: './crests/brasao_argentina.png',
   URU: './crests/brasão da seleção uruguai.webp',
   KSA: './crests/brasão da seleção arabia saudita.png',
-  FRA: './crests/brasão da seleção França.png',
+  FRA: './crests/brasao_franca.png',
   MAR: './crests/brasão da seleção marrocos.png',
   AUT: './crests/brasão da seleção austria.png',
   ESP: './crests/brasão da seleção espanha.png',
   JPN: './crests/brasão da seleção japão.png',
   ECU: './crests/brasão da seleção equador.png',
-  EGY: './crests/brasão da seleção egito.png',
+  EGY: './crests/brasao_egito.png',
   GER: './crests/brasão da seleção alemanha.webp',
-  BEL: './crests/brasão da seleção belgica.jpg',
-  KOR: './crests/brasão seleção iraque.png',
+  BEL: './crests/brasao_belgica.png',
+  KOR: './crests/brasao_kor.png',
   TUN: './crests/brasão da seleção tunisia.png',
   ENG: './crests/brasão da seleção ira.png',
   SEN: './crests/brasão da seleção senegal.png',
   IRN: './crests/brasão da seleção ira.png',
   POR: './crests/brasão da seleção portugual.png',
   GHA: './crests/brasão da seleção gana.png',
-  TUR: './crests/brasão da seleção turquia.png',
+  TUR: './crests/brasao_turquia.png',
   AUS: './crests/brasão da seleção australia.png',
   ALG: './crests/brasão da seleção argelia.png',
   NED: './crests/brasão da seleção holanda.png',
   CRO: './crests/brasão da seleção croacia.png',
   SCO: './crests/brasão da seleção escocia.png',
-  SUI: './crests/brasão da seleção suiça.png',
-  PAN: './crests/brasão da seleção panama.png',
+  SUI: './crests/brasao_suica.png',
+  PAN: './crests/brasao_panama.png',
   SWE: './crests/brasão da seleção suecia.png',
-  NZL: './crests/brasão da seleção nova zelandia.png',
-  RSA: './crests/brasão da seleção iraque.png',
-  CZE: './crests/brasão seleção iraque.png',
-  BIH: './crests/brasão da seleção bosnia.jpg',
+  NZL: './crests/brasao_nova_zelandia.png',
+  RSA: './crests/brasao_rsa.png',
+  CZE: './crests/brasao_cze.png',
+  BIH: './crests/brasao_bosnia.png',
   QAT: './crests/brasão da seleção Catar.png',
   HAI: './crests/brasão da seleção haiti.png',
   CUW: './crests/brasão da seleção curaçao.png',
@@ -136,8 +136,8 @@ const crestsMap = {
   CC: './crests/Logo CocaZero Copa.png',
   // Enriquecidos com Wikimedia Commons estáveis
   JOR: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Jordan_Football_Association_logo.svg/120px-Jordan_Football_Association_logo.svg.png',
-  COD: './crests/brasão da seleção congo.jpg',
-  UZB: './crests/brasão da seleção usbequistao.jpg',
+  COD: './crests/brasao_congo.png',
+  UZB: './crests/brasao_usbequistao.png',
   EXTRAS: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/120px-Golden_Ball.svg.png'
 };
 
@@ -1065,7 +1065,18 @@ function renderHeader() {
           renderHeader();
         }
       };
-      headerContainer.insertBefore(installBtn, authBtn);
+      if (headerContainer && authBtn && authBtn.parentNode === headerContainer) {
+        try {
+          headerContainer.insertBefore(installBtn, authBtn);
+        } catch (e) {
+          console.warn("Falha ao usar insertBefore para o botão PWA:", e);
+          try {
+            headerContainer.appendChild(installBtn);
+          } catch (err) {
+            console.error("Falha ao adicionar o botão PWA:", err);
+          }
+        }
+      }
     }
   }
 }
