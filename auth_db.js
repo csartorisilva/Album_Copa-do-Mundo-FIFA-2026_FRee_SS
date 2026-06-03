@@ -314,6 +314,19 @@
         throw signUpError;
       }
 
+      // Se o cadastro foi realizado com sucesso mas a sessão não foi iniciada automaticamente (ex: e-mail pendente), tenta forçar o login automático imediato
+      if (signUpData && !signUpData.session) {
+        try {
+          console.log("Cadastro bem-sucedido. Tentando login automático imediato...");
+          const { data: signInData, error: signInAfterSignUpError } = await supabaseClient.auth.signInWithPassword({ email, password });
+          if (!signInAfterSignUpError && signInData && signInData.session) {
+            return { action: 'register', data: signInData };
+          }
+        } catch (e) {
+          console.warn("Falha no login automático pós-cadastro:", e);
+        }
+      }
+
       return { action: 'register', data: signUpData };
     },
 

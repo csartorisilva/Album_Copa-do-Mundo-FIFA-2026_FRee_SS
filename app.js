@@ -1377,8 +1377,27 @@ function renderLogin(container) {
     birthdateLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
     birthdateLabel.textContent = 'Data de Nascimento (Exclusiva para novos cadastros)';
     const birthdateInput = document.createElement('input');
-    birthdateInput.type = 'date';
+    birthdateInput.type = 'tel';
+    birthdateInput.placeholder = 'DD/MM/AAAA';
+    birthdateInput.maxLength = 10;
     birthdateInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    
+    birthdateInput.oninput = (e) => {
+      let val = e.target.value.replace(/\D/g, '');
+      if (val.length > 8) val = val.substring(0, 8);
+      let formatted = '';
+      if (val.length > 0) {
+        formatted += val.substring(0, 2);
+      }
+      if (val.length > 2) {
+        formatted += '/' + val.substring(2, 4);
+      }
+      if (val.length > 4) {
+        formatted += '/' + val.substring(4, 8);
+      }
+      e.target.value = formatted;
+    };
+
     birthdateGroup.appendChild(birthdateLabel);
     birthdateGroup.appendChild(birthdateInput);
     form.appendChild(birthdateGroup);
@@ -1426,7 +1445,24 @@ function renderLogin(container) {
     const calculateAge = (birthdateStr) => {
       if (!birthdateStr) return 0;
       const today = new Date();
-      const birthDate = new Date(birthdateStr);
+      
+      let birthDate = null;
+      if (birthdateStr.includes('/')) {
+        const parts = birthdateStr.split('/');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const year = parseInt(parts[2], 10);
+          if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+            birthDate = new Date(year, month, day);
+          }
+        }
+      } else {
+        birthDate = new Date(birthdateStr);
+      }
+
+      if (!birthDate || isNaN(birthDate.getTime())) return 0;
+
       let age = today.getFullYear() - birthDate.getFullYear();
       const m = today.getMonth() - birthDate.getMonth();
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
@@ -1483,13 +1519,42 @@ function renderLogin(container) {
       const birthdate = birthdateInput.value;
  
       if (!email || !password) return;
+
+      // Validação e conversão de Data de Nascimento para o formato do Supabase (YYYY-MM-DD)
+      let birthdateYYYYMMDD = "";
+      if (username) {
+        if (!birthdate || birthdate.length < 10) {
+          showFeedback("Por favor, preencha a data de nascimento completa no formato DD/MM/AAAA.", 'error');
+          return;
+        }
+
+        const parts = birthdate.split('/');
+        if (parts.length !== 3) {
+          showFeedback("Data de nascimento inválida. Use o formato DD/MM/AAAA.", 'error');
+          return;
+        }
+
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        const dateObj = new Date(year, month, day);
+
+        if (isNaN(dateObj.getTime()) || dateObj.getFullYear() !== year || dateObj.getMonth() !== month || dateObj.getDate() !== day) {
+          showFeedback("Por favor, insira uma data de nascimento válida.", 'error');
+          return;
+        }
+
+        const strDay = parts[0].padStart(2, '0');
+        const strMonth = parts[1].padStart(2, '0');
+        birthdateYYYYMMDD = `${year}-${strMonth}-${strDay}`;
+      }
  
       try {
         btnSubmit.disabled = true;
         btnSubmit.textContent = 'PROCESSANDO...';
         feedbackMsg.className = 'text-xs text-center font-semibold mt-3 hidden';
  
-        const result = await authDb.loginOrRegister(email, password, username, birthdate);
+        const result = await authDb.loginOrRegister(email, password, username, birthdateYYYYMMDD);
         
         if (result.action === 'register') {
           const age = calculateAge(birthdate);
