@@ -13,12 +13,16 @@ create table if not exists public.profiles (
   name text not null,
   photo_url text,
   username text unique, -- Nome de usuário único
+  email text,           -- E-mail para busca via username no login
   birthdate date,       -- Data de nascimento para regras de menores
   latitude double precision,
   longitude double precision,
   stickers jsonb default '{}'::jsonb,
   last_seen timestamp with time zone default now()
 );
+
+-- Adiciona a coluna se a tabela já existir no Supabase
+alter table public.profiles add column if not exists email text;
 
 -- =========================================================================
 -- 2. HABILITAR SEGURANÇA EM NÍVEL DE LINHA (RLS)
@@ -63,12 +67,13 @@ create policy "Usuários podem criar apenas seu próprio perfil"
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (uid, name, photo_url, username, birthdate, stickers)
+  insert into public.profiles (uid, name, photo_url, username, email, birthdate, stickers)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'username', new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'Colecionador'),
     coalesce(new.raw_user_meta_data->>'avatar_url', ''),
     new.raw_user_meta_data->>'username',
+    new.email,
     cast(new.raw_user_meta_data->>'birthdate' as date),
     '{}'::jsonb
   );

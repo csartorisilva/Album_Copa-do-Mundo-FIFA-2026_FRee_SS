@@ -83,6 +83,7 @@
                 name: displayName,
                 photo_url: user.user_metadata.avatar_url || "",
                 username: user.user_metadata.username || "",
+                email: user.email,
                 birthdate: userBirthdate || null,
                 latitude: latitude,
                 longitude: longitude,
@@ -207,8 +208,29 @@
         throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
       }
 
+      let finalEmail = email;
+      if (email && !email.includes('@')) {
+        try {
+          const { data: profile, error: queryError } = await supabaseClient
+            .from('profiles')
+            .select('email')
+            .eq('username', email)
+            .maybeSingle();
+            
+          if (queryError) throw queryError;
+          if (profile && profile.email) {
+            finalEmail = profile.email;
+          } else {
+            throw new Error(`Nome de usuário '${email}' não encontrado.`);
+          }
+        } catch (err) {
+          console.error("Erro ao buscar e-mail pelo username:", err);
+          throw new Error("Nome de usuário não encontrado ou erro de conexão.");
+        }
+      }
+
       // 1. Tenta fazer login primeiro de forma limpa e sequencial
-      const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({ email, password });
+      const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({ email: finalEmail, password });
       
       // Se o login foi bem-sucedido e retornou sessão, finaliza aqui
       if (!signInError && data && data.session) {
@@ -318,12 +340,15 @@
       if (signUpData && !signUpData.session) {
         try {
           console.log("Cadastro bem-sucedido. Tentando login automático imediato...");
-          const { data: signInData, error: signInAfterSignUpError } = await supabaseClient.auth.signInWithPassword({ email, password });
+          const { data: signInData, error: signInAfterSignUpError } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
           if (!signInAfterSignUpError && signInData && signInData.session) {
             return { action: 'register', data: signInData };
+          } else if (signInAfterSignUpError) {
+            throw signInAfterSignUpError;
           }
         } catch (e) {
-          console.warn("Falha no login automático pós-cadastro:", e);
+          console.error("Falha no login automático pós-cadastro:", e);
+          throw new Error("Cadastro concluído com sucesso, mas o login automático falhou: " + (e.message || e));
         }
       }
 

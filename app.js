@@ -133,7 +133,7 @@ const crestsMap = {
   IRQ: './crests/brasão da seleção iraque.png',
   NOR: './crests/brasão da seleção noruegua.png',
   FWC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png',
-  CC: './crests/Logo CocaZero Copa.png',
+  CC: './crests/Logo CocaZero Copa1.png',
   // Enriquecidos com Wikimedia Commons estáveis
   JOR: './crests/brasao_jordania.png',
   COD: './crests/brasao_congo.png',
@@ -1311,136 +1311,245 @@ function renderLogin(container) {
 
     wrapper.appendChild(actionGrid);
   } else {
+    // Logo do App centralizado na tela inicial de login (Estado Fechado)
+    const logoImg = document.createElement('img');
+    logoImg.src = './logo2026.png';
+    logoImg.className = 'h-24 w-auto object-contain mx-auto mb-8 filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] animate-pulse';
+    logoImg.alt = 'Logo FIFA 2026';
+    wrapper.appendChild(logoImg);
+
+    // Container do Acordeão
+    const accordionContainer = document.createElement('div');
+    accordionContainer.className = 'flex flex-col gap-4 mb-5';
+
+    // ----------------- ACORDEÃO 1: JÁ TENHO CONTA -----------------
+    const btnToggleLogin = document.createElement('button');
+    btnToggleLogin.id = 'btnToggleLogin';
+    btnToggleLogin.className = 'w-full py-4 px-5 rounded-xl bg-gradient-to-r from-copaBlue to-blue-700 hover:from-blue-600 hover:to-blue-500 text-white font-black text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-between shadow-lg shadow-blue-500/10 cursor-pointer';
+    btnToggleLogin.innerHTML = `
+      <span>JÁ TENHO CONTA</span>
+      <svg id="arrowLogin" class="w-4 h-4 transform transition-transform duration-300 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+      </svg>
+    `;
+
+    const accordionLogin = document.createElement('div');
+    accordionLogin.id = 'accordionLogin';
+    accordionLogin.className = 'max-h-0 opacity-0 overflow-hidden transition-all duration-500 ease-in-out px-1';
+
     // Formulário de Login
-    const title = document.createElement('h2');
-    title.className = 'text-2xl font-black text-center mb-1 uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400';
-    title.textContent = 'Acessar Coleções';
-    wrapper.appendChild(title);
- 
-    const sub = document.createElement('p');
-    sub.className = 'text-center text-xs text-gray-400 mb-6';
-    sub.textContent = 'Digite seu e-mail e senha para entrar. Para novas contas, preencha também o Nome de Usuário e a Data de Nascimento.';
-    wrapper.appendChild(sub);
- 
-    // Formulário Unificado
-    const form = document.createElement('form');
-    form.className = 'flex flex-col gap-4 mb-5';
- 
-    // 1. Campo E-mail
-    const emailGroup = document.createElement('div');
-    emailGroup.className = 'flex flex-col gap-1.5';
-    const emailLabel = document.createElement('label');
-    emailLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
-    emailLabel.textContent = 'E-mail';
-    const emailInput = document.createElement('input');
-    emailInput.type = 'email';
-    emailInput.placeholder = 'exemplo@email.com';
-    emailInput.required = true;
-    emailInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
-    emailGroup.appendChild(emailLabel);
-    emailGroup.appendChild(emailInput);
-    form.appendChild(emailGroup);
- 
-    // 2. Campo Senha
-    const passwordGroup = document.createElement('div');
-    passwordGroup.className = 'flex flex-col gap-1.5';
-    const passwordLabel = document.createElement('label');
-    passwordLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
-    passwordLabel.textContent = 'Senha';
-    const passwordInput = document.createElement('input');
-    passwordInput.type = 'password';
-    passwordInput.placeholder = 'Sua senha';
-    passwordInput.required = true;
-    passwordInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
-    passwordGroup.appendChild(passwordLabel);
-    passwordGroup.appendChild(passwordInput);
-    form.appendChild(passwordGroup);
- 
-    // 3. Campo Nome de Usuário (Username)
-    const usernameGroup = document.createElement('div');
-    usernameGroup.className = 'flex flex-col gap-1.5';
-    const usernameLabel = document.createElement('label');
-    usernameLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
-    usernameLabel.textContent = 'Nome de Usuário (Exclusivo para novos cadastros)';
-    const usernameInput = document.createElement('input');
-    usernameInput.type = 'text';
-    usernameInput.placeholder = 'ex: colecionador_hexa';
-    usernameInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
-    usernameGroup.appendChild(usernameLabel);
-    usernameGroup.appendChild(usernameInput);
-    form.appendChild(usernameGroup);
- 
-    // 4. Campo Data de Nascimento
-    const birthdateGroup = document.createElement('div');
-    birthdateGroup.className = 'flex flex-col gap-1.5';
-    const birthdateLabel = document.createElement('label');
-    birthdateLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
-    birthdateLabel.textContent = 'Data de Nascimento (Exclusiva para novos cadastros)';
-    const birthdateInput = document.createElement('input');
-    birthdateInput.type = 'tel';
-    birthdateInput.placeholder = 'DD/MM/AAAA';
-    birthdateInput.maxLength = 10;
-    birthdateInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    const formLogin = document.createElement('form');
+    formLogin.className = 'flex flex-col gap-4';
+
+    const loginUserGroup = document.createElement('div');
+    loginUserGroup.className = 'flex flex-col gap-1.5';
+    const loginUserLabel = document.createElement('label');
+    loginUserLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
+    loginUserLabel.textContent = 'E-mail ou Nome de Usuário';
+    const loginUserInput = document.createElement('input');
+    loginUserInput.type = 'text';
+    loginUserInput.placeholder = 'seu_usuario ou exemplo@email.com';
+    loginUserInput.required = true;
+    loginUserInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    loginUserGroup.appendChild(loginUserLabel);
+    loginUserGroup.appendChild(loginUserInput);
+    formLogin.appendChild(loginUserGroup);
+
+    const loginPasswordGroup = document.createElement('div');
+    loginPasswordGroup.className = 'flex flex-col gap-1.5';
+    const loginPasswordLabel = document.createElement('label');
+    loginPasswordLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
+    loginPasswordLabel.textContent = 'Senha';
+    const loginPasswordInput = document.createElement('input');
+    loginPasswordInput.type = 'password';
+    loginPasswordInput.placeholder = 'Sua senha';
+    loginPasswordInput.required = true;
+    loginPasswordInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    loginPasswordGroup.appendChild(loginPasswordLabel);
+    loginPasswordGroup.appendChild(loginPasswordInput);
+    formLogin.appendChild(loginPasswordGroup);
+
+    const btnLoginSubmit = document.createElement('button');
+    btnLoginSubmit.type = 'submit';
+    btnLoginSubmit.className = 'w-full py-3.5 rounded-xl bg-gradient-to-r from-copaBlue to-blue-700 hover:from-blue-600 hover:to-blue-500 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-blue-500/10 transition duration-200 flex items-center justify-center gap-2 mt-2 cursor-pointer';
+    btnLoginSubmit.textContent = 'ENTRAR';
+    formLogin.appendChild(btnLoginSubmit);
+
+    const feedbackMsgLogin = document.createElement('div');
+    feedbackMsgLogin.className = 'text-xs text-center font-semibold mt-3 hidden';
+    formLogin.appendChild(feedbackMsgLogin);
+
+    accordionLogin.appendChild(formLogin);
+
+    // ----------------- ACORDEÃO 2: CRIAR CONTA -----------------
+    const btnToggleRegister = document.createElement('button');
+    btnToggleRegister.id = 'btnToggleRegister';
+    btnToggleRegister.className = 'w-full py-4 px-5 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-darkBg font-black text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-between shadow-lg shadow-copaYellow/10 cursor-pointer';
+    btnToggleRegister.innerHTML = `
+      <span>CRIAR CONTA</span>
+      <svg id="arrowRegister" class="w-4 h-4 transform transition-transform duration-300 text-darkBg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+      </svg>
+    `;
+
+    const accordionRegister = document.createElement('div');
+    accordionRegister.id = 'accordionRegister';
+    accordionRegister.className = 'max-h-0 opacity-0 overflow-hidden transition-all duration-500 ease-in-out px-1';
+
+    // Formulário de Cadastro
+    const formRegister = document.createElement('form');
+    formRegister.className = 'flex flex-col gap-4';
+
+    const regEmailGroup = document.createElement('div');
+    regEmailGroup.className = 'flex flex-col gap-1.5';
+    const regEmailLabel = document.createElement('label');
+    regEmailLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
+    regEmailLabel.textContent = 'E-mail';
+    const regEmailInput = document.createElement('input');
+    regEmailInput.type = 'email';
+    regEmailInput.placeholder = 'exemplo@email.com';
+    regEmailInput.required = true;
+    regEmailInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    regEmailGroup.appendChild(regEmailLabel);
+    regEmailGroup.appendChild(regEmailInput);
+    formRegister.appendChild(regEmailGroup);
+
+    const regPasswordGroup = document.createElement('div');
+    regPasswordGroup.className = 'flex flex-col gap-1.5';
+    const regPasswordLabel = document.createElement('label');
+    regPasswordLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
+    regPasswordLabel.textContent = 'Senha';
+    const regPasswordInput = document.createElement('input');
+    regPasswordInput.type = 'password';
+    regPasswordInput.placeholder = 'Sua senha';
+    regPasswordInput.required = true;
+    regPasswordInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    regPasswordGroup.appendChild(regPasswordLabel);
+    regPasswordGroup.appendChild(regPasswordInput);
+    formRegister.appendChild(regPasswordGroup);
+
+    const regUserGroup = document.createElement('div');
+    regUserGroup.className = 'flex flex-col gap-1.5';
+    const regUserLabel = document.createElement('label');
+    regUserLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
+    regUserLabel.textContent = 'Nome de Usuário';
+    const regUserInput = document.createElement('input');
+    regUserInput.type = 'text';
+    regUserInput.placeholder = 'ex: colecionador_hexa';
+    regUserInput.required = true;
+    regUserInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    regUserGroup.appendChild(regUserLabel);
+    regUserGroup.appendChild(regUserInput);
+    formRegister.appendChild(regUserGroup);
+
+    const regBirthdateGroup = document.createElement('div');
+    regBirthdateGroup.className = 'flex flex-col gap-1.5';
+    const regBirthdateLabel = document.createElement('label');
+    regBirthdateLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
+    regBirthdateLabel.textContent = 'Data de Nascimento';
+    const regBirthdateInput = document.createElement('input');
+    regBirthdateInput.type = 'tel';
+    regBirthdateInput.placeholder = 'DD/MM/AAAA';
+    regBirthdateInput.maxLength = 10;
+    regBirthdateInput.required = true;
+    regBirthdateInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
     
-    birthdateInput.oninput = (e) => {
+    regBirthdateInput.oninput = (e) => {
       let val = e.target.value.replace(/\D/g, '');
       if (val.length > 8) val = val.substring(0, 8);
       let formatted = '';
-      if (val.length > 0) {
-        formatted += val.substring(0, 2);
-      }
-      if (val.length > 2) {
-        formatted += '/' + val.substring(2, 4);
-      }
-      if (val.length > 4) {
-        formatted += '/' + val.substring(4, 8);
-      }
+      if (val.length > 0) formatted += val.substring(0, 2);
+      if (val.length > 2) formatted += '/' + val.substring(2, 4);
+      if (val.length > 4) formatted += '/' + val.substring(4, 8);
       e.target.value = formatted;
     };
+    regBirthdateGroup.appendChild(regBirthdateLabel);
+    regBirthdateGroup.appendChild(regBirthdateInput);
+    formRegister.appendChild(regBirthdateGroup);
 
-    birthdateGroup.appendChild(birthdateLabel);
-    birthdateGroup.appendChild(birthdateInput);
-    form.appendChild(birthdateGroup);
- 
-    // 5. Caixa de Consentimento (LGPD)
     const consentGroup = document.createElement('label');
     consentGroup.className = 'flex items-start gap-2.5 cursor-pointer mt-1 mb-2 select-none text-left';
-    
     const consentCheckbox = document.createElement('input');
     consentCheckbox.type = 'checkbox';
     consentCheckbox.className = 'mt-0.5 rounded border-white/10 bg-white/5 text-copaYellow focus:ring-0 focus:ring-offset-0 focus:border-copaYellow/50 transition duration-200 h-4 w-4 accent-copaYellow';
-    
     const consentText = document.createElement('span');
     consentText.className = 'text-[11px] text-gray-400 leading-normal font-medium';
-    consentText.textContent = 'Estou de acordo com o uso do aplicativo e nenhum prejuiço será repassado ao desenvolvedor.';
-    
+    consentText.textContent = 'Estou de acordo com o uso do aplicativo e nenhum prejuízo será repassado ao desenvolvedor.';
     consentGroup.appendChild(consentCheckbox);
     consentGroup.appendChild(consentText);
-    form.appendChild(consentGroup);
+    formRegister.appendChild(consentGroup);
 
-    // Botão de Ação Unificado: "Entrar / Criar Conta"
-    const btnSubmit = document.createElement('button');
-    btnSubmit.type = 'submit';
-    btnSubmit.className = 'w-full py-3.5 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-darkBg font-black text-xs uppercase tracking-wider shadow-lg shadow-copaYellow/10 hover:shadow-copaYellow/25 transition duration-200 flex items-center justify-center gap-2 mt-2';
-    btnSubmit.textContent = 'Entrar / Criar Conta';
-    form.appendChild(btnSubmit);
- 
-    // Elemento para mensagens de feedback (erro / sucesso)
-    const feedbackMsg = document.createElement('div');
-    feedbackMsg.className = 'text-xs text-center font-semibold mt-3 hidden';
-    form.appendChild(feedbackMsg);
+    const btnRegisterSubmit = document.createElement('button');
+    btnRegisterSubmit.type = 'submit';
+    btnRegisterSubmit.className = 'w-full py-3.5 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-darkBg font-black text-xs uppercase tracking-wider shadow-lg shadow-copaYellow/10 hover:shadow-copaYellow/25 transition duration-200 flex items-center justify-center gap-2 mt-2 cursor-pointer';
+    btnRegisterSubmit.textContent = 'FINALIZAR CADASTRO';
+    formRegister.appendChild(btnRegisterSubmit);
 
-    const showFeedback = (message, type = 'error') => {
-      feedbackMsg.textContent = message;
-      feedbackMsg.className = `text-xs text-center font-semibold mt-3 p-3 rounded-xl animate-fade-in block ${
+    const feedbackMsgRegister = document.createElement('div');
+    feedbackMsgRegister.className = 'text-xs text-center font-semibold mt-3 hidden';
+    formRegister.appendChild(feedbackMsgRegister);
+
+    accordionRegister.appendChild(formRegister);
+
+    // Injeta tudo no container principal do acordeão
+    accordionContainer.appendChild(btnToggleLogin);
+    accordionContainer.appendChild(accordionLogin);
+    accordionContainer.appendChild(btnToggleRegister);
+    accordionContainer.appendChild(accordionRegister);
+    wrapper.appendChild(accordionContainer);
+
+    // Lógica das funções de feedback
+    const showFeedback = (message, type = 'error', targetElement) => {
+      if (!message) {
+        targetElement.classList.add('hidden');
+        return;
+      }
+      targetElement.textContent = message;
+      targetElement.className = `text-xs text-center font-semibold mt-3 p-3 rounded-xl animate-fade-in block ${
         type === 'error' 
           ? 'bg-red-500/10 border border-red-500/20 text-red-400' 
           : 'bg-green-500/10 border border-green-500/20 text-green-400'
       }`;
     };
- 
-    wrapper.appendChild(form);
- 
+
+    // Acordeão behavior
+    const arrowLogin = btnToggleLogin.querySelector('#arrowLogin');
+    const arrowRegister = btnToggleRegister.querySelector('#arrowRegister');
+
+    const openAccordion = (accordion, arrow) => {
+      accordion.style.maxHeight = (accordion.scrollHeight + 40) + "px"; // scrollHeight + buffer
+      accordion.style.opacity = "1";
+      accordion.style.marginTop = "1rem";
+      accordion.style.marginBottom = "1rem";
+      arrow.style.transform = "rotate(180deg)";
+    };
+
+    const closeAccordion = (accordion, arrow) => {
+      accordion.style.maxHeight = "0";
+      accordion.style.opacity = "0";
+      accordion.style.marginTop = "0";
+      accordion.style.marginBottom = "0";
+      arrow.style.transform = "rotate(0deg)";
+    };
+
+    btnToggleLogin.onclick = () => {
+      if (accordionLogin.style.maxHeight && accordionLogin.style.maxHeight !== "0px") {
+        closeAccordion(accordionLogin, arrowLogin);
+      } else {
+        openAccordion(accordionLogin, arrowLogin);
+        closeAccordion(accordionRegister, arrowRegister);
+      }
+    };
+
+    btnToggleRegister.onclick = () => {
+      if (accordionRegister.style.maxHeight && accordionRegister.style.maxHeight !== "0px") {
+        closeAccordion(accordionRegister, arrowRegister);
+      } else {
+        openAccordion(accordionRegister, arrowRegister);
+        closeAccordion(accordionLogin, arrowLogin);
+      }
+    };
+
     // Funções auxiliares para validação de idade e modal de menor de idade
     const calculateAge = (birthdateStr) => {
       if (!birthdateStr) return 0;
@@ -1504,55 +1613,81 @@ function renderLogin(container) {
       document.body.appendChild(modalOverlay);
     };
 
-    // Submissão do formulário
-    form.onsubmit = async (e) => {
+    // Submissão Login
+    formLogin.onsubmit = async (e) => {
+      e.preventDefault();
+      const emailOrUser = loginUserInput.value.trim();
+      const password = loginPasswordInput.value;
+      if (!emailOrUser || !password) return;
+
+      try {
+        btnLoginSubmit.disabled = true;
+        btnLoginSubmit.textContent = 'PROCESSANDO...';
+        showFeedback("", 'success', feedbackMsgLogin);
+ 
+        const result = await authDb.loginOrRegister(emailOrUser, password);
+        
+        if (result.action === 'login') {
+          showFeedback("Login realizado com sucesso!", 'success', feedbackMsgLogin);
+          setTimeout(() => { location.hash = '#home'; }, 1000);
+        } else {
+          showFeedback("Conta acessada com sucesso!", 'success', feedbackMsgLogin);
+          setTimeout(() => { location.hash = '#home'; }, 1000);
+        }
+      } catch (err) {
+        console.error("Erro na autenticação:", err);
+        showFeedback("Erro na autenticação: " + (err.message || err), 'error', feedbackMsgLogin);
+      } finally {
+        btnLoginSubmit.disabled = false;
+        btnLoginSubmit.textContent = 'ENTRAR';
+      }
+    };
+
+    // Submissão Cadastro
+    formRegister.onsubmit = async (e) => {
       e.preventDefault();
 
       if (!consentCheckbox.checked) {
-        showFeedback("Você precisa aceitar os termos de proteção de dados para continuar.", 'error');
+        showFeedback("Você precisa aceitar os termos de proteção de dados para continuar.", 'error', feedbackMsgRegister);
         return;
       }
 
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-      const username = usernameInput.value.trim();
-      const birthdate = birthdateInput.value;
+      const email = regEmailInput.value.trim();
+      const password = regPasswordInput.value;
+      const username = regUserInput.value.trim();
+      const birthdate = regBirthdateInput.value;
  
-      if (!email || !password) return;
+      if (!email || !password || !username || !birthdate) return;
 
-      // Validação e conversão de Data de Nascimento para o formato do Supabase (YYYY-MM-DD)
-      let birthdateYYYYMMDD = "";
-      if (username) {
-        if (!birthdate || birthdate.length < 10) {
-          showFeedback("Por favor, preencha a data de nascimento completa no formato DD/MM/AAAA.", 'error');
-          return;
-        }
-
-        const parts = birthdate.split('/');
-        if (parts.length !== 3) {
-          showFeedback("Data de nascimento inválida. Use o formato DD/MM/AAAA.", 'error');
-          return;
-        }
-
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10) - 1;
-        const year = parseInt(parts[2], 10);
-        const dateObj = new Date(year, month, day);
-
-        if (isNaN(dateObj.getTime()) || dateObj.getFullYear() !== year || dateObj.getMonth() !== month || dateObj.getDate() !== day) {
-          showFeedback("Por favor, insira uma data de nascimento válida.", 'error');
-          return;
-        }
-
-        const strDay = parts[0].padStart(2, '0');
-        const strMonth = parts[1].padStart(2, '0');
-        birthdateYYYYMMDD = `${year}-${strMonth}-${strDay}`;
+      if (birthdate.length < 10) {
+        showFeedback("Por favor, preencha a data de nascimento completa no formato DD/MM/AAAA.", 'error', feedbackMsgRegister);
+        return;
       }
+
+      const parts = birthdate.split('/');
+      if (parts.length !== 3) {
+        showFeedback("Data de nascimento inválida. Use o formato DD/MM/AAAA.", 'error', feedbackMsgRegister);
+        return;
+      }
+
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+      const dateObj = new Date(year, month, day);
+
+      if (isNaN(dateObj.getTime()) || dateObj.getFullYear() !== year || dateObj.getMonth() !== month || dateObj.getDate() !== day) {
+        showFeedback("Por favor, insira uma data de nascimento válida.", 'error', feedbackMsgRegister);
+        return;
+      }
+
+      const strDay = parts[0].padStart(2, '0');
+      const strMonth = parts[1].padStart(2, '0');
+      const birthdateYYYYMMDD = `${year}-${strMonth}-${strDay}`;
  
       try {
-        btnSubmit.disabled = true;
-        btnSubmit.textContent = 'PROCESSANDO...';
-        feedbackMsg.className = 'text-xs text-center font-semibold mt-3 hidden';
+        btnRegisterSubmit.disabled = true;
+        btnRegisterSubmit.textContent = 'PROCESSANDO...';
+        showFeedback("", 'success', feedbackMsgRegister);
  
         const result = await authDb.loginOrRegister(email, password, username, birthdateYYYYMMDD);
         
@@ -1560,40 +1695,29 @@ function renderLogin(container) {
           const age = calculateAge(birthdate);
           if (age < 18) {
             showMinorAlertModal(() => {
-              if (result.data && !result.data.session) {
-                showFeedback("Cadastro realizado! Por favor, verifique seu e-mail para confirmar a conta.", 'success');
-              } else {
-                showFeedback("Conta criada e autenticada com sucesso!", 'success');
-                setTimeout(() => { location.hash = '#home'; }, 1500);
-              }
+              showFeedback("Conta criada e autenticada com sucesso!", 'success', feedbackMsgRegister);
+              setTimeout(() => { location.hash = '#home'; }, 1500);
             });
           } else {
-            if (result.data && !result.data.session) {
-              showFeedback("Cadastro realizado! Por favor, verifique seu e-mail para confirmar a conta.", 'success');
-            } else {
-              showFeedback("Conta criada e autenticada com sucesso!", 'success');
-              setTimeout(() => { location.hash = '#home'; }, 1500);
-            }
+            showFeedback("Conta criada e autenticada com sucesso!", 'success', feedbackMsgRegister);
+            setTimeout(() => { location.hash = '#home'; }, 1500);
           }
-        } else if (result.action === 'login') {
-          showFeedback("Login realizado com sucesso!", 'success');
-          setTimeout(() => { location.hash = '#home'; }, 1000);
         }
       } catch (err) {
-        console.error("Erro na autenticação:", err);
-        showFeedback("Erro na autenticação: " + (err.message || err), 'error');
+        console.error("Erro no cadastro:", err);
+        showFeedback("Erro no cadastro: " + (err.message || err), 'error', feedbackMsgRegister);
       } finally {
-        btnSubmit.disabled = false;
-        btnSubmit.textContent = 'Entrar / Criar Conta';
+        btnRegisterSubmit.disabled = false;
+        btnRegisterSubmit.textContent = 'FINALIZAR CADASTRO';
       }
     };
- 
+
     const grid = document.createElement('div');
     grid.className = 'flex flex-col gap-3';
  
     // Botão Fazer Depois (Pular / Ir para o Álbum)
     const btnLater = document.createElement('button');
-    btnLater.className = 'w-full py-3.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaYellow/40 transition duration-200 mt-2 flex flex-col items-center justify-center gap-1 skip-login-btn group';
+    btnLater.className = 'w-full py-3.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaYellow/40 transition duration-200 mt-2 flex flex-col items-center justify-center gap-1 skip-login-btn group cursor-pointer';
     btnLater.innerHTML = `
       <div class="flex items-center gap-1.5 text-gray-500 group-hover:text-gray-300 font-bold text-xs transition duration-200">
         <svg class="w-3.5 h-3.5 text-copaYellow animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -2019,7 +2143,7 @@ function renderHome(container) {
       code: 'CC',
       limit: 14,
       prog: ccProg,
-      logo: './crests/Logo CocaZero Copa.png',
+      logo: './crests/Logo CocaZero Copa1.png',
       grayscale: false
     },
     {
@@ -2533,7 +2657,7 @@ function renderTeamPage(code, container) {
     crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
     crest.className = 'w-10 h-10 object-contain rounded bg-white/5 p-1 border border-white/10';
   } else if (code === 'CC') {
-    crest.src = './crests/Logo CocaZero Copa.png';
+    crest.src = './crests/Logo CocaZero Copa1.png';
     crest.className = 'w-10 h-10 object-contain rounded bg-white/5 p-1 border border-white/10';
   } else if (code === 'EXTRAS') {
     crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/100px-Golden_Ball.svg.png';
@@ -2886,7 +3010,7 @@ function renderTeamPage(code, container) {
         miniCrest.className = 'w-5 h-5 object-contain bg-white/10 p-0.5 rounded border border-white/20';
       } else if (code === 'CC') {
         // Logo da coca-cola ao invés de bandeira
-        miniCrest.src = './crests/Logo CocaZero Copa.png';
+        miniCrest.src = './crests/Logo CocaZero Copa1.png';
         miniCrest.className = 'w-5 h-5 object-contain bg-white/10 p-0.5 rounded border border-white/20';
       } else {
         const flagCode = (flagMap[code] || 'us').toLowerCase();
