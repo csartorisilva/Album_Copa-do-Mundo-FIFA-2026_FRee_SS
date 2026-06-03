@@ -1206,8 +1206,115 @@ function renderLogin(container) {
 
     const sub = document.createElement('p');
     sub.className = 'text-center text-xs text-gray-400 mb-6';
-    sub.textContent = 'Faça login com a sua conta Google para sincronizar seu álbum na nuvem e buscar trocas';
+    sub.textContent = 'Acesse com e-mail/senha ou sua conta Google para sincronizar na nuvem e buscar trocas';
     wrapper.appendChild(sub);
+
+    // Toggle de Abas: Entrar vs Criar Conta
+    let isSignUpMode = false;
+
+    const toggleContainer = document.createElement('div');
+    toggleContainer.className = 'flex border-b border-white/10 mb-4 text-xs font-bold text-center';
+    
+    const tabLogin = document.createElement('button');
+    tabLogin.className = 'flex-1 py-2.5 text-copaYellow border-b-2 border-copaYellow transition';
+    tabLogin.textContent = 'Entrar';
+    
+    const tabRegister = document.createElement('button');
+    tabRegister.className = 'flex-1 py-2.5 text-gray-400 hover:text-white transition border-b-2 border-transparent';
+    tabRegister.textContent = 'Criar Conta';
+
+    toggleContainer.appendChild(tabLogin);
+    toggleContainer.appendChild(tabRegister);
+    wrapper.appendChild(toggleContainer);
+
+    // Formulário de E-mail e Senha
+    const form = document.createElement('form');
+    form.className = 'flex flex-col gap-3.5 mb-5';
+
+    const emailInput = document.createElement('input');
+    emailInput.type = 'email';
+    emailInput.placeholder = 'Seu e-mail';
+    emailInput.required = true;
+    emailInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    form.appendChild(emailInput);
+    
+    const passwordInput = document.createElement('input');
+    passwordInput.type = 'password';
+    passwordInput.placeholder = 'Sua senha';
+    passwordInput.required = true;
+    passwordInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    form.appendChild(passwordInput);
+
+    const btnSubmit = document.createElement('button');
+    btnSubmit.type = 'submit';
+    btnSubmit.className = 'w-full py-3 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-darkBg font-black text-xs uppercase tracking-wider shadow-lg shadow-copaYellow/10 hover:shadow-copaYellow/25 transition duration-200 flex items-center justify-center gap-2';
+    btnSubmit.textContent = 'Entrar';
+    form.appendChild(btnSubmit);
+
+    wrapper.appendChild(form);
+
+    // Ações dos botões de Aba
+    tabLogin.onclick = (e) => {
+      e.preventDefault();
+      isSignUpMode = false;
+      tabLogin.className = 'flex-1 py-2.5 text-copaYellow border-b-2 border-copaYellow transition';
+      tabRegister.className = 'flex-1 py-2.5 text-gray-400 hover:text-white transition border-b-2 border-transparent';
+      btnSubmit.textContent = 'Entrar';
+      passwordInput.placeholder = 'Sua senha';
+    };
+
+    tabRegister.onclick = (e) => {
+      e.preventDefault();
+      isSignUpMode = true;
+      tabRegister.className = 'flex-1 py-2.5 text-copaYellow border-b-2 border-copaYellow transition';
+      tabLogin.className = 'flex-1 py-2.5 text-gray-400 hover:text-white transition border-b-2 border-transparent';
+      btnSubmit.textContent = 'Criar Conta / Cadastrar';
+      passwordInput.placeholder = 'Sua senha (mín. 6 caracteres)';
+    };
+
+    // Submissão do formulário
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) return;
+
+      try {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = isSignUpMode ? '🔄 Cadastrando...' : '🔄 Entrando...';
+
+        if (isSignUpMode) {
+          const data = await authDb.signUpEmail(email, password);
+          if (data && !data.session) {
+            alert("Cadastro solicitado! Verifique seu e-mail para confirmar a conta.");
+          } else {
+            alert("Conta criada e autenticada com sucesso!");
+            location.hash = '#home';
+          }
+        } else {
+          await authDb.signInEmail(email, password);
+          alert("Login realizado com sucesso!");
+          location.hash = '#home';
+        }
+      } catch (err) {
+        console.error("Erro na autenticação por e-mail:", err);
+        alert("Erro na autenticação: " + (err.message || err));
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = isSignUpMode ? 'Criar Conta / Cadastrar' : 'Entrar';
+      }
+    };
+
+    // Divisor
+    const divider = document.createElement('div');
+    divider.className = 'flex items-center gap-3 my-4';
+    divider.innerHTML = `
+      <hr class="flex-1 border-white/10">
+      <span class="text-[10px] uppercase font-bold text-gray-500 tracking-wider">ou</span>
+      <hr class="flex-1 border-white/10">
+    `;
+    wrapper.appendChild(divider);
 
     const grid = document.createElement('div');
     grid.className = 'flex flex-col gap-3';
@@ -1237,8 +1344,19 @@ function renderLogin(container) {
     // Botão Fazer Depois (Pular / Ir para o Álbum)
     const btnLater = document.createElement('button');
     btnLater.className = 'w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaYellow/40 text-gray-500 hover:text-gray-300 font-bold text-xs transition duration-200 mt-3 flex items-center justify-center gap-1.5 skip-login-btn';
-    btnLater.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Pular por agora (continuar sem login)`;
+    btnLater.innerHTML = `
+      <svg class="w-3.5 h-3.5 text-copaYellow animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+      Pular por agora (continuar sem login)
+    `;
     grid.appendChild(btnLater);
+
+    // Nota de texto em destaque dizendo exatamente: "Nota: Seu álbum e suas figurinhas não ficarão salvos."
+    const warningNote = document.createElement('p');
+    warningNote.className = 'text-[10px] font-bold text-red-500 text-center mt-2.5 opacity-90 leading-tight';
+    warningNote.textContent = 'Nota: Seu álbum e suas figurinhas não ficarão salvos.';
+    grid.appendChild(warningNote);
 
     wrapper.appendChild(grid);
   }

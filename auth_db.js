@@ -30,7 +30,13 @@
       if (!SUPABASE_URL || !SUPABASE_KEY) {
         throw new Error(`Credenciais do Supabase ausentes ou vazias no supabase_config.js. URL: '${SUPABASE_URL || ""}', Key: '${SUPABASE_KEY ? "configurada (tamanho: " + SUPABASE_KEY.length + ")" : "ausente"}'`);
       }
-      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      });
       console.log("Supabase inicializado com sucesso em modo nuvem.");
 
       // Escuta mudanças de estado da autenticação (Login, Logout, etc.)
@@ -205,6 +211,26 @@
         console.error("Erro no login Supabase:", e);
         throw e;
       }
+    },
+
+    // Cadastro via E-mail e Senha
+    async signUpEmail(email, password) {
+      if (!supabaseClient) {
+        throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
+      }
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) throw error;
+      return data;
+    },
+
+    // Login via E-mail e Senha
+    async signInEmail(email, password) {
+      if (!supabaseClient) {
+        throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
+      }
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      return data;
     },
 
     // Logout da conta
