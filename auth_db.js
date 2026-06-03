@@ -221,16 +221,18 @@
       return null;
     },
 
-    // Login ou Cadastro unificado via E-mail e Senha
     async loginOrRegister(email, password, username = "", birthdate = "") {
       if (!supabaseClient) {
         throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
       }
 
+      const cleanEmail = email ? email.trim() : "";
+      const cleanPassword = password ? password.trim() : "";
+      const cleanUsername = username ? username.trim() : "";
+
       // Se username e birthdate NÃO forem informados, é um fluxo exclusivo de LOGIN
-      if (!username || !birthdate) {
-        let finalEmail = email ? email.trim() : "";
-        let finalPassword = password ? password.trim() : "";
+      if (!cleanUsername || !birthdate) {
+        let finalEmail = cleanEmail;
         let isEmail = true;
 
         // Se começar com '@', remove e trata como username
@@ -265,11 +267,29 @@
         // Tenta fazer login tradicional (Exclusivo para o bloco Já Tenho Conta)
         const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({ 
           email: finalEmail, 
-          password: finalPassword 
+          password: cleanPassword 
         });
         if (signInError) {
           throw signInError;
         }
+
+        // SALVA SESSÃO LOCALMENTE DE FORMA IMEDIATA PARA EVITAR CORRIDA DE REDIRECIONAMENTO
+        if (data && data.session) {
+          const user = data.session.user;
+          const displayName = user.user_metadata.username || user.user_metadata.full_name || user.user_metadata.name || "Colecionador";
+          currentUser = {
+            uid: user.id,
+            name: displayName,
+            photo_url: user.user_metadata.avatar_url || "",
+            provider: user.app_metadata.provider || "email",
+            birthdate: user.user_metadata.birthdate || "",
+            latitude: null,
+            longitude: null,
+            last_seen: new Date().toISOString()
+          };
+          localStorage.setItem(sessionKey, JSON.stringify(currentUser));
+        }
+
         return { action: 'login', data };
       }
 
@@ -290,7 +310,7 @@
       const { data: checkUser } = await supabaseClient
         .from('profiles')
         .select('uid')
-        .eq('username', username)
+        .eq('username', cleanUsername)
         .maybeSingle();
       if (checkUser) {
         throw new Error("Este Nome de Usuário já está em uso. Por favor, escolha outro.");
@@ -298,11 +318,11 @@
 
       // 2. Tenta realizar o cadastro (signUp) direto
       const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
-        email,
-        password,
+        email: cleanEmail,
+        password: cleanPassword,
         options: {
           data: {
-            username: username,
+            username: cleanUsername,
             birthdate: finalBirthdate
           }
         }
@@ -312,7 +332,7 @@
         const errorMsg = (signUpError.message || "").toLowerCase();
         // Bypass temporário para testes se for bloqueio de IP/email do Supabase no cadastro
         if (errorMsg.includes("email rate limit exceeded") || errorMsg.includes("rate limit") || signUpError.status === 429) {
-          const finalUsername = username || "Colecionador Teste";
+          const finalUsername = cleanUsername || "Colecionador Teste";
           const testBirthdate = finalBirthdate || "2010-01-01"; // Padrão menor de idade para testes rápidos
           
           console.warn("Bypass do Rate Limit no signUp ativado para testes: simulando login/cadastro bem-sucedido.");
@@ -346,14 +366,36 @@
             access_token: signUpData.session.access_token,
             refresh_token: signUpData.session.refresh_token
           });
+
+          // SALVA SESSÃO LOCALMENTE DE FORMA IMEDIATA
+          const user = signUpData.session.user;
+          const displayName = user.user_metadata.username || user.user_metadata.full_name || user.user_metadata.name || "Colecionador";
+          currentUser = {
+            uid: user.id,
+            name: displayName,
+            photo_url: user.user_metadata.avatar_url || "",
+            provider: user.app_metadata.provider || "email",
+            birthdate: user.user_metadata.birthdate || "",
+            latitude: null,
+            longitude: null,
+            last_seen: new Date().toISOString()
+          };
+          localStorage.setItem(sessionKey, JSON.stringify(currentUser));
         } catch (setSessionErr) {
           console.warn("Erro ao definir sessão nativa:", setSessionErr);
         }
       } else {
         // Fallback automático de signIn caso a sessão não venha no signUp
-        console.log("Sessão nativa não retornada no signUp. Executando fallback de login automático...");
+        console.log("Sessão nativa não retornada no signUp. Executando fallback de login automático com delay para evitar race condition...");
+        
+        // Adiciona um pequeno delay no fallback de login de cadastro para garantir o commit no Supabase
+        await new Promise(resolve => setTimeout(resolve, 800));
+
         try {
-          const { data: signInData, error: signInErr } = await supabaseClient.auth.signInWithPassword({ email, password });
+          const { data: signInData, error: signInErr } = await supabaseClient.auth.signInWithPassword({ 
+            email: cleanEmail, 
+            password: cleanPassword 
+          });
           if (signInErr) throw signInErr;
           if (signInData && signInData.session) {
             await supabaseClient.auth.setSession({
@@ -361,6 +403,21 @@
               refresh_token: signInData.session.refresh_token
             });
             signUpData.session = signInData.session;
+
+            // SALVA SESSÃO LOCALMENTE DE FORMA IMEDIATA
+            const user = signInData.session.user;
+            const displayName = user.user_metadata.username || user.user_metadata.full_name || user.user_metadata.name || "Colecionador";
+            currentUser = {
+              uid: user.id,
+              name: displayName,
+              photo_url: user.user_metadata.avatar_url || "",
+              provider: user.app_metadata.provider || "email",
+              birthdate: user.user_metadata.birthdate || "",
+              latitude: null,
+              longitude: null,
+              last_seen: new Date().toISOString()
+            };
+            localStorage.setItem(sessionKey, JSON.stringify(currentUser));
           }
         } catch (fallbackErr) {
           console.error("Fallback de login automático falhou:", fallbackErr);
