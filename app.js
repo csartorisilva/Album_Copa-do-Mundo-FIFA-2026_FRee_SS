@@ -35,6 +35,7 @@ window.alert = function(message) {
   container.appendChild(btn);
   overlay.appendChild(container);
   document.body.appendChild(overlay);
+};
 // Lógica de Captura do PWA (Progressive Web App)
 let deferredPrompt = null;
 
@@ -2963,7 +2964,51 @@ function shareTextViaSystem(title, text) {
 
 // ------------------- TROCAS -------------------
 // Global Trades State
-let currentTradesSubTab = 'match'; // 'match' ou 'manual'
+let currentTradesSubTab = 'match'; // 'match', 'manual' ou 'estou_trocando'
+let estouTrocandoState = {
+  negotiating: [],
+  matched: []
+};
+
+function loadEstouTrocandoState() {
+  const albumId = storage.getCurrentAlbumId();
+  if (!albumId) return;
+  const key = `estou_trocando_${albumId}`;
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      estouTrocandoState = JSON.parse(saved);
+      if (!estouTrocandoState.negotiating) estouTrocandoState.negotiating = [];
+      if (!estouTrocandoState.matched) estouTrocandoState.matched = [];
+    } else {
+      estouTrocandoState = { negotiating: [], matched: [] };
+    }
+  } catch (e) {
+    console.error("Erro ao carregar estado de trocas:", e);
+    estouTrocandoState = { negotiating: [], matched: [] };
+  }
+}
+
+function saveEstouTrocandoState() {
+  const albumId = storage.getCurrentAlbumId();
+  if (!albumId) return;
+  const key = `estou_trocando_${albumId}`;
+  localStorage.setItem(key, JSON.stringify(estouTrocandoState));
+}
+
+function getStickerDisplayLabel(key) {
+  const parts = key.split('-');
+  const code = parts[0];
+  const num = parts[1];
+  if (code === 'EXTRAS') {
+    const variant = parts[2] || '';
+    const legendIndex = parseInt(num, 10) - 1;
+    const name = (legendsData && legendsData[legendIndex]) ? legendsData[legendIndex].name : `LÉG ${num}`;
+    return `${name} (${variant.toUpperCase()})`;
+  }
+  return `${code} ${num}`;
+}
+
 
 function renderTrades(container) {
   const user = authDb.getCurrentUser();
@@ -3121,15 +3166,20 @@ function renderTrades(container) {
   tabRow.className = 'flex border-b border-white/5';
   
   const tabMatch = document.createElement('button');
-  tabMatch.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'match' ? 'active-tab' : ''}`;
-  tabMatch.textContent = 'O que Pode Dar Match! 💡';
+  tabMatch.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'match' ? 'active-tab' : ''}`;
+  tabMatch.textContent = 'Matches 💡';
   
   const tabManual = document.createElement('button');
-  tabManual.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'manual' ? 'active-tab' : ''}`;
-  tabManual.innerHTML = '🤝 MATCH PERFEITO';
+  tabManual.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'manual' ? 'active-tab' : ''}`;
+  tabManual.textContent = 'Minha Rede 👥';
+
+  const tabEstouTrocando = document.createElement('button');
+  tabEstouTrocando.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'estou_trocando' ? 'active-tab' : ''}`;
+  tabEstouTrocando.textContent = 'Estou Trocando 🔄';
   
   tabRow.appendChild(tabMatch);
   tabRow.appendChild(tabManual);
+  tabRow.appendChild(tabEstouTrocando);
   tabCard.appendChild(tabRow);
   mainDiv.appendChild(tabCard);
   
@@ -3139,21 +3189,20 @@ function renderTrades(container) {
   container.appendChild(mainDiv);
 
   function setTradesSubTabState() {
-    tabMatch.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'match' ? 'active-tab' : ''}`;
-    tabManual.className = `flex-1 py-2 text-center text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'manual' ? 'active-tab' : ''}`;
+    tabMatch.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'match' ? 'active-tab' : ''}`;
+    tabManual.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'manual' ? 'active-tab' : ''}`;
+    tabEstouTrocando.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'estou_trocando' ? 'active-tab' : ''}`;
     
     subContentContainer.innerHTML = '';
     
     if (currentTradesSubTab === 'match') {
       renderMatchSuggestions(subContentContainer);
-    } else {
+    } else if (currentTradesSubTab === 'manual') {
       renderManualTradesList(subContentContainer);
+    } else if (currentTradesSubTab === 'estou_trocando') {
+      renderEstouTrocandoBoard(subContentContainer);
     }
   }
-
-  tabMatch.onclick = () => { currentTradesSubTab = 'match'; setTradesSubTabState(); };
-  tabManual.onclick = () => { currentTradesSubTab = 'manual'; setTradesSubTabState(); };
-  setTradesSubTabState();
 
   async function renderMatchSuggestions(subContainer) {
     subContainer.innerHTML = '';
@@ -3662,8 +3711,256 @@ function renderTrades(container) {
     }
   }
 
+  async function renderEstouTrocandoBoard(subContainer) {
+    subContainer.innerHTML = '';
+    loadEstouTrocandoState();
+
+    const mainBoard = document.createElement('div');
+    mainBoard.className = 'space-y-4 animate-fade-in';
+
+    // 1. Placar Superior
+    const scoreCard = document.createElement('div');
+    scoreCard.className = 'glass-panel p-3.5 rounded-xl border border-white/5 bg-[#131735]/40 flex justify-between items-center w-full';
+
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'flex items-center gap-3.5';
+
+    const negCount = estouTrocandoState.negotiating.length;
+    const matCount = estouTrocandoState.matched.length;
+
+    infoDiv.innerHTML = `
+      <div class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
+        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Negociação:</span>
+        <span class="text-xs font-black text-white">${negCount}</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
+        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Deu Match:</span>
+        <span class="text-xs font-black text-white">${matCount}</span>
+      </div>
+    `;
+
+    const btnReset = document.createElement('button');
+    btnReset.className = 'py-1 px-3 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 font-bold text-[9px] uppercase tracking-wider rounded-lg transition-all duration-200 active:scale-95';
+    btnReset.textContent = '🔄 Limpar Fluxo';
+    btnReset.onclick = () => {
+      if (confirm('Tem certeza de que deseja limpar todas as figurinhas em negociação e combinadas deste painel?')) {
+        estouTrocandoState = { negotiating: [], matched: [] };
+        saveEstouTrocandoState();
+        renderEstouTrocandoBoard(subContainer);
+      }
+    };
+
+    scoreCard.appendChild(infoDiv);
+    scoreCard.appendChild(btnReset);
+    mainBoard.appendChild(scoreCard);
+
+    // Obter dados do álbum
+    const albumId = storage.getCurrentAlbumId();
+    const albums = storage.getAlbums();
+    const album = albums[albumId] || { stickers: {} };
+    const userStickers = album.stickers || {};
+
+    // 2. Colunas Superiores (Faltantes e À Troca)
+    const colsGrid = document.createElement('div');
+    colsGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+
+    // Faltantes Col
+    const colFaltantes = document.createElement('div');
+    colFaltantes.className = 'glass-panel p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/[0.02] flex flex-col gap-2.5';
+
+    const faltantesTitle = document.createElement('h3');
+    faltantesTitle.className = 'text-[10px] font-black text-yellow-400 uppercase tracking-widest flex items-center gap-1.5';
+    faltantesTitle.innerHTML = '🟨 Faltantes';
+    colFaltantes.appendChild(faltantesTitle);
+
+    // Filtro para faltantes
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Buscar figurinha (ex: BRA, 10)...';
+    searchInput.className = 'w-full bg-[#131735]/80 text-white placeholder-gray-500 border border-white/5 focus:border-yellow-500/40 text-[10px] px-2.5 py-1.5 rounded-lg focus:outline-none transition-all duration-200';
+    colFaltantes.appendChild(searchInput);
+
+    const faltantesList = document.createElement('div');
+    faltantesList.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 gap-1.5 overflow-y-auto max-h-[300px] pr-1.5';
+    colFaltantes.appendChild(faltantesList);
+
+    // À Troca Col
+    const colATroca = document.createElement('div');
+    colATroca.className = 'glass-panel p-4 rounded-xl border border-blue-500/20 bg-blue-500/[0.02] flex flex-col gap-2.5';
+
+    const aTrocaTitle = document.createElement('h3');
+    aTrocaTitle.className = 'text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-1.5';
+    aTrocaTitle.innerHTML = '🟦 À Troca (Em Negociação)';
+    colATroca.appendChild(aTrocaTitle);
+
+    const aTrocaList = document.createElement('div');
+    aTrocaList.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 gap-1.5 overflow-y-auto max-h-[345px] pr-1.5';
+    colATroca.appendChild(aTrocaList);
+
+    colsGrid.appendChild(colFaltantes);
+    colsGrid.appendChild(colATroca);
+    mainBoard.appendChild(colsGrid);
+
+    // 3. Quadrante Inferior (Deu Match)
+    const colDeuMatch = document.createElement('div');
+    colDeuMatch.className = 'glass-panel p-4 rounded-xl border border-green-500/20 bg-green-500/[0.02] flex flex-col gap-2.5 w-full';
+
+    const deuMatchTitle = document.createElement('h3');
+    deuMatchTitle.className = 'text-[10px] font-black text-green-400 uppercase tracking-widest flex items-center gap-1.5';
+    deuMatchTitle.innerHTML = '🟩 Deu Match (Clique para colar)';
+    colDeuMatch.appendChild(deuMatchTitle);
+
+    const deuMatchList = document.createElement('div');
+    deuMatchList.className = 'grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-1.5 overflow-y-auto max-h-[220px] pr-1.5';
+    colDeuMatch.appendChild(deuMatchList);
+    mainBoard.appendChild(colDeuMatch);
+
+    subContainer.appendChild(mainBoard);
+
+    // Auxiliares de renderização
+    function updateLists() {
+      // Limpar listas
+      faltantesList.innerHTML = '';
+      aTrocaList.innerHTML = '';
+      deuMatchList.innerHTML = '';
+
+      // Gerar faltantes disponíveis para negociação
+      const allStickerKeys = [];
+      groupsData.forEach(g => {
+        g.teams.forEach(t => {
+          for (let i = 1; i <= 20; i++) {
+            allStickerKeys.push(`${t.code}-${i}`);
+          }
+        });
+      });
+      for (let i = 1; i <= 19; i++) allStickerKeys.push(`FWC-${i}`);
+      for (let i = 1; i <= 14; i++) allStickerKeys.push(`CC-${i}`);
+
+      const variants = ['ouro', 'prata', 'bronze', 'bordo'];
+      for (let i = 1; i <= 20; i++) {
+        variants.forEach(variant => {
+          allStickerKeys.push(`EXTRAS-${i}-${variant}`);
+        });
+      }
+
+      // Filtrar as faltantes
+      const filterVal = searchInput.value.toLowerCase().trim();
+      const missingKeys = allStickerKeys.filter(key => {
+        const isOwned = userStickers[key] ? userStickers[key].owned : false;
+        const isNegotiating = estouTrocandoState.negotiating.includes(key);
+        const isMatched = estouTrocandoState.matched.includes(key);
+        
+        if (isOwned || isNegotiating || isMatched) return false;
+
+        if (filterVal) {
+          const displayLabel = getStickerDisplayLabel(key).toLowerCase();
+          return displayLabel.includes(filterVal) || key.toLowerCase().includes(filterVal);
+        }
+        return true;
+      });
+
+      // Renderizar Faltantes (Amarelo)
+      if (missingKeys.length === 0) {
+        faltantesList.innerHTML = '<p class="text-center text-[10px] text-gray-500 py-4 col-span-3">Nenhuma figurinha.</p>';
+      } else {
+        missingKeys.forEach(key => {
+          const pill = document.createElement('div');
+          pill.className = 'px-2 py-1.5 rounded-lg border border-yellow-500/30 bg-yellow-500/10 text-yellow-300 text-[9px] font-black uppercase tracking-wider text-center cursor-pointer hover:bg-yellow-500/20 active:scale-95 transition-all duration-150';
+          pill.textContent = getStickerDisplayLabel(key);
+          pill.onclick = () => {
+            estouTrocandoState.negotiating.push(key);
+            saveEstouTrocandoState();
+            updateLists();
+            updateStatsRow();
+          };
+          faltantesList.appendChild(pill);
+        });
+      }
+
+      // Renderizar À Troca (Azul)
+      if (estouTrocandoState.negotiating.length === 0) {
+        aTrocaList.innerHTML = '<p class="text-center text-[10px] text-gray-500 py-4 col-span-3">Nenhuma em negociação.</p>';
+      } else {
+        estouTrocandoState.negotiating.forEach(key => {
+          const pill = document.createElement('div');
+          pill.className = 'px-2 py-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-300 text-[9px] font-black uppercase tracking-wider text-center cursor-pointer hover:bg-blue-500/20 active:scale-95 transition-all duration-150';
+          pill.textContent = getStickerDisplayLabel(key);
+          pill.onclick = () => {
+            // Mover para Match
+            estouTrocandoState.negotiating = estouTrocandoState.negotiating.filter(k => k !== key);
+            estouTrocandoState.matched.push(key);
+            saveEstouTrocandoState();
+            updateLists();
+            updateStatsRow();
+          };
+          aTrocaList.appendChild(pill);
+        });
+      }
+
+      // Renderizar Deu Match (Verde)
+      if (estouTrocandoState.matched.length === 0) {
+        deuMatchList.innerHTML = '<p class="text-center text-[10px] text-gray-500 py-4 col-span-full">Nenhum match pendente.</p>';
+      } else {
+        estouTrocandoState.matched.forEach(key => {
+          const pill = document.createElement('div');
+          pill.className = 'px-2 py-1.5 rounded-lg border border-green-500/30 bg-green-500/10 text-green-300 text-[9px] font-black uppercase tracking-wider text-center cursor-pointer hover:bg-green-500/20 active:scale-95 transition-all duration-150';
+          pill.textContent = getStickerDisplayLabel(key);
+          pill.onclick = () => {
+            // Colar figurinha!
+            if (!album.stickers[key]) {
+              album.stickers[key] = { owned: true, duplicate: 0 };
+            } else {
+              album.stickers[key].owned = true;
+            }
+            
+            // Remover do fluxo
+            estouTrocandoState.matched = estouTrocandoState.matched.filter(k => k !== key);
+            
+            // Salvar tudo
+            storage.setAlbums(albums);
+            authDb.syncStickers(album.stickers);
+            saveEstouTrocandoState();
+            
+            // Atualizar UI
+            renderHeader(); // Atualiza barra superior
+            updateLists();
+            updateStatsRow();
+          };
+          deuMatchList.appendChild(pill);
+        });
+      }
+    }
+
+    function updateStatsRow() {
+      const n = estouTrocandoState.negotiating.length;
+      const m = estouTrocandoState.matched.length;
+      infoDiv.innerHTML = `
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Negociação:</span>
+          <span class="text-xs font-black text-white">${n}</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Deu Match:</span>
+          <span class="text-xs font-black text-white">${m}</span>
+        </div>
+      `;
+    }
+
+    // Input listener com debounce simples
+    searchInput.oninput = () => {
+      updateLists();
+    };
+
+    updateLists();
+  }
+
   tabMatch.onclick = () => { currentTradesSubTab = 'match'; setTradesSubTabState(); };
   tabManual.onclick = () => { currentTradesSubTab = 'manual'; setTradesSubTabState(); };
+  tabEstouTrocando.onclick = () => { currentTradesSubTab = 'estou_trocando'; setTradesSubTabState(); };
   setTradesSubTabState();
 }
 
