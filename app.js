@@ -35,7 +35,27 @@ window.alert = function(message) {
   container.appendChild(btn);
   overlay.appendChild(container);
   document.body.appendChild(overlay);
-};
+// Lógica de Captura do PWA (Progressive Web App)
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Impede o Chrome de exibir o prompt padrão
+  e.preventDefault();
+  // Salva o evento para uso posterior
+  deferredPrompt = e;
+  // Recarrega o header para exibir o botão de instalação
+  if (typeof renderHeader === 'function') {
+    renderHeader();
+  }
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  if (typeof renderHeader === 'function') {
+    renderHeader();
+  }
+  console.log('PWA instalado com sucesso.');
+});
 
 const PALLETE = {
   blue: '#0033A0',
@@ -1014,6 +1034,37 @@ function renderHeader() {
       tradesBtn.classList.add('animate-pulse', 'border-copaYellow/50', 'shadow-[0_0_8px_rgba(255,199,38,0.45)]');
     } else {
       tradesBtn.classList.remove('animate-pulse', 'border-copaYellow/50', 'shadow-[0_0_8px_rgba(255,199,38,0.45)]');
+    }
+  }
+
+  // Verifica se há o prompt de instalação disponível e insere o botão "Instalar App" no topo do menu do álbum
+  const headerContainer = document.querySelector('header .flex.items-center.gap-2');
+  if (headerContainer && authBtn) {
+    const prevInstallBtn = document.getElementById('pwaInstallBtn');
+    if (prevInstallBtn) {
+      prevInstallBtn.remove();
+    }
+
+    if (deferredPrompt) {
+      const installBtn = document.createElement('button');
+      installBtn.id = 'pwaInstallBtn';
+      installBtn.className = 'bg-gradient-to-r from-copaYellow to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-darkBg font-black text-[9px] uppercase tracking-wider px-2 py-1.5 rounded-lg flex items-center gap-1 transition-all duration-200 animate-pulse';
+      installBtn.innerHTML = `
+        <svg class="w-3 h-3 text-darkBg" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
+        <span>Instalar App</span>
+      `;
+      installBtn.onclick = async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log(`PWA install choice: ${outcome}`);
+          deferredPrompt = null;
+          renderHeader();
+        }
+      };
+      headerContainer.insertBefore(installBtn, authBtn);
     }
   }
 }
