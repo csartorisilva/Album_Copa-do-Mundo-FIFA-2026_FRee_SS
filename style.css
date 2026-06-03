@@ -936,3 +936,15 @@ body {
   border-color: #ef4444 !important;
   box-shadow: 0 0 12px rgba(239, 68, 68, 0.4) !important;
 }
+
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 0 0px rgba(255, 199, 38, 0.8); border-color: #FFC726; }
+  50% { box-shadow: 0 0 0 10px rgba(255, 199, 38, 0); border-color: #FFC726; }
+  100% { box-shadow: 0 0 0 0px rgba(255, 199, 38, 0); }
+}
+.pulse-highlight {
+  animation: pulse-border 1.5s ease-in-out infinite !important;
+  transform: scale(1.05) !important;
+  transition: transform 0.3s ease;
+  z-index: 40 !important;
+}

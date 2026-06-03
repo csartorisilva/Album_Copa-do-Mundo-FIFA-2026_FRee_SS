@@ -135,7 +135,7 @@ const crestsMap = {
   FWC: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png',
   CC: './crests/Logo CocaZero Copa.png',
   // Enriquecidos com Wikimedia Commons estáveis
-  JOR: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Jordan_Football_Association_logo.svg/120px-Jordan_Football_Association_logo.svg.png',
+  JOR: './crests/brasao_jordania.png',
   COD: './crests/brasao_congo.png',
   UZB: './crests/brasao_usbequistao.png',
   EXTRAS: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/120px-Golden_Ball.svg.png'
@@ -1162,6 +1162,20 @@ function renderNewPage(hash, root) {
   // Transiciona para ativa (página aberta/abotoada)
   pageContainer.classList.remove('page-enter');
   pageContainer.classList.add('page-active');
+
+  // Lógica de Scroll Automático para a figurinha pesquisada
+  const targetId = sessionStorage.getItem('scrollTargetSticker');
+  if (targetId) {
+    sessionStorage.removeItem('scrollTargetSticker');
+    setTimeout(() => {
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('pulse-highlight');
+        setTimeout(() => el.classList.remove('pulse-highlight'), 3000);
+      }
+    }, 600);
+  }
 }
 
 // Calcula estatísticas do álbum atual
@@ -1653,6 +1667,206 @@ function renderHome(container) {
     }
   ];
 
+  // Campo de Busca Inteligente e Fixo
+  const searchStickyContainer = document.createElement('div');
+  searchStickyContainer.className = 'sticky top-[-16px] z-[40] bg-[#050814]/95 backdrop-blur-md pt-3 pb-3 border-b border-white/5 w-full';
+
+  const searchInputWrapper = document.createElement('div');
+  searchInputWrapper.className = 'relative w-full';
+
+  const searchBox = document.createElement('div');
+  searchBox.className = 'flex items-center bg-[#131735] border border-white/10 rounded-xl px-3.5 py-2.5 focus-within:border-copaYellow transition-all duration-200';
+
+  searchBox.innerHTML = `
+    <svg class="w-4 h-4 text-gray-400 mr-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+  `;
+
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.id = 'albumSearchInput';
+  searchInput.placeholder = 'Buscar país (ex: Brasil) ou figurinha faltante (ex: BRA 13)...';
+  searchInput.className = 'bg-transparent text-white placeholder-gray-400 text-xs w-full focus:outline-none font-medium';
+  searchBox.appendChild(searchInput);
+  searchInputWrapper.appendChild(searchBox);
+
+  // Suggestions container
+  const suggestionsBox = document.createElement('div');
+  suggestionsBox.id = 'searchSuggestions';
+  suggestionsBox.className = 'absolute left-0 right-0 mt-1.5 bg-[#0e112a] border border-white/10 rounded-xl shadow-2xl overflow-y-auto max-h-60 hidden z-[110] divide-y divide-white/5';
+  searchInputWrapper.appendChild(suggestionsBox);
+
+  searchStickyContainer.appendChild(searchInputWrapper);
+  rootHome.appendChild(searchStickyContainer);
+
+  function updateSearchSuggestions(query) {
+    suggestionsBox.innerHTML = '';
+    if (!query.trim()) {
+      suggestionsBox.classList.add('hidden');
+      return;
+    }
+
+    const cleanQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+    const suggestions = [];
+
+    const albumId = storage.getCurrentAlbumId();
+    const albums = storage.getAlbums();
+    const album = albums[albumId];
+    const stickers = album ? album.stickers : {};
+
+    // 1. Buscar correspondência nos países / seleções
+    const specials = [
+      { name: 'FIFA', code: 'FWC' },
+      { name: 'Escudos', code: 'ESCUDOS' },
+      { name: 'Coca-Cola', code: 'CC' },
+      { name: 'Premium (Lendários)', code: 'EXTRAS' }
+    ];
+    
+    specials.forEach(s => {
+      const matchName = s.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const matchCode = s.code.toLowerCase();
+      if (matchName.includes(cleanQuery) || matchCode.includes(cleanQuery)) {
+        suggestions.push({
+          type: 'country',
+          name: s.name,
+          code: s.code,
+          label: `País: ${s.name} (${s.code})`
+        });
+      }
+    });
+
+    groupsData.forEach(g => {
+      g.teams.forEach(t => {
+        const matchName = t.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const matchCode = t.code.toLowerCase();
+        if (matchName.includes(cleanQuery) || matchCode.includes(cleanQuery)) {
+          suggestions.push({
+            type: 'country',
+            name: t.name,
+            code: t.code,
+            label: `País: ${t.name} (${t.code})`
+          });
+        }
+      });
+    });
+
+    // 2. Buscar correspondência em figurinhas FALTANTES
+    const numMatch = cleanQuery.match(/\d+/);
+    const hasNum = numMatch !== null;
+    const searchNum = hasNum ? parseInt(numMatch[0]) : null;
+    const textQuery = cleanQuery.replace(/\d+/g, '').trim();
+
+    const groupsToCheck = [];
+    groupsData.forEach(g => g.teams.forEach(t => groupsToCheck.push({ code: t.code, name: t.name, limit: 20 })));
+    groupsToCheck.push({ code: 'FWC', name: 'FIFA', limit: 19 });
+    groupsToCheck.push({ code: 'CC', name: 'Coca-Cola', limit: 14 });
+
+    groupsToCheck.forEach(group => {
+      const matchName = group.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const matchCode = group.code.toLowerCase();
+      
+      const textMatches = textQuery === '' || matchName.includes(textQuery) || matchCode.includes(textQuery);
+      
+      if (textMatches) {
+        for (let i = 1; i <= group.limit; i++) {
+          const key = `${group.code}-${i}`;
+          const isOwned = stickers[key]?.owned;
+          
+          if (!isOwned) {
+            if (hasNum && i !== searchNum) {
+              continue;
+            }
+            
+            suggestions.push({
+              type: 'sticker',
+              code: group.code,
+              number: i,
+              key: key,
+              label: `Figurinha Faltante: ${group.code} ${i} (${group.name})`
+            });
+          }
+        }
+      }
+    });
+
+    // Legends (EXTRAS)
+    const matchExtras = 'legends'.includes(cleanQuery) || 'extras'.includes(cleanQuery) || 'premium'.includes(cleanQuery) || textQuery === '';
+    if (matchExtras) {
+      const variants = ['ouro', 'prata', 'bronze', 'bordo'];
+      legendsData.forEach((legend, idx) => {
+        const matchLegendName = legend.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (textQuery === '' || matchLegendName.includes(textQuery)) {
+          variants.forEach(variant => {
+            const key = `EXTRAS-${idx + 1}-${variant}`;
+            const isOwned = stickers[key]?.owned;
+            if (!isOwned) {
+              if (hasNum && (idx + 1) !== searchNum) {
+                return;
+              }
+              suggestions.push({
+                type: 'sticker',
+                code: 'EXTRAS',
+                key: key,
+                label: `Lendário Faltante: ${legend.name} (${variant.toUpperCase()})`
+              });
+            }
+          });
+        }
+      });
+    }
+
+    const limitedSuggestions = suggestions.slice(0, 30);
+
+    if (limitedSuggestions.length === 0) {
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'p-3 text-xs text-gray-500 text-center';
+      emptyDiv.textContent = 'Nenhuma correspondência ou figurinha faltante encontrada';
+      suggestionsBox.appendChild(emptyDiv);
+    } else {
+      limitedSuggestions.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'p-3 text-xs hover:bg-[#1a1e43] text-gray-200 cursor-pointer flex justify-between items-center transition duration-150 border-b border-white/5';
+        itemDiv.textContent = item.label;
+
+        itemDiv.onclick = () => {
+          suggestionsBox.classList.add('hidden');
+          searchInput.value = '';
+          
+          if (item.type === 'country') {
+            const cardId = `country-card-${item.code}`;
+            const el = document.getElementById(cardId);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              el.classList.add('pulse-highlight');
+              setTimeout(() => el.classList.remove('pulse-highlight'), 3000);
+            }
+          } else if (item.type === 'sticker') {
+            sessionStorage.setItem('scrollTargetSticker', `card-${item.key}`);
+            location.hash = `#team-${item.code}`;
+          }
+        };
+        suggestionsBox.appendChild(itemDiv);
+      });
+    }
+
+    suggestionsBox.classList.remove('hidden');
+  }
+
+  searchInput.addEventListener('input', (e) => {
+    updateSearchSuggestions(e.target.value);
+  });
+
+  searchInput.addEventListener('focus', (e) => {
+    updateSearchSuggestions(e.target.value);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!searchStickyContainer.contains(e.target)) {
+      suggestionsBox.classList.add('hidden');
+    }
+  });
+
   // 4. Divisor de Título Grupos + Link Classificação Geral (Movido para cá)
   const groupsHeaderRow = document.createElement('div');
   groupsHeaderRow.className = 'flex justify-between items-center border-b border-white/5 pb-1 mt-4';
@@ -1755,6 +1969,7 @@ function renderHome(container) {
 
   specialItems.forEach(item => {
     const card = document.createElement('div');
+    card.id = `country-card-${item.code}`;
     card.className = 'selection-card-futz';
     card.onclick = () => location.hash = `#team-${item.code}`;
 
@@ -1831,6 +2046,7 @@ function renderHome(container) {
     const sortedTeams = [...g.teams].sort((a, b) => a.rank - b.rank);
     sortedTeams.forEach(team => {
       const card = document.createElement('div');
+      card.id = `country-card-${team.code}`;
       card.className = 'selection-card-futz';
       card.onclick = () => location.hash = `#team-${team.code}`;
 
