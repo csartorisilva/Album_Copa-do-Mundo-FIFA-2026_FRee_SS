@@ -229,20 +229,32 @@
 
       // Se username e birthdate NÃO forem informados, é um fluxo exclusivo de LOGIN
       if (!username || !birthdate) {
-        let finalEmail = email;
-        if (email && !email.includes('@')) {
+        let finalEmail = email ? email.trim() : "";
+        let finalPassword = password ? password.trim() : "";
+        let isEmail = true;
+
+        // Se começar com '@', remove e trata como username
+        if (finalEmail.startsWith('@')) {
+          finalEmail = finalEmail.substring(1);
+          isEmail = false;
+        } else if (!finalEmail.includes('@')) {
+          // Se não contiver '@' em nenhuma parte, trata como username
+          isEmail = false;
+        }
+
+        if (!isEmail) {
           try {
             const { data: profile, error: queryError } = await supabaseClient
               .from('profiles')
               .select('email')
-              .ilike('username', email)
+              .ilike('username', finalEmail)
               .maybeSingle();
               
             if (queryError) throw queryError;
             if (profile && profile.email) {
               finalEmail = profile.email;
             } else {
-              throw new Error(`Nome de usuário '${email}' não encontrado.`);
+              throw new Error(`Nome de usuário '@${finalEmail}' não encontrado.`);
             }
           } catch (err) {
             console.error("Erro ao buscar e-mail pelo username:", err);
@@ -251,7 +263,10 @@
         }
 
         // Tenta fazer login tradicional (Exclusivo para o bloco Já Tenho Conta)
-        const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({ email: finalEmail, password });
+        const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({ 
+          email: finalEmail, 
+          password: finalPassword 
+        });
         if (signInError) {
           throw signInError;
         }
