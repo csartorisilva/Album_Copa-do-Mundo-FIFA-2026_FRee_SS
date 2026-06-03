@@ -259,6 +259,18 @@
       }
 
       // Caso contrário, é o fluxo exclusivo de CADASTRO
+      // Normalização da data de nascimento (converter DD/MM/AAAA para AAAA-MM-DD caso contenha barras)
+      let finalBirthdate = birthdate;
+      if (birthdate && birthdate.includes('/')) {
+        const dateParts = birthdate.split('/');
+        if (dateParts.length === 3) {
+          const day = dateParts[0].padStart(2, '0');
+          const month = dateParts[1].padStart(2, '0');
+          const year = dateParts[2];
+          finalBirthdate = `${year}-${month}-${day}`;
+        }
+      }
+
       // 1. Validamos se o username é único antes de prosseguir
       const { data: checkUser } = await supabaseClient
         .from('profiles')
@@ -276,7 +288,7 @@
         options: {
           data: {
             username: username,
-            birthdate: birthdate
+            birthdate: finalBirthdate
           }
         }
       });
@@ -286,7 +298,7 @@
         // Bypass temporário para testes se for bloqueio de IP/email do Supabase no cadastro
         if (errorMsg.includes("email rate limit exceeded") || errorMsg.includes("rate limit") || signUpError.status === 429) {
           const finalUsername = username || "Colecionador Teste";
-          const finalBirthdate = birthdate || "2010-01-01"; // Padrão menor de idade para testes rápidos
+          const testBirthdate = finalBirthdate || "2010-01-01"; // Padrão menor de idade para testes rápidos
           
           console.warn("Bypass do Rate Limit no signUp ativado para testes: simulando login/cadastro bem-sucedido.");
           currentUser = {
@@ -294,7 +306,7 @@
             name: finalUsername,
             photo_url: "",
             provider: "email",
-            birthdate: finalBirthdate,
+            birthdate: testBirthdate,
             latitude: null,
             longitude: null,
             last_seen: new Date().toISOString()
@@ -323,9 +335,22 @@
           console.warn("Erro ao definir sessão nativa:", setSessionErr);
         }
       } else {
-        // Se a sessão nativa vier nula e a confirmação de e-mail estiver desativada no painel,
-        // mas o Supabase não retornou a sessão na resposta do signUp, lançamos um erro explícito.
-        throw new Error("Cadastro realizado com sucesso! Por favor, acesse o bloco 'JÁ TENHO CONTA' para fazer login.");
+        // Fallback automático de signIn caso a sessão não venha no signUp
+        console.log("Sessão nativa não retornada no signUp. Executando fallback de login automático...");
+        try {
+          const { data: signInData, error: signInErr } = await supabaseClient.auth.signInWithPassword({ email, password });
+          if (signInErr) throw signInErr;
+          if (signInData && signInData.session) {
+            await supabaseClient.auth.setSession({
+              access_token: signInData.session.access_token,
+              refresh_token: signInData.session.refresh_token
+            });
+            signUpData.session = signInData.session;
+          }
+        } catch (fallbackErr) {
+          console.error("Fallback de login automático falhou:", fallbackErr);
+          throw new Error("Cadastro concluído com sucesso, mas o login automático falhou. Por favor, acesse o bloco 'JÁ TENHO CONTA' para entrar.");
+        }
       }
 
       return { action: 'register', data: signUpData };
