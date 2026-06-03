@@ -208,83 +208,39 @@
         throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
       }
 
-      let finalEmail = email;
-      if (email && !email.includes('@')) {
-        try {
-          const { data: profile, error: queryError } = await supabaseClient
-            .from('profiles')
-            .select('email')
-            .ilike('username', email)
-            .maybeSingle();
-            
-          if (queryError) throw queryError;
-          if (profile && profile.email) {
-            finalEmail = profile.email;
-          } else {
-            throw new Error(`Nome de usuário '${email}' não encontrado.`);
+      // Se username e birthdate NÃO forem informados, é um fluxo exclusivo de LOGIN
+      if (!username || !birthdate) {
+        let finalEmail = email;
+        if (email && !email.includes('@')) {
+          try {
+            const { data: profile, error: queryError } = await supabaseClient
+              .from('profiles')
+              .select('email')
+              .ilike('username', email)
+              .maybeSingle();
+              
+            if (queryError) throw queryError;
+            if (profile && profile.email) {
+              finalEmail = profile.email;
+            } else {
+              throw new Error(`Nome de usuário '${email}' não encontrado.`);
+            }
+          } catch (err) {
+            console.error("Erro ao buscar e-mail pelo username:", err);
+            throw new Error(err.message || "Nome de usuário não encontrado ou erro de conexão.");
           }
-        } catch (err) {
-          console.error("Erro ao buscar e-mail pelo username:", err);
-          throw new Error(err.message || "Nome de usuário não encontrado ou erro de conexão.");
         }
-      }
 
-      // 1. Tenta fazer login primeiro de forma limpa e sequencial
-      const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({ email: finalEmail, password });
-      
-      // Se o login foi bem-sucedido e retornou sessão, finaliza aqui
-      if (!signInError && data && data.session) {
+        // Tenta fazer login tradicional (Exclusivo para o bloco Já Tenho Conta)
+        const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({ email: finalEmail, password });
+        if (signInError) {
+          throw signInError;
+        }
         return { action: 'login', data };
       }
 
-      // Tratamento detalhado de erros do login
-      if (signInError) {
-        const errorMsg = (signInError.message || "").toLowerCase();
-        const errorStatus = signInError.status;
-
-        // Se for erro de limite de requisições (Rate Limit 429), lança o erro imediatamente ou simula login local
-        const isRateLimit = errorStatus === 429 || errorMsg.includes("rate limit") || errorMsg.includes("too many requests") || errorMsg.includes("email rate limit exceeded");
-        if (isRateLimit) {
-          // Bypass temporário para testes se for bloqueio de IP/email do Supabase
-          if (errorMsg.includes("email rate limit exceeded") || errorMsg.includes("rate limit")) {
-            const finalUsername = username || "Colecionador Teste";
-            const finalBirthdate = birthdate || "2010-01-01"; // Padrão menor de idade para testes rápidos
-            
-            console.warn("Bypass do Rate Limit no signIn ativado para testes: simulando login bem-sucedido.");
-            currentUser = {
-              uid: "mock-uid-" + Date.now(),
-              name: finalUsername,
-              photo_url: "",
-              provider: "email",
-              birthdate: finalBirthdate,
-              latitude: null,
-              longitude: null,
-              last_seen: new Date().toISOString()
-            };
-            localStorage.setItem(sessionKey, JSON.stringify(currentUser));
-            if (typeof renderHeader === 'function') renderHeader();
-            return { action: 'register', data: { session: { user: currentUser } } };
-          }
-          throw signInError;
-        }
-
-        // Se for outro erro de sistema/rede que não seja credenciais inválidas/usuário não encontrado, também propaga
-        const isInvalidCredentials = errorMsg.includes("invalid login credentials") || 
-                                     errorMsg.includes("invalid_credentials") || 
-                                     errorMsg.includes("user not found") ||
-                                     errorStatus === 400;
-        if (!isInvalidCredentials) {
-          throw signInError;
-        }
-      }
-
-      // 2. Se o login falhou porque o usuário não existe (ou credenciais novas), prosseguimos para o cadastro.
-      // O nome de usuário e a data de nascimento passam a ser obrigatórios.
-      if (!username || !birthdate) {
-        throw new Error("Credenciais inválidas. Se você deseja criar uma nova conta, preencha também o Nome de Usuário e a Data de Nascimento.");
-      }
-
-      // Validamos se o username é único antes de prosseguir
+      // Caso contrário, é o fluxo exclusivo de CADASTRO
+      // 1. Validamos se o username é único antes de prosseguir
       const { data: checkUser } = await supabaseClient
         .from('profiles')
         .select('uid')
@@ -294,7 +250,7 @@
         throw new Error("Este Nome de Usuário já está em uso. Por favor, escolha outro.");
       }
 
-      // Tenta realizar o cadastro
+      // 2. Tenta realizar o cadastro (signUp) direto
       const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
         email,
         password,
@@ -331,12 +287,12 @@
 
         // Se o e-mail já estiver cadastrado, a senha do login acima estava incorreta
         if (signUpError.message && (signUpError.message.includes("already registered") || signUpError.message.includes("already exists"))) {
-          throw new Error("Senha incorreta para este e-mail.");
+          throw new Error("Este e-mail já está cadastrado. Por favor, faça login com sua senha.");
         }
         throw signUpError;
       }
 
-      // Se o cadastro retornar a sessão nativa ativa imediatamente, absorve a sessão
+      // Se o cadastro retornar a sessão nativa ativa imediatamente, absorve a sessão e retorna
       if (signUpData && signUpData.session) {
         try {
           console.log("Cadastro bem-sucedido com sessão nativa. Definindo sessão...");
@@ -344,28 +300,13 @@
             access_token: signUpData.session.access_token,
             refresh_token: signUpData.session.refresh_token
           });
-          return { action: 'register', data: signUpData };
         } catch (setSessionErr) {
           console.warn("Erro ao definir sessão nativa:", setSessionErr);
         }
-      }
-
-      // Se a sessão não foi iniciada automaticamente, aguarda 1.5s e força o login automático
-      if (signUpData && !signUpData.session) {
-        try {
-          console.log("Cadastro bem-sucedido. Aguardando 1.5s para processamento do perfil...");
-          await new Promise(resolve => setTimeout(resolve, 1500));
-          console.log("Tentando login automático pós-cadastro...");
-          const { data: signInData, error: signInAfterSignUpError } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
-          if (!signInAfterSignUpError && signInData && signInData.session) {
-            return { action: 'register', data: signInData };
-          } else if (signInAfterSignUpError) {
-            throw signInAfterSignUpError;
-          }
-        } catch (e) {
-          console.error("Falha no login automático pós-cadastro:", e);
-          throw new Error("Cadastro concluído com sucesso, mas o login automático falhou: " + (e.message || e));
-        }
+      } else {
+        // Se a sessão nativa vier nula e a confirmação de e-mail estiver desativada no painel,
+        // mas o Supabase não retornou a sessão na resposta do signUp, lançamos um erro explícito.
+        throw new Error("Cadastro realizado com sucesso! Por favor, acesse o bloco 'JÁ TENHO CONTA' para fazer login.");
       }
 
       return { action: 'register', data: signUpData };

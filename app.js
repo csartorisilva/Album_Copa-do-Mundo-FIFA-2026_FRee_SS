@@ -1704,12 +1704,10 @@ function renderLogin(container) {
           const age = calculateAge(birthdate);
           if (age < 18) {
             showMinorAlertModal(() => {
-              showFeedback("Conta criada e autenticada com sucesso!", 'success', feedbackMsgRegister);
-              setTimeout(() => { location.hash = '#home'; }, 1500);
+              location.hash = '#home';
             });
           } else {
-            showFeedback("Conta criada e autenticada com sucesso!", 'success', feedbackMsgRegister);
-            setTimeout(() => { location.hash = '#home'; }, 1500);
+            location.hash = '#home';
           }
         }
       } catch (err) {
