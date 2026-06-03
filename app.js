@@ -1270,6 +1270,22 @@ function renderLogin(container) {
     birthdateGroup.appendChild(birthdateInput);
     form.appendChild(birthdateGroup);
  
+    // 5. Caixa de Consentimento (LGPD)
+    const consentGroup = document.createElement('label');
+    consentGroup.className = 'flex items-start gap-2.5 cursor-pointer mt-1 mb-2 select-none text-left';
+    
+    const consentCheckbox = document.createElement('input');
+    consentCheckbox.type = 'checkbox';
+    consentCheckbox.className = 'mt-0.5 rounded border-white/10 bg-white/5 text-copaYellow focus:ring-0 focus:ring-offset-0 focus:border-copaYellow/50 transition duration-200 h-4 w-4 accent-copaYellow';
+    
+    const consentText = document.createElement('span');
+    consentText.className = 'text-[11px] text-gray-400 leading-normal font-medium';
+    consentText.textContent = 'Estou de acordo com o uso do aplicativo e nenhum prejuiço será repassado ao desenvolvedor.';
+    
+    consentGroup.appendChild(consentCheckbox);
+    consentGroup.appendChild(consentText);
+    form.appendChild(consentGroup);
+
     // Botão de Ação Unificado: "Entrar / Criar Conta"
     const btnSubmit = document.createElement('button');
     btnSubmit.type = 'submit';
@@ -1279,9 +1295,61 @@ function renderLogin(container) {
  
     wrapper.appendChild(form);
  
+    // Funções auxiliares para validação de idade e modal de menor de idade
+    const calculateAge = (birthdateStr) => {
+      if (!birthdateStr) return 0;
+      const today = new Date();
+      const birthDate = new Date(birthdateStr);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    };
+
+    const showMinorAlertModal = (onConfirm) => {
+      const modalOverlay = document.createElement('div');
+      modalOverlay.className = 'fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[9999] p-4 animate-fade-in';
+      
+      const modalContainer = document.createElement('div');
+      modalContainer.className = 'bg-[#120e16] border border-copaYellow/20 rounded-2xl p-6 max-w-sm w-full text-center flex flex-col items-center gap-4 shadow-2xl shadow-copaYellow/5';
+      
+      modalContainer.innerHTML = `
+        <div class="w-12 h-12 rounded-full bg-copaYellow/10 flex items-center justify-center border border-copaYellow/30 text-copaYellow mb-1">
+          <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-sm uppercase tracking-wider">Aviso Importante</h3>
+        <p class="text-gray-300 text-xs leading-relaxed">
+          Vimos que você é menor de idade e recomendamos fortemente a utilização deste app com o consentimento dos seus pais ou tutor.
+        </p>
+      `;
+      
+      const btnConfirm = document.createElement('button');
+      btnConfirm.className = 'w-full mt-2 py-3 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-darkBg font-black text-xs uppercase tracking-wider shadow-lg shadow-copaYellow/10 transition duration-200 cursor-pointer';
+      btnConfirm.textContent = 'Estou ciente';
+      
+      btnConfirm.onclick = () => {
+        document.body.removeChild(modalOverlay);
+        onConfirm();
+      };
+      
+      modalContainer.appendChild(btnConfirm);
+      modalOverlay.appendChild(modalContainer);
+      document.body.appendChild(modalOverlay);
+    };
+
     // Submissão do formulário
     form.onsubmit = async (e) => {
       e.preventDefault();
+
+      if (!consentCheckbox.checked) {
+        alert("Você precisa aceitar os termos de proteção de dados para continuar.");
+        return;
+      }
+
       const email = emailInput.value.trim();
       const password = passwordInput.value;
       const username = usernameInput.value.trim();
@@ -1296,11 +1364,23 @@ function renderLogin(container) {
         const result = await authDb.loginOrRegister(email, password, username, birthdate);
         
         if (result.action === 'register') {
-          if (result.data && !result.data.session) {
-            alert("Cadastro realizado! Por favor, verifique seu e-mail para confirmar a conta e poder entrar.");
+          const age = calculateAge(birthdate);
+          if (age < 18) {
+            showMinorAlertModal(() => {
+              if (result.data && !result.data.session) {
+                alert("Cadastro realizado! Por favor, verifique seu e-mail para confirmar a conta e poder entrar.");
+              } else {
+                alert("Conta criada e autenticada com sucesso!");
+                location.hash = '#home';
+              }
+            });
           } else {
-            alert("Conta criada e autenticada com sucesso!");
-            location.hash = '#home';
+            if (result.data && !result.data.session) {
+              alert("Cadastro realizado! Por favor, verifique seu e-mail para confirmar a conta e poder entrar.");
+            } else {
+              alert("Conta criada e autenticada com sucesso!");
+              location.hash = '#home';
+            }
           }
         } else if (result.action === 'login') {
           alert("Login realizado com sucesso!");
