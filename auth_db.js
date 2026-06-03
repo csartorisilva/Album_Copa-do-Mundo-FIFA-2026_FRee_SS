@@ -336,10 +336,26 @@
         throw signUpError;
       }
 
-      // Se o cadastro foi realizado com sucesso mas a sessão não foi iniciada automaticamente (ex: e-mail pendente), tenta forçar o login automático imediato
+      // Se o cadastro retornar a sessão nativa ativa imediatamente, absorve a sessão
+      if (signUpData && signUpData.session) {
+        try {
+          console.log("Cadastro bem-sucedido com sessão nativa. Definindo sessão...");
+          await supabaseClient.auth.setSession({
+            access_token: signUpData.session.access_token,
+            refresh_token: signUpData.session.refresh_token
+          });
+          return { action: 'register', data: signUpData };
+        } catch (setSessionErr) {
+          console.warn("Erro ao definir sessão nativa:", setSessionErr);
+        }
+      }
+
+      // Se a sessão não foi iniciada automaticamente, aguarda 1.5s e força o login automático
       if (signUpData && !signUpData.session) {
         try {
-          console.log("Cadastro bem-sucedido. Tentando login automático imediato...");
+          console.log("Cadastro bem-sucedido. Aguardando 1.5s para processamento do perfil...");
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          console.log("Tentando login automático pós-cadastro...");
           const { data: signInData, error: signInAfterSignUpError } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
           if (!signInAfterSignUpError && signInData && signInData.session) {
             return { action: 'register', data: signInData };
