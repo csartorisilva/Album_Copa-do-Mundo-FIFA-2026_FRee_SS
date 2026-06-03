@@ -214,7 +214,7 @@
           const { data: profile, error: queryError } = await supabaseClient
             .from('profiles')
             .select('email')
-            .eq('username', email)
+            .ilike('username', email)
             .maybeSingle();
             
           if (queryError) throw queryError;
@@ -225,7 +225,7 @@
           }
         } catch (err) {
           console.error("Erro ao buscar e-mail pelo username:", err);
-          throw new Error("Nome de usuário não encontrado ou erro de conexão.");
+          throw new Error(err.message || "Nome de usuário não encontrado ou erro de conexão.");
         }
       }
 

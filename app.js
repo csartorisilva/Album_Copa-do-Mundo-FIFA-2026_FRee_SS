@@ -1377,7 +1377,7 @@ function renderLogin(container) {
 
     const feedbackMsgLogin = document.createElement('div');
     feedbackMsgLogin.className = 'text-xs text-center font-semibold mt-3 hidden';
-    formLogin.appendChild(feedbackMsgLogin);
+    formLogin.prepend(feedbackMsgLogin);
 
     accordionLogin.appendChild(formLogin);
 
@@ -1487,7 +1487,7 @@ function renderLogin(container) {
 
     const feedbackMsgRegister = document.createElement('div');
     feedbackMsgRegister.className = 'text-xs text-center font-semibold mt-3 hidden';
-    formRegister.appendChild(feedbackMsgRegister);
+    formRegister.prepend(feedbackMsgRegister);
 
     accordionRegister.appendChild(formRegister);
 
@@ -1505,11 +1505,12 @@ function renderLogin(container) {
         return;
       }
       targetElement.textContent = message;
-      targetElement.className = `text-xs text-center font-semibold mt-3 p-3 rounded-xl animate-fade-in block ${
-        type === 'error' 
-          ? 'bg-red-500/10 border border-red-500/20 text-red-400' 
-          : 'bg-green-500/10 border border-green-500/20 text-green-400'
-      }`;
+      if (type === 'error') {
+        // MODO DIAGNÓSTICO: Fundo preto, texto amarelo brilhante, fonte de 18px
+        targetElement.className = 'text-[18px] font-black text-center p-5 rounded-xl border-4 border-[#FFC726] bg-[#000000] text-[#FFC726] block my-4 animate-pulse w-full max-w-full shadow-2xl';
+      } else {
+        targetElement.className = 'text-xs text-center font-semibold mt-3 p-3 rounded-xl animate-fade-in block bg-green-500/10 border border-green-500/20 text-green-400';
+      }
     };
 
     // Acordeão behavior
@@ -1666,8 +1667,12 @@ function renderLogin(container) {
         }
       } catch (err) {
         console.error("Erro na autenticação:", err);
-        showFeedback("Erro na autenticação: " + (err.message || err), 'error', feedbackMsgLogin);
-        showErrorModal("Erro de Autenticação", err.message || err);
+        let msg = err.message || err;
+        if (msg === "Invalid login credentials") {
+          msg = "Credenciais de login inválidas. Por favor, verifique seu e-mail/usuário e senha.";
+        }
+        showFeedback(msg, 'error', feedbackMsgLogin);
+        showErrorModal("Erro de Autenticação", msg);
       } finally {
         btnLoginSubmit.disabled = false;
         btnLoginSubmit.textContent = 'ENTRAR';
@@ -1744,8 +1749,12 @@ function renderLogin(container) {
         }
       } catch (err) {
         console.error("Erro no cadastro:", err);
-        showFeedback("Erro no cadastro: " + (err.message || err), 'error', feedbackMsgRegister);
-        showErrorModal("Erro no Cadastro", err.message || err);
+        let msg = err.message || err;
+        if (msg === "Invalid login credentials") {
+          msg = "Credenciais de login inválidas. Por favor, verifique seu e-mail/usuário e senha.";
+        }
+        showFeedback(msg, 'error', feedbackMsgRegister);
+        showErrorModal("Erro no Cadastro", msg);
       } finally {
         btnRegisterSubmit.disabled = false;
         btnRegisterSubmit.textContent = 'FINALIZAR CADASTRO';
