@@ -1039,7 +1039,7 @@ function renderHeader() {
   }
 
   // Verifica se há o prompt de instalação disponível e insere o botão "Instalar App" no topo do menu do álbum
-  const headerContainer = document.querySelector('header .flex.items-center.gap-2');
+  const headerContainer = authBtn ? authBtn.parentElement : null;
   if (headerContainer && authBtn) {
     const prevInstallBtn = document.getElementById('pwaInstallBtn');
     if (prevInstallBtn) {

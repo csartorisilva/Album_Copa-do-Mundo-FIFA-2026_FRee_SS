@@ -114,6 +114,19 @@
         } else {
           // Se não houver sessão ativa no Supabase, limpa os dados locais de login de nuvem
           if (!isDemoMode) {
+            // Se for uma sessão simulada de teste local (bypass de rate limit), não a destrua no carregamento
+            if (currentUser && currentUser.uid && currentUser.uid.startsWith("mock-uid-")) {
+              if (event === 'SIGNED_OUT') {
+                currentUser = null;
+                localStorage.removeItem(sessionKey);
+                if (typeof renderHeader === 'function') renderHeader();
+              } else {
+                console.log("Mantendo sessão simulada de teste local ativa.");
+              }
+              return;
+            }
+
+            // Para sessões reais, limpa se a sessão do Supabase expirou/não existe
             currentUser = null;
             localStorage.removeItem(sessionKey);
             if (typeof renderHeader === 'function') renderHeader();
