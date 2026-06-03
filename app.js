@@ -1291,7 +1291,7 @@ function renderLogin(container) {
  
       try {
         btnSubmit.disabled = true;
-        btnSubmit.textContent = '🔄 Processando...';
+        btnSubmit.textContent = 'PROCESSANDO...';
  
         const result = await authDb.loginOrRegister(email, password, username, birthdate);
         
@@ -1320,20 +1320,19 @@ function renderLogin(container) {
  
     // Botão Fazer Depois (Pular / Ir para o Álbum)
     const btnLater = document.createElement('button');
-    btnLater.className = 'w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaYellow/40 text-gray-500 hover:text-gray-300 font-bold text-xs transition duration-200 mt-2 flex items-center justify-center gap-1.5 skip-login-btn';
+    btnLater.className = 'w-full py-3.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaYellow/40 transition duration-200 mt-2 flex flex-col items-center justify-center gap-1 skip-login-btn group';
     btnLater.innerHTML = `
-      <svg class="w-3.5 h-3.5 text-copaYellow animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-      </svg>
-      Pular por agora (continuar sem login)
+      <div class="flex items-center gap-1.5 text-gray-500 group-hover:text-gray-300 font-bold text-xs transition duration-200">
+        <svg class="w-3.5 h-3.5 text-copaYellow animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <span>Pular por agora (continuar sem login)</span>
+      </div>
+      <span class="text-[9.5px] text-red-400/70 font-semibold text-center leading-tight mt-0.5">
+        Nota: Seu álbum e suas figurinhas não ficarão salvos.
+      </span>
     `;
     grid.appendChild(btnLater);
- 
-    // Nota de texto em destaque dizendo exatamente: "Nota: Seu álbum e suas figurinhas não ficarão salvos."
-    const warningNote = document.createElement('p');
-    warningNote.className = 'text-[10px] font-bold text-red-500 text-center mt-2.5 opacity-90 leading-tight';
-    warningNote.textContent = 'Nota: Seu álbum e suas figurinhas não ficarão salvos.';
-    grid.appendChild(warningNote);
  
     wrapper.appendChild(grid);
   }

@@ -194,24 +194,36 @@
         throw new Error("Cliente Supabase não inicializado. Verifique se o SUPABASE_URL e o SUPABASE_KEY estão configurados no arquivo supabase_config.js.");
       }
 
-      // 1. Tenta fazer login primeiro
-      try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (!error && data.session) {
-          return { action: 'login', data };
+      // 1. Tenta fazer login primeiro de forma limpa e sequencial
+      const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({ email, password });
+      
+      // Se o login foi bem-sucedido e retornou sessão, finaliza aqui
+      if (!signInError && data && data.session) {
+        return { action: 'login', data };
+      }
+
+      // Tratamento detalhado de erros do login
+      if (signInError) {
+        const errorMsg = (signInError.message || "").toLowerCase();
+        const errorStatus = signInError.status;
+
+        // Se for erro de limite de requisições (Rate Limit 429), lança o erro imediatamente
+        const isRateLimit = errorStatus === 429 || errorMsg.includes("rate limit") || errorMsg.includes("too many requests");
+        if (isRateLimit) {
+          throw signInError;
         }
-        
-        // Se o erro for de rede ou diferente de credenciais inválidas, propaga
-        if (error && error.status !== 400 && !error.message.includes("Invalid login credentials") && !error.message.includes("invalid_credentials")) {
-          throw error;
-        }
-      } catch (e) {
-        if (e.message && !e.message.includes("Invalid login credentials") && !e.message.includes("invalid_credentials")) {
-          throw e;
+
+        // Se for outro erro de sistema/rede que não seja credenciais inválidas/usuário não encontrado, também propaga
+        const isInvalidCredentials = errorMsg.includes("invalid login credentials") || 
+                                     errorMsg.includes("invalid_credentials") || 
+                                     errorMsg.includes("user not found") ||
+                                     errorStatus === 400;
+        if (!isInvalidCredentials) {
+          throw signInError;
         }
       }
 
-      // Se o login falhou, consideramos que pode ser um novo cadastro.
+      // 2. Se o login falhou porque o usuário não existe (ou credenciais novas), prosseguimos para o cadastro.
       // O nome de usuário e a data de nascimento passam a ser obrigatórios.
       if (!username || !birthdate) {
         throw new Error("Credenciais inválidas. Se você deseja criar uma nova conta, preencha também o Nome de Usuário e a Data de Nascimento.");
