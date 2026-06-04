@@ -12,6 +12,16 @@
   let currentUser = null;
   const sessionKey = "album_auth_session";
 
+  // Helper para impor limite de tempo nas requisições do Supabase (impede travamentos em "PROCESSANDO")
+  const promiseWithTimeout = (promise, ms = 12000) => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("A conexão com o servidor expirou (Timeout). Verifique se sua conexão está ativa ou se sua rede corporativa/VPN está bloqueando as requisições para a nuvem do Supabase.")), ms)
+      )
+    ]);
+  };
+
   // Carrega sessão salva no LocalStorage como fallback imediato
   const savedSession = localStorage.getItem(sessionKey);
   if (savedSession) {
