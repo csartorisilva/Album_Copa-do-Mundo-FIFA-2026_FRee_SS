@@ -3209,6 +3209,7 @@ function shareTextViaSystem(title, text) {
 // ------------------- TROCAS -------------------
 // Global Trades State
 let currentTradesSubTab = 'match'; // 'match', 'manual' ou 'estou_trocando'
+let missingStickersSortOrder = 'alpha'; // 'alpha' ou 'album'
 let estouTrocandoState = {
   negotiating: [],
   matched: []
@@ -4014,17 +4015,46 @@ function renderTrades(container) {
     const colFaltantes = document.createElement('div');
     colFaltantes.className = 'glass-panel p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/[0.02] flex flex-col gap-2.5';
 
+    const faltantesHeaderRow = document.createElement('div');
+    faltantesHeaderRow.className = 'flex justify-between items-center w-full';
+
     const faltantesTitle = document.createElement('h3');
     faltantesTitle.className = 'text-[10px] font-black text-yellow-400 uppercase tracking-widest flex items-center gap-1.5';
     faltantesTitle.innerHTML = '🟨 Faltantes';
-    colFaltantes.appendChild(faltantesTitle);
+    faltantesHeaderRow.appendChild(faltantesTitle);
 
-    // Filtro para faltantes
+    const btnPrintMissing = document.createElement('button');
+    btnPrintMissing.className = 'py-0.5 px-2 bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500/20 text-yellow-400 font-bold text-[9px] uppercase tracking-wider rounded transition-all duration-200 active:scale-95 flex items-center gap-1 cursor-pointer';
+    btnPrintMissing.innerHTML = '🖨️ Imprimir';
+    btnPrintMissing.onclick = () => printMissingStickers();
+    faltantesHeaderRow.appendChild(btnPrintMissing);
+
+    colFaltantes.appendChild(faltantesHeaderRow);
+
+    // Filtro e Ordenação para faltantes
+    const filterSortRow = document.createElement('div');
+    filterSortRow.className = 'flex gap-2 w-full';
+
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
-    searchInput.placeholder = 'Buscar figurinha (ex: BRA, 10)...';
-    searchInput.className = 'w-full bg-[#131735]/80 text-white placeholder-gray-500 border border-white/5 focus:border-yellow-500/40 text-[10px] px-2.5 py-1.5 rounded-lg focus:outline-none transition-all duration-200';
-    colFaltantes.appendChild(searchInput);
+    searchInput.placeholder = 'Buscar...';
+    searchInput.className = 'flex-1 min-w-0 bg-[#131735]/80 text-white placeholder-gray-500 border border-white/5 focus:border-yellow-500/40 text-[10px] px-2.5 py-1.5 rounded-lg focus:outline-none transition-all duration-200';
+    filterSortRow.appendChild(searchInput);
+
+    const sortSelect = document.createElement('select');
+    sortSelect.className = 'bg-[#131735]/80 text-white border border-white/5 focus:border-yellow-500/40 text-[10px] px-2 py-1.5 rounded-lg focus:outline-none cursor-pointer';
+    sortSelect.innerHTML = `
+      <option value="alpha">A-Z (Alfabética)</option>
+      <option value="album">Álbum (Ordem)</option>
+    `;
+    sortSelect.value = missingStickersSortOrder;
+    sortSelect.onchange = (e) => {
+      missingStickersSortOrder = e.target.value;
+      updateLists();
+    };
+    filterSortRow.appendChild(sortSelect);
+
+    colFaltantes.appendChild(filterSortRow);
 
     const faltantesList = document.createElement('div');
     faltantesList.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 gap-1.5 overflow-y-auto max-h-[300px] pr-1.5';
@@ -4104,6 +4134,15 @@ function renderTrades(container) {
         }
         return true;
       });
+
+      // Ordenar as faltantes
+      if (missingStickersSortOrder === 'alpha') {
+        missingKeys.sort((a, b) => {
+          const labelA = getStickerDisplayLabel(a);
+          const labelB = getStickerDisplayLabel(b);
+          return labelA.localeCompare(labelB, 'pt', { numeric: true });
+        });
+      }
 
       // Renderizar Faltantes (Amarelo)
       if (missingKeys.length === 0) {
@@ -4206,6 +4245,141 @@ function renderTrades(container) {
   tabManual.onclick = () => { currentTradesSubTab = 'manual'; setTradesSubTabState(); };
   tabEstouTrocando.onclick = () => { currentTradesSubTab = 'estou_trocando'; setTradesSubTabState(); };
   setTradesSubTabState();
+}
+
+function printMissingStickers() {
+  const albumId = storage.getCurrentAlbumId();
+  const albums = storage.getAlbums();
+  const album = albums[albumId] || { stickers: {} };
+  const userStickers = album.stickers || {};
+
+  const allStickerKeys = [];
+  groupsData.forEach(g => {
+    g.teams.forEach(t => {
+      for (let i = 1; i <= 20; i++) {
+        allStickerKeys.push(`${t.code}-${i}`);
+      }
+    });
+  });
+  for (let i = 1; i <= 19; i++) allStickerKeys.push(`FWC-${i}`);
+  for (let i = 1; i <= 14; i++) allStickerKeys.push(`CC-${i}`);
+
+  const variants = ['ouro', 'prata', 'bronze', 'bordo'];
+  for (let i = 1; i <= 20; i++) {
+    variants.forEach(variant => {
+      allStickerKeys.push(`EXTRAS-${i}-${variant}`);
+    });
+  }
+
+  // Filter missing
+  let missingKeys = allStickerKeys.filter(key => {
+    const isOwned = userStickers[key] ? userStickers[key].owned : false;
+    const isNegotiating = estouTrocandoState.negotiating.includes(key);
+    const isMatched = estouTrocandoState.matched.includes(key);
+    return !(isOwned || isNegotiating || isMatched);
+  });
+
+  // Sort
+  if (missingStickersSortOrder === 'alpha') {
+    missingKeys.sort((a, b) => {
+      const labelA = getStickerDisplayLabel(a);
+      const labelB = getStickerDisplayLabel(b);
+      return labelA.localeCompare(labelB, 'pt', { numeric: true });
+    });
+  }
+
+  const displayLabels = missingKeys.map(key => getStickerDisplayLabel(key));
+
+  if (displayLabels.length === 0) {
+    alert("Você não tem figurinhas faltantes para imprimir!");
+    return;
+  }
+
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow.document;
+  
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Figurinhas Faltantes</title>
+      <style>
+        @page {
+          size: A4 portrait;
+          margin: 10mm;
+        }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          color: #000;
+          background: #fff;
+        }
+        h1 {
+          font-size: 18px;
+          margin-bottom: 5px;
+          text-align: center;
+          text-transform: uppercase;
+        }
+        .info-header {
+          font-size: 11px;
+          margin-bottom: 15px;
+          text-align: center;
+          color: #444;
+          border-bottom: 1px solid #ddd;
+          padding-bottom: 5px;
+        }
+        .grid-container {
+          display: grid;
+          grid-template-columns: repeat(20, minmax(0, 1fr));
+          gap: 2px;
+          width: 100%;
+        }
+        .sticker-item {
+          font-size: 16px;
+          font-weight: bold;
+          text-align: center;
+          padding: 6px 0;
+          border: 1px solid #bbb;
+          background-color: #fff;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Figurinhas Faltantes</h1>
+      <div class="info-header">
+        Total de figurinhas: <strong>${displayLabels.length}</strong> | Gerado em: ${new Date().toLocaleDateString('pt-BR')}
+      </div>
+      <div class="grid-container">
+        ${displayLabels.map(label => `<div class="sticker-item">${label}</div>`).join('')}
+      </div>
+    </body>
+    </html>
+  `;
+
+  doc.open();
+  doc.write(htmlContent);
+  doc.close();
+
+  iframe.contentWindow.focus();
+  setTimeout(() => {
+    iframe.contentWindow.print();
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 1000);
+  }, 500);
 }
 
 // Funções utilitárias de compartilhamento de listas
