@@ -246,11 +246,11 @@
 
         if (!isEmail) {
           try {
-            const { data: profile, error: queryError } = await supabaseClient
+            const { data: profile, error: queryError } = await promiseWithTimeout(supabaseClient
               .from('profiles')
               .select('email')
               .ilike('username', finalEmail)
-              .maybeSingle();
+              .maybeSingle());
               
             if (queryError) throw queryError;
             if (profile && profile.email) {
@@ -265,10 +265,10 @@
         }
 
         // Tenta fazer login tradicional (Exclusivo para o bloco Já Tenho Conta)
-        const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({ 
+        const { data, error: signInError } = await promiseWithTimeout(supabaseClient.auth.signInWithPassword({ 
           email: finalEmail, 
           password: cleanPassword 
-        });
+        }));
         if (signInError) {
           throw signInError;
         }
@@ -307,17 +307,17 @@
       }
 
       // 1. Validamos se o username é único antes de prosseguir
-      const { data: checkUser } = await supabaseClient
+      const { data: checkUser } = await promiseWithTimeout(supabaseClient
         .from('profiles')
         .select('uid')
         .eq('username', cleanUsername)
-        .maybeSingle();
+        .maybeSingle());
       if (checkUser) {
         throw new Error("Este Nome de Usuário já está em uso. Por favor, escolha outro.");
       }
 
       // 2. Tenta realizar o cadastro (signUp) direto
-      const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+      const { data: signUpData, error: signUpError } = await promiseWithTimeout(supabaseClient.auth.signUp({
         email: cleanEmail,
         password: cleanPassword,
         options: {
@@ -326,7 +326,7 @@
             birthdate: finalBirthdate
           }
         }
-      });
+      }));
 
       if (signUpError) {
         const errorMsg = (signUpError.message || "").toLowerCase();
@@ -362,10 +362,10 @@
       if (signUpData && signUpData.session) {
         try {
           console.log("Cadastro bem-sucedido com sessão nativa. Definindo sessão...");
-          await supabaseClient.auth.setSession({
+          await promiseWithTimeout(supabaseClient.auth.setSession({
             access_token: signUpData.session.access_token,
             refresh_token: signUpData.session.refresh_token
-          });
+          }));
 
           // SALVA SESSÃO LOCALMENTE DE FORMA IMEDIATA
           const user = signUpData.session.user;
@@ -392,16 +392,16 @@
         await new Promise(resolve => setTimeout(resolve, 800));
 
         try {
-          const { data: signInData, error: signInErr } = await supabaseClient.auth.signInWithPassword({ 
+          const { data: signInData, error: signInErr } = await promiseWithTimeout(supabaseClient.auth.signInWithPassword({ 
             email: cleanEmail, 
             password: cleanPassword 
-          });
+          }));
           if (signInErr) throw signInErr;
           if (signInData && signInData.session) {
-            await supabaseClient.auth.setSession({
+            await promiseWithTimeout(supabaseClient.auth.setSession({
               access_token: signInData.session.access_token,
               refresh_token: signInData.session.refresh_token
-            });
+            }));
             signUpData.session = signInData.session;
 
             // SALVA SESSÃO LOCALMENTE DE FORMA IMEDIATA

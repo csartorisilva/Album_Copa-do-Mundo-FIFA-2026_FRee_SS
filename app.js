@@ -1518,6 +1518,26 @@ function renderLogin(container) {
       }
     };
 
+    const startDotsAnimation = (btn, baseText) => {
+      if (btn._dotsInterval) {
+        clearInterval(btn._dotsInterval);
+      }
+      let count = 1;
+      btn.textContent = baseText + '.';
+      btn._dotsInterval = setInterval(() => {
+        count = (count % 3) + 1;
+        btn.textContent = baseText + '.'.repeat(count);
+      }, 400);
+    };
+
+    const stopDotsAnimation = (btn, originalText) => {
+      if (btn._dotsInterval) {
+        clearInterval(btn._dotsInterval);
+        btn._dotsInterval = null;
+      }
+      btn.textContent = originalText;
+    };
+
     // Acordeão behavior
     const arrowLogin = btnToggleLogin.querySelector('#arrowLogin');
     const arrowRegister = btnToggleRegister.querySelector('#arrowRegister');
@@ -1628,7 +1648,7 @@ function renderLogin(container) {
 
       try {
         btnLoginSubmit.disabled = true;
-        btnLoginSubmit.textContent = 'PROCESSANDO...';
+        startDotsAnimation(btnLoginSubmit, 'PROCESSANDO');
         showFeedback("", 'success', feedbackMsgLogin);
  
         const result = await authDb.loginOrRegister(emailOrUser, password);
@@ -1643,7 +1663,7 @@ function renderLogin(container) {
         showFeedback(msg, 'error', feedbackMsgLogin);
       } finally {
         btnLoginSubmit.disabled = false;
-        btnLoginSubmit.textContent = 'ENTRAR';
+        stopDotsAnimation(btnLoginSubmit, 'ENTRAR');
       }
     };
 
@@ -1694,13 +1714,16 @@ function renderLogin(container) {
  
       try {
         btnRegisterSubmit.disabled = true;
-        btnRegisterSubmit.textContent = 'PROCESSANDO...';
+        startDotsAnimation(btnRegisterSubmit, 'PROCESSANDO');
         showFeedback("", 'success', feedbackMsgRegister);
  
         const result = await authDb.loginOrRegister(email, password, username, birthdateYYYYMMDD);
         
         if (result.action === 'register') {
-          window.location.href = "album.html";
+          showFeedback("Conta criada com sucesso! Redirecionando para o álbum...", 'success', feedbackMsgRegister);
+          setTimeout(() => {
+            window.location.href = "album.html";
+          }, 1500);
         }
       } catch (err) {
         console.error("Erro no cadastro:", err);
@@ -1711,7 +1734,7 @@ function renderLogin(container) {
         showFeedback(msg, 'error', feedbackMsgRegister);
       } finally {
         btnRegisterSubmit.disabled = false;
-        btnRegisterSubmit.textContent = 'FINALIZAR CADASTRO';
+        stopDotsAnimation(btnRegisterSubmit, 'FINALIZAR CADASTRO');
       }
     };
 
