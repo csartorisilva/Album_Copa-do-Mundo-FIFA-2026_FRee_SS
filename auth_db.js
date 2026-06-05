@@ -96,15 +96,23 @@
               if (profile.username) displayName = profile.username;
               if (profile.birthdate) userBirthdate = profile.birthdate;
               
-              // Sincroniza o álbum local se o perfil na nuvem tiver figurinhas
-              if (profile.stickers && Object.keys(profile.stickers).length > 0) {
-                const activeAlbumId = localStorage.getItem('currentAlbumId');
-                const albums = JSON.parse(localStorage.getItem('albums') || '{}');
-                if (activeAlbumId && albums[activeAlbumId]) {
-                  albums[activeAlbumId].stickers = { ...albums[activeAlbumId].stickers, ...profile.stickers };
-                  localStorage.setItem('albums', JSON.stringify(albums));
-                }
+              // Sincroniza o álbum local com o perfil na nuvem (cria o álbum se não existir no novo dispositivo)
+              let activeAlbumId = localStorage.getItem('currentAlbumId');
+              let albums = {};
+              try {
+                albums = JSON.parse(localStorage.getItem('albums') || '{}');
+              } catch (e) {}
+
+              if (!activeAlbumId || Object.keys(albums).length === 0) {
+                activeAlbumId = "album-" + Math.random().toString(36).substring(2, 9);
+                albums[activeAlbumId] = { name: 'Meu Álbum Principal', stickers: {} };
+                localStorage.setItem('currentAlbumId', activeAlbumId);
               }
+
+              if (profile.stickers && Object.keys(profile.stickers).length > 0) {
+                albums[activeAlbumId].stickers = { ...albums[activeAlbumId].stickers, ...profile.stickers };
+              }
+              localStorage.setItem('albums', JSON.stringify(albums));
             } else {
               // Se o perfil do usuário não existe na tabela profiles, cria um novo
               await supabaseClient.from('profiles').insert({
