@@ -3017,7 +3017,7 @@ function renderTeamPage(code, container) {
       } else if (code === 'CC') {
         // Logo da coca-cola ao invés de bandeira
         miniCrest.src = './crests/Logo CocaZero Copa1.png';
-        miniCrest.className = 'w-5 h-5 object-contain bg-white/10 p-0.5 rounded border border-white/20';
+        miniCrest.className = 'w-10 h-5 object-contain bg-white/10 p-0.5 rounded border border-white/20';
       } else {
         const flagCode = (flagMap[code] || 'us').toLowerCase();
         miniCrest.src = crestsMap[code] || `https://flagcdn.com/w40/${flagCode}.png`;
@@ -3433,879 +3433,161 @@ function getStickerDisplayLabel(key) {
 }
 
 
-function renderTrades(container) {
+const after = content.substring(shareTextStart);
+
+const newLogic = `function renderTrades(container) {
   const user = authDb.getCurrentUser();
   if (!user) {
     const lockBox = document.createElement('div');
     lockBox.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 text-center space-y-6 animate-fade-in';
-    lockBox.innerHTML = `
+    lockBox.innerHTML = \`
       <div class="text-5xl">🔒</div>
       <h2 class="text-xl font-black text-white uppercase tracking-wider">Acesso Restrito</h2>
-      <p class="text-xs text-gray-400">Faça login para participar das Trocas e ver pessoas próximas com quem você pode trocar figurinhas.</p>
+      <p class="text-xs text-gray-400">Faça login para participar das Trocas e gerenciar listas de figurinhas.</p>
       <button onclick="location.hash = '#login'" class="w-full py-3 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 text-black font-black text-xs uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition">
         Entrar / Fazer Login
       </button>
-    `;
+    \`;
     container.appendChild(lockBox);
     return;
   }
 
-
-
   const mainDiv = document.createElement('div');
-  mainDiv.className = 'space-y-5 py-2 animate-fade-in';
+  mainDiv.className = 'space-y-5 py-2 animate-fade-in pb-20';
 
   const headerRow = document.createElement('div');
-  headerRow.className = 'flex justify-between items-center w-full mb-1';
+  headerRow.className = 'flex justify-between items-center w-full mb-4 border-b border-white/10 pb-2';
   
   const title = document.createElement('h2');
-  title.className = 'text-xs font-black text-white uppercase tracking-wider';
-  title.textContent = '🤝 Central de Trocas';
+  title.className = 'text-sm font-black text-white uppercase tracking-wider flex items-center gap-2';
+  title.innerHTML = 'Faltantes <button onclick="printMissingStickers()" class="py-1 px-2 bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500/20 text-yellow-400 font-bold text-[10px] uppercase tracking-wider rounded-lg transition-all active:scale-95 ml-2 cursor-pointer flex items-center gap-1">🖨️ PDF</button>';
   
+  const rightHeader = document.createElement('div');
+  rightHeader.className = 'flex items-center gap-1.5';
+
+  const btnShareOwned = document.createElement('button');
+  btnShareOwned.className = 'p-2 bg-white/5 hover:bg-copaGreen/10 border border-white/10 hover:border-copaGreen/30 rounded-lg text-copaGreen transition flex items-center justify-center';
+  btnShareOwned.title = 'Compartilhar figurinhas coladas';
+  btnShareOwned.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>';
+  btnShareOwned.onclick = () => shareOwnedList();
+  rightHeader.appendChild(btnShareOwned);
+
+  const btnShareMissing = document.createElement('button');
+  btnShareMissing.className = 'p-2 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 rounded-lg text-red-400 transition flex items-center justify-center';
+  btnShareMissing.title = 'Compartilhar figurinhas faltantes';
+  btnShareMissing.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>';
+  btnShareMissing.onclick = () => shareMissingList();
+  rightHeader.appendChild(btnShareMissing);
+
+  const btnShareDuplicates = document.createElement('button');
+  btnShareDuplicates.className = 'p-2 bg-white/5 hover:bg-copaYellow/10 border border-white/10 hover:border-copaYellow/30 rounded-lg text-copaYellow transition flex items-center justify-center';
+  btnShareDuplicates.title = 'Compartilhar repetidas';
+  btnShareDuplicates.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4" /></svg>';
+  btnShareDuplicates.onclick = () => shareDuplicatesList();
+  rightHeader.appendChild(btnShareDuplicates);
+
   const btnBack = document.createElement('button');
-  btnBack.className = 'py-1 px-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold text-[9px] uppercase tracking-wide rounded-lg transition';
-  btnBack.textContent = '🏠 Voltar ao Álbum';
-  btnBack.onclick = () => {
-    location.hash = '#home';
-  };
-  
+  btnBack.className = 'ml-1 py-1.5 px-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold text-[9px] uppercase tracking-wide rounded-lg transition';
+  btnBack.textContent = '🏠 Voltar';
+  btnBack.onclick = () => { location.hash = '#home'; };
+  rightHeader.appendChild(btnBack);
+
   headerRow.appendChild(title);
-  headerRow.appendChild(btnBack);
+  headerRow.appendChild(rightHeader);
   mainDiv.appendChild(headerRow);
 
-  // Bloco de Compartilhamento (filtros de COLADAS, FALTAM e REPETIDAS) transferido para a tela de Trocas
-  const shareBlock = document.createElement('div');
-  shareBlock.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-2.5 w-full mb-4';
+  // Load Album Data
+  const albumId = storage.getCurrentAlbumId();
+  const albums = storage.getAlbums();
+  const album = albums[albumId] || { stickers: {} };
+  const userStickers = album.stickers || {};
 
-  const shareTitle = document.createElement('h3');
-  shareTitle.className = 'text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1';
-  shareTitle.textContent = 'Exportar / Compartilhar Listas';
-  shareBlock.appendChild(shareTitle);
+  const isMissing = (key) => {
+    const isOwned = userStickers[key] ? userStickers[key].owned : false;
+    const isNegotiating = estouTrocandoState.negotiating.includes(key);
+    const isMatched = estouTrocandoState.matched.includes(key);
+    return !(isOwned || isNegotiating || isMatched);
+  };
 
-  const shareButtonsContainer = document.createElement('div');
-  shareButtonsContainer.className = 'grid grid-cols-3 gap-2 w-full';
+  const getCrestUrlHelper = (code) => {
+    if (code === 'FWC') return 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
+    if (code === 'CC') return './crests/Logo CocaZero Copa1.png';
+    return crestsMap[code] || \`https://flagcdn.com/w40/\${flagMap[code] || 'un'}.png\`;
+  };
 
-  // 1. Possuo (Owned)
-  const btnShareOwned = document.createElement('button');
-  btnShareOwned.className = 'px-2 py-2 bg-white/5 hover:bg-copaGreen/10 border border-white/10 hover:border-copaGreen/30 rounded-lg text-white hover:text-copaGreen transition text-[9px] font-bold uppercase tracking-wider flex items-center justify-center gap-1';
-  btnShareOwned.title = 'Compartilhar figurinhas coladas';
-  btnShareOwned.innerHTML = `
-    <svg class="w-3.5 h-3.5 text-copaGreen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-    </svg>
-    Coladas
-  `;
-  btnShareOwned.onclick = () => shareOwnedList();
-  shareButtonsContainer.appendChild(btnShareOwned);
-
-  // 2. Faltam (Missing)
-  const btnShareMissing = document.createElement('button');
-  btnShareMissing.className = 'px-2 py-2 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 rounded-lg text-white hover:text-red-400 transition text-[9px] font-bold uppercase tracking-wider flex items-center justify-center gap-1';
-  btnShareMissing.title = 'Compartilhar figurinhas faltantes';
-  btnShareMissing.innerHTML = `
-    <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-    Faltam
-  `;
-  btnShareMissing.onclick = () => shareMissingList();
-  shareButtonsContainer.appendChild(btnShareMissing);
-
-  // 3. Repetidas (Duplicates)
-  const btnShareDuplicates = document.createElement('button');
-  btnShareDuplicates.className = 'px-2 py-2 bg-white/5 hover:bg-copaYellow/10 border border-white/10 hover:border-copaYellow/30 rounded-lg text-white hover:text-copaYellow transition text-[9px] font-bold uppercase tracking-wider flex items-center justify-center gap-1';
-  btnShareDuplicates.title = 'Compartilhar repetidas para troca';
-  btnShareDuplicates.innerHTML = `
-    <svg class="w-3.5 h-3.5 text-copaYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4" />
-    </svg>
-    Repetidas
-  `;
-  btnShareDuplicates.onclick = () => shareDuplicatesList();
-  shareButtonsContainer.appendChild(btnShareDuplicates);
-
-  shareBlock.appendChild(shareButtonsContainer);
-  mainDiv.appendChild(shareBlock);
-
-  const tabCard = document.createElement('div');
-  tabCard.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
+  const teamsToProcess = [];
   
-  const tabRow = document.createElement('div');
-  tabRow.className = 'flex border-b border-white/5';
-  
-  const tabMatch = document.createElement('button');
-  tabMatch.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'match' ? 'active-tab' : ''}`;
-  tabMatch.textContent = 'Matches 💡';
-  
-  const tabManual = document.createElement('button');
-  tabManual.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'manual' ? 'active-tab' : ''}`;
-  tabManual.textContent = 'Minha Rede 👥';
-
-  const tabEstouTrocando = document.createElement('button');
-  tabEstouTrocando.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'estou_trocando' ? 'active-tab' : ''}`;
-  tabEstouTrocando.textContent = 'Estou Trocando 🔄';
-  
-  tabRow.appendChild(tabMatch);
-  tabRow.appendChild(tabManual);
-  tabRow.appendChild(tabEstouTrocando);
-  tabCard.appendChild(tabRow);
-  mainDiv.appendChild(tabCard);
-  
-  const subContentContainer = document.createElement('div');
-  subContentContainer.className = 'space-y-4';
-  mainDiv.appendChild(subContentContainer);
-  container.appendChild(mainDiv);
-
-  function setTradesSubTabState() {
-    tabMatch.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'match' ? 'active-tab' : ''}`;
-    tabManual.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'manual' ? 'active-tab' : ''}`;
-    tabEstouTrocando.className = `flex-1 py-2 text-center text-[11px] sm:text-xs font-bold text-gray-400 hover:text-white transition ${currentTradesSubTab === 'estou_trocando' ? 'active-tab' : ''}`;
-    
-    subContentContainer.innerHTML = '';
-    
-    if (currentTradesSubTab === 'match') {
-      renderMatchSuggestions(subContentContainer);
-    } else if (currentTradesSubTab === 'manual') {
-      renderManualTradesList(subContentContainer);
-    } else if (currentTradesSubTab === 'estou_trocando') {
-      renderEstouTrocandoBoard(subContentContainer);
-    }
-  }
-
-  async function renderMatchSuggestions(subContainer) {
-    subContainer.innerHTML = '';
-    // 1. Barra de filtro superior com Lupa e Raio
-    const filterCard = document.createElement('div');
-    filterCard.className = 'glass-panel p-3 rounded-xl border border-white/5 bg-[#131735]/60 flex justify-between items-center w-full mb-3';
-    
-    const filterWrapper = document.createElement('div');
-    filterWrapper.className = 'flex items-center gap-2';
-    
-    const searchIcon = document.createElement('span');
-    searchIcon.textContent = '🔎';
-    searchIcon.className = 'text-xs text-copaYellow';
-    filterWrapper.appendChild(searchIcon);
-
-    const filterLabel = document.createElement('span');
-    filterLabel.className = 'text-[9px] font-black text-gray-400 uppercase tracking-wider';
-    filterLabel.textContent = 'Buscar no raio:';
-    filterWrapper.appendChild(filterLabel);
-
-    const radiusSelector = document.createElement('select');
-    radiusSelector.className = 'bg-[#131735] text-white border border-white/10 text-[10px] px-2 py-1 rounded-lg focus:outline-none cursor-pointer';
-    
-    const radiusOptions = [
-      { value: 1, label: '1 km' },
-      { value: 5, label: '5 km' },
-      { value: 15, label: '15 km' },
-      { value: 50, label: '50 km' },
-      { value: 99999, label: 'Ilimitado' }
-    ];
-
-    radiusOptions.forEach(opt => {
-      const el = document.createElement('option');
-      el.value = opt.value;
-      el.textContent = opt.label;
-      if (opt.value === currentCommunityRadius) el.selected = true;
-      radiusSelector.appendChild(el);
-    });
-
-    radiusSelector.onchange = (e) => {
-      currentCommunityRadius = parseInt(e.target.value, 10);
-      renderMatchSuggestions(subContainer);
-    };
-
-    filterWrapper.appendChild(radiusSelector);
-    filterCard.appendChild(filterWrapper);
-    subContainer.appendChild(filterCard);
-
-    const listDiv = document.createElement('div');
-    listDiv.className = 'space-y-4';
-    subContainer.appendChild(listDiv);
-
-    listDiv.innerHTML = '<p class="text-center text-xs text-gray-400 py-6 animate-pulse">Cruzando dados de colecionadores...</p>';
-    
-    try {
-      const allCollectors = await authDb.getNearbyCollectors(user.latitude, user.longitude, currentCommunityRadius);
-      const favs = authDb.getFavorites();
-      const collectors = allCollectors.filter(c => favs.includes(c.uid));
-      listDiv.innerHTML = '';
-      
-      const localAlbums = JSON.parse(localStorage.getItem('albums') || '{}');
-      const activeAlbumId = localStorage.getItem('currentAlbumId');
-      const activeAlbum = localAlbums[activeAlbumId] || { stickers: {} };
-      const userStickers = activeAlbum.stickers || {};
-      
-      const matchingCollectors = [];
-      
-      const allCodes = [];
-      groupsData.forEach(g => g.teams.forEach(t => allCodes.push(t.code)));
-      allCodes.push('FWC', 'CC', 'EXTRAS');
-
-      collectors.forEach(c => {
-        const heHasForYou = [];
-        const youHaveForHim = [];
-
-        allCodes.forEach(code => {
-          if (code === 'EXTRAS') return;
-          const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
-          for (let i = 1; i <= limit; i++) {
-            const key = `${code}-${i}`;
-            const userSticker = userStickers[key];
-            const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
-
-            const collectorSticker = c.stickers[key];
-            const collectorOwned = collectorSticker ? collectorSticker.owned : false;
-            const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
-            const userOwned = userSticker ? userSticker.owned : false;
-
-            if (userDup > 0 && !collectorOwned) {
-              youHaveForHim.push(key);
-            }
-            if (collectorDup > 0 && !userOwned) {
-              heHasForYou.push(key);
-            }
-          }
-        });
-
-        const premiumVariants = ['ouro', 'prata', 'bronze', 'bordo'];
-        premiumVariants.forEach(variant => {
-          for (let i = 1; i <= 20; i++) {
-            const key = `EXTRAS-${i}-${variant}`;
-            const userSticker = userStickers[key];
-            const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
-
-            const collectorSticker = c.stickers[key];
-            const collectorOwned = collectorSticker ? collectorSticker.owned : false;
-            const collectorDup = collectorSticker ? (collectorSticker.duplicate || 0) : 0;
-            const userOwned = userSticker ? userSticker.owned : false;
-
-            if (userDup > 0 && !collectorOwned) {
-              youHaveForHim.push(key);
-            }
-            if (collectorDup > 0 && !userOwned) {
-              heHasForYou.push(key);
-            }
-          }
-        });
-        
-        if (heHasForYou.length > 0 && youHaveForHim.length > 0) {
-          matchingCollectors.push({
-            collector: c,
-            heHasForYou,
-            youHaveForHim
-          });
-        }
-      });
-      
-      if (matchingCollectors.length === 0) {
-        listDiv.innerHTML = `
-          <div class="glass-panel p-8 rounded-2xl border-white/5 text-center py-10">
-            <p class="text-xs text-gray-400">Nenhum match encontrado na sua área no raio de ${currentCommunityRadius === 99999 ? 'Ilimitado' : currentCommunityRadius + ' km'}.</p>
-            <p class="text-[9px] text-gray-500 mt-2">Dica: Adicione mais figurinhas repetidas no seu álbum ou aumente o raio de busca!</p>
-          </div>
-        `;
-        return;
-      }
-      
-      matchingCollectors.forEach(item => {
-        const c = item.collector;
-        
-        const card = document.createElement('div');
-        card.className = 'glass-panel p-4 rounded-xl border border-white/5 bg-[#131735]/40 space-y-3 transition hover:border-white/10';
-        
-        // Header clicável para expandir
-        const cardHeader = document.createElement('div');
-        cardHeader.className = 'flex justify-between items-center cursor-pointer';
-        
-        const userInfo = document.createElement('div');
-        userInfo.className = 'flex items-center gap-2.5';
-        
-        const avatar = document.createElement('img');
-        avatar.src = c.photo_url;
-        avatar.className = 'w-8 h-8 rounded-full object-cover border border-white/10';
-        
-        const textInfo = document.createElement('div');
-        textInfo.className = 'text-left';
-        textInfo.innerHTML = `
-          <h3 class="font-black text-white text-[10px] leading-tight">${c.name} <span class="text-[7px] bg-purple-500 text-white font-black uppercase px-1.5 py-0.5 rounded-full ml-1 animate-pulse">🤝 MATCH PERFEITO</span></h3>
-          <p class="text-[8px] text-gray-400 mt-0.5">📍 ${c.distance} km de distância</p>
-        `;
-        
-        userInfo.appendChild(avatar);
-        userInfo.appendChild(textInfo);
-        cardHeader.appendChild(userInfo);
-        
-        const pairCount = Math.min(item.heHasForYou.length, item.youHaveForHim.length);
-        const countsCol = document.createElement('div');
-        countsCol.className = 'text-right flex flex-col gap-0.5';
-        countsCol.innerHTML = `
-          <p class="text-[10px] text-gray-300 font-bold">${pairCount} Match(es) Perfeito(s) 🤝</p>
-          <p class="text-[8px] text-gray-400">Clique para expandir</p>
-        `;
-        cardHeader.appendChild(countsCol);
-        card.appendChild(cardHeader);
-        
-        // Área expansível (Escondida por padrão)
-        const expandedArea = document.createElement('div');
-        expandedArea.className = 'border-t border-white/5 pt-3 space-y-3';
-        expandedArea.style.display = 'none';
-        
-        // Construção dos pares de Match Perfeito
-        const perfectPairs = [];
-        for (let i = 0; i < pairCount; i++) {
-          perfectPairs.push({
-            receive: item.heHasForYou[i],
-            give: item.youHaveForHim[i],
-            selected: true
-          });
-        }
-        
-        const listHeader = document.createElement('div');
-        listHeader.className = 'flex justify-between items-center px-2 text-[8px] font-black text-gray-400 uppercase tracking-wider mb-1';
-        listHeader.innerHTML = `
-          <span>Ele me dá</span>
-          <span>Troca 1:1</span>
-          <span>Eu entrego</span>
-        `;
-        expandedArea.appendChild(listHeader);
-        
-        const pairsListContainer = document.createElement('div');
-        pairsListContainer.className = 'space-y-2 max-h-[200px] overflow-y-auto pr-1';
-        
-        perfectPairs.forEach((pair, idx) => {
-          const row = document.createElement('div');
-          row.className = 'flex items-center justify-between p-2 rounded-xl border border-white/5 bg-[#131735]/40 hover:bg-[#131735]/70 transition cursor-pointer select-none';
-          
-          const leftSide = document.createElement('div');
-          leftSide.className = 'flex items-center gap-2';
-          
-          const checkbox = document.createElement('input');
-          checkbox.type = 'checkbox';
-          checkbox.checked = pair.selected;
-          checkbox.className = 'rounded border-white/10 bg-[#131735] text-copaYellow focus:ring-0 cursor-pointer';
-          
-          const receiveCap = createMiniStickerCapsule(pair.receive);
-          receiveCap.style.pointerEvents = 'none';
-          
-          leftSide.appendChild(checkbox);
-          leftSide.appendChild(receiveCap);
-          
-          const arrow = document.createElement('span');
-          arrow.className = 'text-xs text-gray-400 font-bold';
-          arrow.textContent = '⇄';
-          
-          const rightSide = document.createElement('div');
-          rightSide.className = 'flex items-center gap-2';
-          
-          const giveCap = createMiniStickerCapsule(pair.give);
-          giveCap.style.pointerEvents = 'none';
-          
-          rightSide.appendChild(giveCap);
-          
-          row.appendChild(leftSide);
-          row.appendChild(arrow);
-          row.appendChild(rightSide);
-          
-          row.onclick = (e) => {
-            e.stopPropagation();
-            pair.selected = !pair.selected;
-            checkbox.checked = pair.selected;
-            if (pair.selected) {
-              row.className = 'flex items-center justify-between p-2 rounded-xl border border-copaYellow/20 bg-[#131735]/40 hover:bg-[#131735]/70 transition cursor-pointer select-none';
-            } else {
-              row.className = 'flex items-center justify-between p-2 rounded-xl border border-white/5 bg-[#131735]/20 hover:bg-[#131735]/40 transition cursor-pointer select-none opacity-50';
-            }
-            updateCounter();
-          };
-          
-          if (pair.selected) {
-            row.className = 'flex items-center justify-between p-2 rounded-xl border border-copaYellow/20 bg-[#131735]/40 hover:bg-[#131735]/70 transition cursor-pointer select-none';
-          }
-          
-          pairsListContainer.appendChild(row);
-        });
-        expandedArea.appendChild(pairsListContainer);
-        
-        // Rodapé do expandível com contador e botão de ação
-        const footerRow = document.createElement('div');
-        footerRow.className = 'flex justify-between items-center border-t border-white/5 pt-2 mt-2';
-        
-        const counterText = document.createElement('span');
-        counterText.className = 'text-[9px] font-black text-white uppercase tracking-wide';
-        
-        function updateCounter() {
-          const selectedPairs = perfectPairs.filter(p => p.selected);
-          counterText.innerHTML = `<span class="text-copaYellow font-black">${selectedPairs.length}</span> Match(es) selecionado(s)`;
-        }
-        updateCounter();
-        footerRow.appendChild(counterText);
-        
-        const btnNegotiate = document.createElement('button');
-        btnNegotiate.className = 'py-1 px-2.5 bg-[#00e676] hover:bg-opacity-95 text-black font-black uppercase text-[8px] rounded-lg transition';
-        btnNegotiate.textContent = 'Abrir Negociação';
-        btnNegotiate.onclick = (e) => {
-          e.stopPropagation();
-          const selectedPairs = perfectPairs.filter(p => p.selected);
-          if (selectedPairs.length === 0) {
-            alert("Selecione pelo menos um Match Perfeito para negociar.");
-            return;
-          }
-          const giveNames = selectedPairs.map(p => getStickerNameForShare(p.give)).join(', ');
-          const receiveNames = selectedPairs.map(p => getStickerNameForShare(p.receive)).join(', ');
-          const textMessage = `Fala, ${c.name}! Vi seu perfil no Ultimate Cromo 2026 e temos um MATCH PERFEITO! 🤝\n\nQuero receber: ${receiveNames}\nVou entregar: ${giveNames}\n\nVamos fechar essa troca 1:1? 🔄`;
-          shareTextViaSystem(`Negociar com ${c.name}`, textMessage);
-        };
-        footerRow.appendChild(btnNegotiate);
-        expandedArea.appendChild(footerRow);
-        card.appendChild(expandedArea);
-        
-        // Ação de Toggle no Header
-        cardHeader.onclick = () => {
-          if (expandedArea.style.display === 'none') {
-            expandedArea.style.display = 'block';
-            card.classList.add('border-copaYellow/20');
-          } else {
-            expandedArea.style.display = 'none';
-            card.classList.remove('border-copaYellow/20');
-          }
-        };
-        
-        listDiv.appendChild(card);
-      });
-      
-    } catch (e) {
-      console.error(e);
-      subContainer.innerHTML = '<p class="text-center text-xs text-red-400 py-6">Erro ao processar matches automáticos.</p>';
-    }
-  }
-
-  async function renderManualTradesList(subContainer) {
-    subContainer.innerHTML = '';
-    const listCard = document.createElement('div');
-    listCard.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
-    
-    const filtersRow = document.createElement('div');
-    filtersRow.className = 'flex justify-between items-center w-full';
-    
-    const filterWrapper = document.createElement('div');
-    filterWrapper.className = 'flex items-center gap-1.5';
-    
-    const filterLabel = document.createElement('span');
-    filterLabel.className = 'text-[9px] font-black text-gray-400 uppercase tracking-wider';
-    filterLabel.textContent = 'Raio:';
-    filterWrapper.appendChild(filterLabel);
-
-    const radiusSelector = document.createElement('select');
-    radiusSelector.className = 'bg-[#131735] text-white border border-white/10 text-[10px] px-2 py-1 rounded-lg focus:outline-none cursor-pointer';
-    
-    const options = [
-      { value: 1, label: '1 km' },
-      { value: 5, label: '5 km' },
-      { value: 15, label: '15 km' },
-      { value: 50, label: '50 km' },
-      { value: 99999, label: 'Ilimitado' }
-    ];
-
-    options.forEach(opt => {
-      const el = document.createElement('option');
-      el.value = opt.value;
-      el.textContent = opt.label;
-      if (opt.value === currentCommunityRadius) el.selected = true;
-      radiusSelector.appendChild(el);
-    });
-
-    radiusSelector.onchange = (e) => {
-      currentCommunityRadius = parseInt(e.target.value, 10);
-      renderManualTradesList(subContainer);
-    };
-
-    filterWrapper.appendChild(radiusSelector);
-    filtersRow.appendChild(filterWrapper);
-    
-    const tabWrapper = document.createElement('div');
-    tabWrapper.className = 'flex gap-2';
-    
-    const btnNearby = document.createElement('button');
-    btnNearby.className = `px-2 py-1 text-[9px] font-bold rounded transition ${currentCommunityTab === 'nearby' ? 'bg-copaGreen text-black font-black' : 'bg-white/5 text-gray-400 hover:text-white'}`;
-    btnNearby.textContent = 'Próximos';
-    btnNearby.onclick = () => {
-      currentCommunityTab = 'nearby';
-      renderManualTradesList(subContainer);
-    };
-    
-    const btnFavs = document.createElement('button');
-    btnFavs.className = `px-2 py-1 text-[9px] font-bold rounded transition ${currentCommunityTab === 'favorites' ? 'bg-copaGreen text-black font-black' : 'bg-white/5 text-gray-400 hover:text-white'}`;
-    btnFavs.textContent = 'Favoritos';
-    btnFavs.onclick = () => {
-      currentCommunityTab = 'favorites';
-      renderManualTradesList(subContainer);
-    };
-    
-    tabWrapper.appendChild(btnNearby);
-    tabWrapper.appendChild(btnFavs);
-    filtersRow.appendChild(tabWrapper);
-    
-    listCard.appendChild(filtersRow);
-    subContainer.appendChild(listCard);
-    
-    const listDiv = document.createElement('div');
-    listDiv.className = 'space-y-3';
-    subContainer.appendChild(listDiv);
-    
-    listDiv.innerHTML = '<p class="text-center text-xs text-gray-400 py-6 animate-pulse">Buscando colecionadores...</p>';
-    
-    try {
-      const collectors = await authDb.getNearbyCollectors(user.latitude, user.longitude, currentCommunityRadius);
-      listDiv.innerHTML = '';
-
-      let filtered = collectors;
-      if (currentCommunityTab === 'favorites') {
-        const favs = authDb.getFavorites();
-        filtered = collectors.filter(c => favs.includes(c.uid));
-      }
-
-      if (filtered.length === 0) {
-        listDiv.innerHTML = `
-          <div class="glass-panel p-8 rounded-2xl border-white/5 text-center py-10">
-            <p class="text-xs text-gray-400">${currentCommunityTab === 'favorites' ? 'Nenhum colecionador favoritado na sua rede.' : 'Nenhum colecionador encontrado neste raio.'}</p>
-          </div>
-        `;
-        return;
-      }
-
-      const localAlbums = JSON.parse(localStorage.getItem('albums') || '{}');
-      const activeAlbumId = localStorage.getItem('currentAlbumId');
-      const activeAlbum = localAlbums[activeAlbumId] || { stickers: {} };
-      const userStickers = activeAlbum.stickers || {};
-
-      filtered.forEach(c => {
-        let missingForUser = 0;
-        let missingForCollector = 0;
-
-        Object.entries(c.stickers).forEach(([key, val]) => {
-          const userSticker = userStickers[key];
-          const userOwned = userSticker ? userSticker.owned : false;
-          const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
-          
-          if (val.owned && !userOwned) {
-            missingForUser++;
-          }
-          if (userDup > 0 && !val.owned) {
-            missingForCollector++;
-          }
-        });
-
-        const isPerfectMatch = (missingForUser > 0 && missingForCollector > 0);
-
-        const card = document.createElement('div');
-        card.className = `glass-panel p-4 rounded-xl border-white/5 flex items-center justify-between gap-4 collector-card cursor-pointer ${isPerfectMatch ? 'perfect-match-box' : ''}`;
-        card.onclick = (e) => {
-          if (e.target.closest('button')) return;
-          location.hash = `#community-profile-${c.uid}`;
-        };
-
-        const avatar = document.createElement('img');
-        avatar.src = c.photo_url;
-        avatar.loading = 'lazy';
-        avatar.decoding = 'async';
-        avatar.className = 'w-10 h-10 rounded-full object-cover border border-white/10';
-        card.appendChild(avatar);
-
-        const info = document.createElement('div');
-        info.className = 'flex-1 min-w-0';
-        
-        const nameRow = document.createElement('div');
-        nameRow.className = 'flex items-center gap-1.5';
-        
-        const nameText = document.createElement('h3');
-        nameText.className = 'font-bold text-xs text-white truncate';
-        nameText.textContent = c.name;
-        nameRow.appendChild(nameText);
-
-        if (isPerfectMatch) {
-          const matchBadge = document.createElement('span');
-          matchBadge.className = 'text-[7px] font-black uppercase bg-copaYellow text-black px-1.5 py-0.5 rounded-full tracking-wider animate-pulse';
-          matchBadge.textContent = 'Troca Certeira';
-          nameRow.appendChild(matchBadge);
-        }
-
-        info.appendChild(nameRow);
-
-        const subInfo = document.createElement('p');
-        subInfo.className = 'text-[9px] text-gray-400 mt-1';
-        subInfo.innerHTML = `📍 <strong>${c.distance} km</strong> de distância • Visto há pouco`;
-        info.appendChild(subInfo);
-
-        const stats = document.createElement('p');
-        stats.className = 'text-[9px] text-copaGreen font-bold mt-1.5 flex items-center gap-2';
-        
-        let statsHtml = "";
-        if (missingForUser > 0) {
-          statsHtml += `<span class="text-copaYellow font-bold">Te falta: ${missingForUser}</span>`;
-        }
-        if (missingForCollector > 0) {
-          if (statsHtml) statsHtml += ` <span class="text-white/10">|</span> `;
-          statsHtml += `<span class="text-copaGreen font-bold">Falta para ele: ${missingForCollector}</span>`;
-        }
-        if (!statsHtml) {
-          statsHtml = `<span class="text-gray-500 font-normal">Nenhuma troca qualificada</span>`;
-        }
-        stats.innerHTML = statsHtml;
-        info.appendChild(stats);
-
-        card.appendChild(info);
-
-        const favBtn = document.createElement('button');
-        favBtn.className = 'w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-xs transition duration-200';
-        
-        const isFav = authDb.isFavorite(c.uid);
-        favBtn.innerHTML = isFav ? '❤️' : '🤍';
-        favBtn.title = isFav ? 'Remover da Minha Rede' : 'Adicionar à Minha Rede';
-        favBtn.onclick = (e) => {
-          e.stopPropagation();
-          const state = authDb.toggleFavorite(c.uid);
-          favBtn.innerHTML = state ? '❤️' : '🤍';
-          renderManualTradesList(subContainer);
-        };
-
-        card.appendChild(favBtn);
-        listDiv.appendChild(card);
-      });
-
-    } catch (e) {
-      console.error(e);
-      listDiv.innerHTML = '<p class="text-center text-xs text-red-400 py-6">Erro ao carregar colecionadores.</p>';
-    }
-  }
-
-  async function renderEstouTrocandoBoard(subContainer) {
-    subContainer.innerHTML = '';
-    
-    let selectedKeys = [];
-    let transitioningKeys = [];
-    let isTransitioning = false;
-
-    // Obter dados do álbum
-    const albumId = storage.getCurrentAlbumId();
-    const albums = storage.getAlbums();
-    const album = albums[albumId] || { stickers: {} };
-    const userStickers = album.stickers || {};
-
-    const mainBoard = document.createElement('div');
-    mainBoard.className = 'glass-panel p-5 rounded-2xl border border-white/5 bg-[#120e16]/60 flex flex-col gap-4 animate-fade-in w-full';
-
-    // Header Row with Title and Print Button
-    const headerRow = document.createElement('div');
-    headerRow.className = 'flex justify-between items-center w-full pb-2 border-b border-white/5';
-
-    const boardTitle = document.createElement('h3');
-    boardTitle.className = 'text-xs font-black text-yellow-400 uppercase tracking-widest flex items-center gap-1.5';
-    boardTitle.innerHTML = '🟨 Trocas - Figurinhas Faltantes';
-    headerRow.appendChild(boardTitle);
-
-    const btnPrintMissing = document.createElement('button');
-    btnPrintMissing.className = 'py-1 px-3 bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500/20 text-yellow-400 font-bold text-[10px] uppercase tracking-wider rounded-lg transition-all duration-200 active:scale-95 flex items-center gap-1 cursor-pointer';
-    btnPrintMissing.innerHTML = '🖨️ Imprimir';
-    btnPrintMissing.onclick = () => printMissingStickers();
-    headerRow.appendChild(btnPrintMissing);
-    
-    mainBoard.appendChild(headerRow);
-
-    // Search and Sort controls
-    const filterSortRow = document.createElement('div');
-    filterSortRow.className = 'flex gap-3 w-full';
-
-    const searchInput = document.createElement('input');
-    searchInput.type = 'text';
-    searchInput.placeholder = 'Buscar...';
-    searchInput.className = 'flex-1 min-w-0 bg-[#131735]/80 text-white placeholder-gray-500 border border-white/5 focus:border-yellow-500/40 text-[11px] px-3 py-2 rounded-xl focus:outline-none transition-all duration-200';
-    filterSortRow.appendChild(searchInput);
-
-    const sortSelect = document.createElement('select');
-    sortSelect.className = 'bg-[#131735]/80 text-white border border-white/5 focus:border-yellow-500/40 text-[11px] px-3 py-2 rounded-xl focus:outline-none cursor-pointer';
-    sortSelect.innerHTML = `
-      <option value="alpha">A-Z (Alfabética)</option>
-      <option value="album">Álbum (Ordem)</option>
-    `;
-    sortSelect.value = missingStickersSortOrder;
-    sortSelect.onchange = (e) => {
-      missingStickersSortOrder = e.target.value;
-      updateLists();
-    };
-    filterSortRow.appendChild(sortSelect);
-
-    mainBoard.appendChild(filterSortRow);
-
-    // Grid container for the missing stickers
-    const stickersGrid = document.createElement('div');
-    stickersGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 overflow-y-auto max-h-[380px] pr-2 py-1';
-    mainBoard.appendChild(stickersGrid);
-
-    // Action buttons container
-    const actionsRow = document.createElement('div');
-    actionsRow.className = 'grid grid-cols-2 gap-3 w-full mt-2 pt-3 border-t border-white/5';
-
-    const btnVoltar = document.createElement('button');
-    btnVoltar.className = 'py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-1.5';
-    btnVoltar.innerHTML = '↩️ Voltar';
-    btnVoltar.disabled = true;
-
-    const btnTroquei = document.createElement('button');
-    btnTroquei.className = 'py-3 rounded-xl bg-gradient-to-r from-green-500 to-green-700 hover:from-green-400 hover:to-green-600 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-green-500/10 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-1.5';
-    btnTroquei.innerHTML = '✔️ Troquei';
-    btnTroquei.disabled = true;
-
-    actionsRow.appendChild(btnVoltar);
-    actionsRow.appendChild(btnTroquei);
-    mainBoard.appendChild(actionsRow);
-
-    subContainer.appendChild(mainBoard);
-
-    // Pre-calculate all stickers keys
-    const allStickerKeys = [];
-    groupsData.forEach(g => {
+  // FWC
+  teamsToProcess.push({ name: 'FIFA World Cup', code: 'FWC', count: 19 });
+  // CC
+  teamsToProcess.push({ name: 'Cidades Sede', code: 'CC', count: 14 });
+  // Normal Teams
+  groupsData.forEach(g => {
+    if (g.id !== 'EXTRAS') {
       g.teams.forEach(t => {
-        for (let i = 1; i <= 20; i++) {
-          allStickerKeys.push(`${t.code}-${i}`);
-        }
-      });
-    });
-    for (let i = 1; i <= 19; i++) allStickerKeys.push(`FWC-${i}`);
-    for (let i = 1; i <= 14; i++) allStickerKeys.push(`CC-${i}`);
-
-    const variants = ['ouro', 'prata', 'bronze', 'bordo'];
-    for (let i = 1; i <= 20; i++) {
-      variants.forEach(variant => {
-        allStickerKeys.push(`EXTRAS-${i}-${variant}`);
+        teamsToProcess.push({ name: t.name, code: t.code, count: 20 });
       });
     }
+  });
 
-    function updateButtonsState() {
-      const hasSelected = selectedKeys.length > 0;
-      btnTroquei.disabled = !hasSelected || isTransitioning;
-      btnVoltar.disabled = !hasSelected || isTransitioning;
+  let totalMissing = 0;
+  
+  teamsToProcess.forEach(team => {
+    const missingKeys = [];
+    for(let i=1; i<=team.count; i++) {
+      const key = \`\${team.code}-\${i}\`;
+      if (isMissing(key)) missingKeys.push(i); // Push number
     }
 
-    function updateLists() {
-      stickersGrid.innerHTML = '';
-
-      const filterVal = searchInput.value.toLowerCase().trim();
-      let missingKeys = allStickerKeys.filter(key => {
-        const isOwned = userStickers[key] ? userStickers[key].owned : false;
-        return !isOwned;
+    if (missingKeys.length > 0) {
+      totalMissing += missingKeys.length;
+      
+      const teamBlock = document.createElement('div');
+      teamBlock.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
+      
+      const teamHeader = document.createElement('div');
+      teamHeader.className = 'flex items-center gap-3 border-b border-white/5 pb-2';
+      
+      const crestImg = document.createElement('img');
+      crestImg.src = getCrestUrlHelper(team.code);
+      crestImg.className = 'w-8 h-8 object-contain drop-shadow-md';
+      
+      const teamName = document.createElement('h3');
+      teamName.className = 'font-black text-white text-sm uppercase tracking-wider flex-1';
+      teamName.textContent = team.name;
+      
+      const missingCount = document.createElement('span');
+      missingCount.className = 'bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full text-[10px] font-bold';
+      missingCount.textContent = \`Faltam \${missingKeys.length}\`;
+      
+      teamHeader.appendChild(crestImg);
+      teamHeader.appendChild(teamName);
+      teamHeader.appendChild(missingCount);
+      teamBlock.appendChild(teamHeader);
+      
+      const grid = document.createElement('div');
+      grid.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mt-1';
+      
+      missingKeys.forEach(num => {
+        const item = document.createElement('div');
+        item.className = 'bg-white/5 border border-white/10 rounded-lg py-2 text-center text-white font-bold text-sm shadow-inner truncate px-1';
+        item.textContent = \`\${team.code} \${num}\`;
+        grid.appendChild(item);
       });
-
-      if (filterVal) {
-        missingKeys = missingKeys.filter(key => {
-          const displayLabel = getStickerDisplayLabel(key).toLowerCase();
-          return displayLabel.includes(filterVal) || key.toLowerCase().includes(filterVal);
-        });
-      }
-
-      if (missingStickersSortOrder === 'alpha') {
-        missingKeys.sort((a, b) => {
-          const labelA = getStickerDisplayLabel(a);
-          const labelB = getStickerDisplayLabel(b);
-          return labelA.localeCompare(labelB, 'pt', { numeric: true });
-        });
-      }
-
-      if (missingKeys.length === 0) {
-        stickersGrid.className = 'flex items-center justify-center w-full py-8';
-        stickersGrid.innerHTML = '<p class="text-center text-xs text-gray-500 py-4 col-span-full">Nenhuma figurinha faltante.</p>';
-      } else {
-        stickersGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 overflow-y-auto max-h-[380px] pr-2 py-1';
-        missingKeys.forEach(key => {
-          const pill = document.createElement('div');
-          
-          const isSelected = selectedKeys.includes(key);
-          const isTransitioningGreen = transitioningKeys.includes(key);
-
-          if (isTransitioningGreen) {
-            pill.className = 'px-3 py-2.5 rounded-xl border-2 border-green-500/50 bg-green-500/20 text-green-300 text-xs font-black uppercase tracking-wider text-center transition-all duration-150 shadow-md shadow-green-500/5 cursor-default';
-          } else if (isSelected) {
-            pill.className = 'px-3 py-2.5 rounded-xl border-2 border-blue-500/50 bg-blue-500/20 text-blue-300 text-xs font-black uppercase tracking-wider text-center cursor-pointer hover:bg-blue-500/30 active:scale-95 transition-all duration-150 shadow-md shadow-blue-500/5 select-none';
-          } else {
-            pill.className = 'px-3 py-2.5 rounded-xl border-2 border-yellow-500/20 bg-yellow-500/[0.03] text-yellow-400/80 text-xs font-black uppercase tracking-wider text-center cursor-pointer hover:bg-yellow-500/10 active:scale-95 transition-all duration-150 select-none';
-          }
-
-          pill.textContent = getStickerDisplayLabel(key);
-
-          pill.onclick = () => {
-            if (isTransitioning || isTransitioningGreen) return;
-            if (!isSelected) {
-              selectedKeys.push(key);
-              updateLists();
-              updateButtonsState();
-            }
-          };
-
-          pill.ondblclick = (e) => {
-            e.stopPropagation();
-            if (isTransitioning || isTransitioningGreen) return;
-            if (isSelected) {
-              selectedKeys = selectedKeys.filter(k => k !== key);
-              updateLists();
-              updateButtonsState();
-            }
-          };
-
-          stickersGrid.appendChild(pill);
-        });
-      }
+      
+      teamBlock.appendChild(grid);
+      mainDiv.appendChild(teamBlock);
     }
+  });
 
-    btnTroquei.onclick = async () => {
-      if (selectedKeys.length === 0 || isTransitioning) return;
-
-      isTransitioning = true;
-      btnTroquei.disabled = true;
-      btnVoltar.disabled = true;
-
-      transitioningKeys = [...selectedKeys];
-      selectedKeys = [];
-      updateLists();
-
-      setTimeout(async () => {
-        transitioningKeys.forEach(key => {
-          if (!album.stickers[key]) {
-            album.stickers[key] = { owned: true, duplicate: 0 };
-          } else {
-            album.stickers[key].owned = true;
-          }
-        });
-
-        storage.setAlbums(albums);
-        await authDb.syncStickers(album.stickers);
-
-        transitioningKeys = [];
-        isTransitioning = false;
-
-        if (typeof renderHeader === 'function') renderHeader();
-        updateLists();
-        updateButtonsState();
-      }, 2000);
-    };
-
-    btnVoltar.onclick = () => {
-      if (selectedKeys.length === 0 || isTransitioning) return;
-      selectedKeys = [];
-      updateLists();
-      updateButtonsState();
-    };
-
-    searchInput.oninput = () => {
-      updateLists();
-    };
-
-    updateLists();
+  if (totalMissing === 0) {
+    const emptyMsg = document.createElement('p');
+    emptyMsg.className = 'text-center text-gray-400 py-10 text-sm font-medium';
+    emptyMsg.textContent = 'Parabéns! Você não tem nenhuma figurinha faltando nessas seleções!';
+    mainDiv.appendChild(emptyMsg);
   }
 
-  tabMatch.onclick = () => { currentTradesSubTab = 'match'; setTradesSubTabState(); };
-  tabManual.onclick = () => { currentTradesSubTab = 'manual'; setTradesSubTabState(); };
-  tabEstouTrocando.onclick = () => { currentTradesSubTab = 'estou_trocando'; setTradesSubTabState(); };
-  setTradesSubTabState();
+  container.appendChild(mainDiv);
 }
 
 function printMissingStickers() {
@@ -4314,140 +3596,37 @@ function printMissingStickers() {
   const album = albums[albumId] || { stickers: {} };
   const userStickers = album.stickers || {};
 
-  const allStickerKeys = [];
-  groupsData.forEach(g => {
-    g.teams.forEach(t => {
-      for (let i = 1; i <= 20; i++) {
-        allStickerKeys.push(`${t.code}-${i}`);
-      }
-    });
-  });
-  for (let i = 1; i <= 19; i++) allStickerKeys.push(`FWC-${i}`);
-  for (let i = 1; i <= 14; i++) allStickerKeys.push(`CC-${i}`);
-
-  const variants = ['ouro', 'prata', 'bronze', 'bordo'];
-  for (let i = 1; i <= 20; i++) {
-    variants.forEach(variant => {
-      allStickerKeys.push(`EXTRAS-${i}-${variant}`);
-    });
-  }
-
-  // Filter missing
-  let missingKeys = allStickerKeys.filter(key => {
+  const isMissing = (key) => {
     const isOwned = userStickers[key] ? userStickers[key].owned : false;
     const isNegotiating = estouTrocandoState.negotiating.includes(key);
     const isMatched = estouTrocandoState.matched.includes(key);
     return !(isOwned || isNegotiating || isMatched);
+  };
+
+  const getCrestUrlHelper = (code) => {
+    if (code === 'FWC') return 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
+    if (code === 'CC') return './crests/Logo CocaZero Copa1.png';
+    return crestsMap[code] || \`https://flagcdn.com/w40/\${flagMap[code] || 'un'}.png\`;
+  };
+
+  const teamsToProcess = [];
+  teamsToProcess.push({ name: 'FIFA World Cup', code: 'FWC', count: 19 });
+  teamsToProcess.push({ name: 'Cidades Sede', code: 'CC', count: 14 });
+  groupsData.forEach(g => {
+    if (g.id !== 'EXTRAS') {
+      g.teams.forEach(t => {
+        teamsToProcess.push({ name: t.name, code: t.code, count: 20 });
+      });
+    }
   });
 
-  // Sort
-  if (missingStickersSortOrder === 'alpha') {
-    missingKeys.sort((a, b) => {
-      const labelA = getStickerDisplayLabel(a);
-      const labelB = getStickerDisplayLabel(b);
-      return labelA.localeCompare(labelB, 'pt', { numeric: true });
-    });
-  }
+  let totalMissing = 0;
+  let blocksHtml = '';
 
-  const displayLabels = missingKeys.map(key => getStickerDisplayLabel(key));
-
-  if (displayLabels.length === 0) {
-    alert("Você não tem figurinhas faltantes para imprimir!");
-    return;
-  }
-
-  const iframe = document.createElement('iframe');
-  iframe.style.position = 'fixed';
-  iframe.style.right = '0';
-  iframe.style.bottom = '0';
-  iframe.style.width = '0';
-  iframe.style.height = '0';
-  iframe.style.border = '0';
-  document.body.appendChild(iframe);
-
-  const doc = iframe.contentWindow.document;
-  
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Figurinhas Faltantes</title>
-      <style>
-        @page {
-          size: A4 portrait;
-          margin: 10mm;
-        }
-        body {
-          font-family: Arial, sans-serif;
-          margin: 0;
-          padding: 0;
-          color: #000;
-          background: #fff;
-        }
-        h1 {
-          font-size: 18px;
-          margin-bottom: 5px;
-          text-align: center;
-          text-transform: uppercase;
-        }
-        .info-header {
-          font-size: 11px;
-          margin-bottom: 15px;
-          text-align: center;
-          color: #444;
-          border-bottom: 1px solid #ddd;
-          padding-bottom: 5px;
-        }
-        .grid-container {
-          display: grid;
-          grid-template-columns: repeat(20, minmax(0, 1fr));
-          gap: 2px;
-          width: 100%;
-        }
-        .sticker-item {
-          font-size: 16px;
-          font-weight: bold;
-          text-align: center;
-          padding: 6px 0;
-          border: 1px solid #bbb;
-          background-color: #fff;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Figurinhas Faltantes</h1>
-      <div class="info-header">
-        Total de figurinhas: <strong>${displayLabels.length}</strong> | Gerado em: ${new Date().toLocaleDateString('pt-BR')}
-      </div>
-      <div class="grid-container">
-        ${displayLabels.map(label => `<div class="sticker-item">${label}</div>`).join('')}
-      </div>
-    </body>
-    </html>
-  `;
-
-  doc.open();
-  doc.write(htmlContent);
-  doc.close();
-
-  iframe.contentWindow.focus();
-  setTimeout(() => {
-    iframe.contentWindow.print();
-    setTimeout(() => {
-      document.body.removeChild(iframe);
-    }, 1000);
-  }, 500);
-}
-
-// Funções utilitárias de compartilhamento de listas
-function formatStickerNumber(num) {
-  return num < 10 ? '0' + num : num;
-}
-
+  teamsToProcess.forEach(team => {
+    const missingKeys = [];
+    for(let i=1; i<=team.count; i++) {
+      if (isMissing(\`\${team.code}-\${i}\`)) missingKeys.push(i);
 function shareText(title, text) {
   if (navigator.share) {
     navigator.share({
@@ -5662,3 +4841,4 @@ function updateHeaderSearchSuggestions(query) {
 
   suggestionsBox.classList.remove('hidden');
 }
+
