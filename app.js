@@ -3661,12 +3661,12 @@ function renderTrades(container) {
       teamBlock.appendChild(teamHeader);
       
       const grid = document.createElement('div');
-      grid.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mt-1';
+      grid.className = 'flex flex-wrap gap-2 mt-1';
       
       missingKeys.forEach(num => {
         const key = team.code + '-' + num;
         const item = document.createElement('div');
-        item.className = 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-lg py-2 text-center font-bold text-sm shadow-inner truncate px-1 cursor-pointer select-none transition duration-150';
+        item.className = 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-lg py-1.5 px-3 text-center font-bold text-xs shadow-inner truncate cursor-pointer select-none transition duration-150 min-w-[70px]';
         item.textContent = team.code + ' ' + num;
         
         // Single click: turns blue (ready to change / mark as owned)
@@ -3676,7 +3676,7 @@ function renderTrades(container) {
             // Already selected, do nothing on single click, let dblclick handle revert
           } else {
             selectedToGlue.add(key);
-            item.className = 'bg-blue-500/20 border border-blue-500/40 text-blue-400 rounded-lg py-2 text-center font-bold text-sm shadow-inner truncate px-1 cursor-pointer select-none transition duration-150';
+            item.className = 'bg-blue-500/20 border border-blue-500/40 text-blue-400 rounded-lg py-1.5 px-3 text-center font-bold text-xs shadow-inner truncate cursor-pointer select-none transition duration-150 min-w-[70px]';
             updateCommitButton();
           }
         };
@@ -3686,7 +3686,7 @@ function renderTrades(container) {
           e.preventDefault();
           if (selectedToGlue.has(key)) {
             selectedToGlue.delete(key);
-            item.className = 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-lg py-2 text-center font-bold text-sm shadow-inner truncate px-1 cursor-pointer select-none transition duration-150';
+            item.className = 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-lg py-1.5 px-3 text-center font-bold text-xs shadow-inner truncate cursor-pointer select-none transition duration-150 min-w-[70px]';
             updateCommitButton();
           }
         };
