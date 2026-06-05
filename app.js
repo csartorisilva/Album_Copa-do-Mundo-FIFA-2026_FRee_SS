@@ -3433,21 +3433,21 @@ function getStickerDisplayLabel(key) {
 }
 
 
-const after = content.substring(shareTextStart);
 
-const newLogic = `function renderTrades(container) {
+
+function renderTrades(container) {
   const user = authDb.getCurrentUser();
   if (!user) {
     const lockBox = document.createElement('div');
     lockBox.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 text-center space-y-6 animate-fade-in';
-    lockBox.innerHTML = \`
+    lockBox.innerHTML = `
       <div class="text-5xl">🔒</div>
       <h2 class="text-xl font-black text-white uppercase tracking-wider">Acesso Restrito</h2>
       <p class="text-xs text-gray-400">Faça login para participar das Trocas e gerenciar listas de figurinhas.</p>
       <button onclick="location.hash = '#login'" class="w-full py-3 rounded-xl bg-gradient-to-r from-copaYellow to-yellow-600 text-black font-black text-xs uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition">
         Entrar / Fazer Login
       </button>
-    \`;
+    `;
     container.appendChild(lockBox);
     return;
   }
