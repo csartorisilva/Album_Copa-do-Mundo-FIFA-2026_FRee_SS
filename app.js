@@ -3535,7 +3535,7 @@ const newLogic = `function renderTrades(container) {
   teamsToProcess.forEach(team => {
     const missingKeys = [];
     for(let i=1; i<=team.count; i++) {
-      const key = \"\" + team.code + "-\" + i + "\";
+      const key = team.code + '-' + i;
       if (isMissing(key)) missingKeys.push(i); // Push number
     }
 
@@ -3558,7 +3558,7 @@ const newLogic = `function renderTrades(container) {
       
       const missingCount = document.createElement('span');
       missingCount.className = 'bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full text-[10px] font-bold';
-      missingCount.textContent = \"Faltam \" + missingKeys.length + "\";
+      missingCount.textContent = 'Faltam ' + missingKeys.length;
       
       teamHeader.appendChild(crestImg);
       teamHeader.appendChild(teamName);
@@ -3571,7 +3571,7 @@ const newLogic = `function renderTrades(container) {
       missingKeys.forEach(num => {
         const item = document.createElement('div');
         item.className = 'bg-white/5 border border-white/10 rounded-lg py-2 text-center text-white font-bold text-sm shadow-inner truncate px-1';
-        item.textContent = \"\" + team.code + " \" + num + "\";
+        item.textContent = team.code + ' ' + num;
         grid.appendChild(item);
       });
       
@@ -3620,16 +3620,16 @@ function printMissingStickers() {
     }
   });
 
-  let totalMissing = 0;
-  let blocksHtml = '';
 
-  teamsToProcess.forEach(team => {
-    const missingKeys = [];
-    for(let i=1; i<=team.count; i++) {
-      if (isMissing(team.code + '-' + i)) missingKeys.push(i);
-    }
-  });
-}
+
+
+
+
+
+
+
+
+
 
 function shareText(title, text) {
   if (navigator.share) {
