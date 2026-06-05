@@ -1365,13 +1365,49 @@ function renderLogin(container) {
     const loginPasswordLabel = document.createElement('label');
     loginPasswordLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
     loginPasswordLabel.textContent = 'Senha';
+
+    const loginPasswordWrapper = document.createElement('div');
+    loginPasswordWrapper.className = 'relative w-full';
+
     const loginPasswordInput = document.createElement('input');
     loginPasswordInput.type = 'password';
     loginPasswordInput.placeholder = 'Sua senha';
     loginPasswordInput.required = true;
-    loginPasswordInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    loginPasswordInput.className = 'w-full pr-12 pl-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+
+    const btnToggleLoginPassword = document.createElement('button');
+    btnToggleLoginPassword.type = 'button';
+    btnToggleLoginPassword.className = 'absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition duration-200 cursor-pointer focus:outline-none';
+    btnToggleLoginPassword.innerHTML = `
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+      </svg>
+    `;
+
+    btnToggleLoginPassword.onclick = () => {
+      if (loginPasswordInput.type === 'password') {
+        loginPasswordInput.type = 'text';
+        btnToggleLoginPassword.innerHTML = `
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+          </svg>
+        `;
+      } else {
+        loginPasswordInput.type = 'password';
+        btnToggleLoginPassword.innerHTML = `
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        `;
+      }
+    };
+
+    loginPasswordWrapper.appendChild(loginPasswordInput);
+    loginPasswordWrapper.appendChild(btnToggleLoginPassword);
     loginPasswordGroup.appendChild(loginPasswordLabel);
-    loginPasswordGroup.appendChild(loginPasswordInput);
+    loginPasswordGroup.appendChild(loginPasswordWrapper);
     formLogin.appendChild(loginPasswordGroup);
 
     const btnLoginSubmit = document.createElement('button');
@@ -1424,13 +1460,49 @@ function renderLogin(container) {
     const regPasswordLabel = document.createElement('label');
     regPasswordLabel.className = 'text-[10px] uppercase font-bold text-gray-400 tracking-wider';
     regPasswordLabel.textContent = 'Senha';
+
+    const regPasswordWrapper = document.createElement('div');
+    regPasswordWrapper.className = 'relative w-full';
+
     const regPasswordInput = document.createElement('input');
     regPasswordInput.type = 'password';
     regPasswordInput.placeholder = 'Sua senha';
     regPasswordInput.required = true;
-    regPasswordInput.className = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+    regPasswordInput.className = 'w-full pr-12 pl-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-copaYellow/50 focus:bg-white/10 transition duration-200';
+
+    const btnToggleRegPassword = document.createElement('button');
+    btnToggleRegPassword.type = 'button';
+    btnToggleRegPassword.className = 'absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition duration-200 cursor-pointer focus:outline-none';
+    btnToggleRegPassword.innerHTML = `
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+      </svg>
+    `;
+
+    btnToggleRegPassword.onclick = () => {
+      if (regPasswordInput.type === 'password') {
+        regPasswordInput.type = 'text';
+        btnToggleRegPassword.innerHTML = `
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+          </svg>
+        `;
+      } else {
+        regPasswordInput.type = 'password';
+        btnToggleRegPassword.innerHTML = `
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        `;
+      }
+    };
+
+    regPasswordWrapper.appendChild(regPasswordInput);
+    regPasswordWrapper.appendChild(btnToggleRegPassword);
     regPasswordGroup.appendChild(regPasswordLabel);
-    regPasswordGroup.appendChild(regPasswordInput);
+    regPasswordGroup.appendChild(regPasswordWrapper);
     formRegister.appendChild(regPasswordGroup);
 
     const regUserGroup = document.createElement('div');
