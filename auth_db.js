@@ -22,6 +22,22 @@
     ]);
   };
 
+  // Verifica se o Supabase está acessível (útil para detectar VPN bloqueando a nuvem)
+  const checkSupabaseConnectivity = async () => {
+    if (!SUPABASE_URL) return false;
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const url = SUPABASE_URL.endsWith('/') ? SUPABASE_URL : SUPABASE_URL + '/';
+      await fetch(url, { method: 'GET', signal: controller.signal });
+      clearTimeout(timeoutId);
+      return true; // Se respondeu (mesmo com erro HTTP), está online e acessível
+    } catch (e) {
+      console.warn("Supabase está inacessível (bloqueio de rede ou offline):", e);
+      return false;
+    }
+  };
+
   // Carrega sessão salva no LocalStorage como fallback imediato
   const savedSession = localStorage.getItem(sessionKey);
   if (savedSession) {
@@ -164,7 +180,25 @@
               return;
             }
 
-            // Para sessões reais, limpa se a sessão do Supabase expirou/não existe
+            // Para sessões reais: se houver um usuário logado localmente e não for um logout explícito,
+            // verifica se a conexão com o Supabase está bloqueada/offline antes de deslogar.
+            if (currentUser && event !== 'SIGNED_OUT') {
+              checkSupabaseConnectivity().then(isConnected => {
+                if (!isConnected) {
+                  console.log("Supabase inacessível (offline ou VPN bloqueada). Mantendo a sessão local ativa offline.");
+                  return;
+                }
+                
+                // Se o servidor estiver acessível e de fato a sessão é nula (ex: token inválido/expirado), desloga
+                console.log("Supabase acessível mas sem sessão ativa. Limpando sessão local.");
+                currentUser = null;
+                localStorage.removeItem(sessionKey);
+                if (typeof renderHeader === 'function') renderHeader();
+              });
+              return;
+            }
+
+            // Para sessões reais sem login prévio ou se for logout explícito, limpa
             currentUser = null;
             localStorage.removeItem(sessionKey);
             if (typeof renderHeader === 'function') renderHeader();
