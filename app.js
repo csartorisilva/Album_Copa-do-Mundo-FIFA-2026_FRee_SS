@@ -2696,7 +2696,7 @@ function renderTeamPage(code, container) {
   if (code !== 'FWC' && code !== 'CC' && code !== 'EXTRAS' && code !== 'ESCUDOS') {
     const flagImg = document.createElement('img');
     const flagCode = (flagMap[code] || 'us').toLowerCase();
-    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
+    flagImg.src = "https://flagcdn.com/w40/" + flagCode + ".png";
     flagImg.loading = 'lazy';
     flagImg.decoding = 'async';
     flagImg.className = 'w-5.5 h-3.5 object-cover border border-white/20 rounded shadow-sm inline-block mr-1 align-middle';
