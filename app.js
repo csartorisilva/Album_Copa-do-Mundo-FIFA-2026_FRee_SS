@@ -3450,62 +3450,7 @@ function renderTrades(container) {
     return;
   }
 
-  if (!user.latitude || !user.longitude) {
-    const tempLat = sessionStorage.getItem('temp_latitude');
-    const tempLng = sessionStorage.getItem('temp_longitude');
-    if (tempLat && tempLng) {
-      user.latitude = parseFloat(tempLat);
-      user.longitude = parseFloat(tempLng);
-      authDb.updateLocation(user.latitude, user.longitude).then(() => { renderHeader(); });
-    } else {
-      authDb.fetchLocationByIp().then(loc => {
-        if (loc) {
-          user.latitude = loc.lat;
-          user.longitude = loc.lng;
-          authDb.updateLocation(loc.lat, loc.lng).then(() => { renderHeader(); route(); });
-        } else {
-          showGPSRequestScreen(container);
-        }
-      }).catch(() => {
-        showGPSRequestScreen(container);
-      });
-      return;
-    }
-  }
 
-  function showGPSRequestScreen(container) {
-    const gpsBox = document.createElement('div');
-    gpsBox.className = 'max-w-md mx-auto my-12 glass-panel p-8 rounded-2xl border-white/5 text-center space-y-6 animate-fade-in';
-    gpsBox.innerHTML = `
-      <div class="text-5xl">📍</div>
-      <h2 class="text-xl font-black text-white uppercase tracking-wider">Permissão de GPS Requerida</h2>
-      <p class="text-xs text-gray-400">Para calcular a distância e listar outros colecionadores que estão ao seu redor, precisamos que você compartilhe sua geolocalização.</p>
-      <button id="btnRequestGPSCommunity" class="w-full py-3 rounded-xl bg-[#00e676] text-black font-black text-xs uppercase tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition">
-        Permitir Acesso ao GPS
-      </button>
-    `;
-    gpsBox.querySelector('#btnRequestGPSCommunity').onclick = () => {
-      gpsBox.querySelector('#btnRequestGPSCommunity').textContent = "Obtendo GPS...";
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          await authDb.updateLocation(position.coords.latitude, position.coords.longitude);
-          const activeAlbumId = storage.getCurrentAlbumId();
-          const albums = storage.getAlbums();
-          if (activeAlbumId && albums[activeAlbumId]) {
-            await authDb.syncStickers(albums[activeAlbumId].stickers);
-          }
-          renderHeader();
-          route();
-        },
-        (error) => {
-          console.error(error);
-          alert("Não foi possível acessar sua localização. Certifique-se de que deu permissão no seu navegador.");
-          route();
-        }
-      );
-    };
-    container.appendChild(gpsBox);
-  }
 
   const mainDiv = document.createElement('div');
   mainDiv.className = 'space-y-5 py-2 animate-fade-in';
