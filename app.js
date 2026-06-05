@@ -2203,8 +2203,9 @@ function renderHome(container) {
     // Badge de Progresso Gamer no canto inferior direito
     const progBadge = document.createElement('span');
     if (item.prog.owned === item.limit) {
-      progBadge.className = 'badge-neon-gamer completed';
-      progBadge.textContent = '🏆';
+      progBadge.className = 'text-[9px] font-black text-copaGreen uppercase tracking-wider absolute bottom-3 right-3 flex items-center gap-1';
+      progBadge.innerHTML = '🏆 <span class="hidden sm:inline">Completo</span>';
+      bottomRow.style.display = 'none'; // Hide progress bar row when complete
     } else {
       progBadge.className = 'badge-neon-gamer';
       progBadge.textContent = item.prog.owned + "/" + item.limit;
@@ -2305,8 +2306,9 @@ function renderHome(container) {
       // Badge de Progresso Gamer no canto inferior direito
       const progBadge = document.createElement('span');
       if (teamStats.owned === limit) {
-        progBadge.className = 'badge-neon-gamer completed';
-        progBadge.textContent = '🏆';
+        progBadge.className = 'text-[7.5px] font-black text-copaGreen uppercase tracking-wider absolute bottom-2.5 right-2 flex items-center gap-0.5';
+        progBadge.innerHTML = '🏆 <span class="hidden sm:inline">Completo</span>';
+        bottomRow.style.display = 'none'; // Hide progress bar row when complete
       } else {
         progBadge.className = 'badge-neon-gamer';
         progBadge.textContent = teamStats.owned + "/" + limit;
