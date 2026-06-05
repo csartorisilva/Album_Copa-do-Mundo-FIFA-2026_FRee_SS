@@ -1,4 +1,4 @@
-﻿// app.js – lógica principal do álbum de figurinhas FIFA 2026
+// app.js – lógica principal do álbum de figurinhas FIFA 2026
 // Tema Ultimate FIFA - Modo Escuro & Glassmorphism com Card Flip 3D
 
 // Override do alert() nativo do navegador com um modal customizado, responsivo e elegante
@@ -1347,8 +1347,7 @@ function renderLogin(container) {
     btnLogout.onclick = async () => {
       sessionStorage.removeItem('skippedLogin');
       await authDb.logout();
-      renderHeader();
-      renderLogin(container);
+      window.location.href = 'https://ultimate-cromo.vercel.app/';
     };
     actionGrid.appendChild(btnLogout);
 
@@ -4515,9 +4514,7 @@ function handleAuthHeaderClick() {
       panel.remove();
       sessionStorage.removeItem('skippedLogin');
       authDb.logout().then(() => {
-        renderHeader();
-        location.hash = '#home';
-        route();
+        window.location.href = 'https://ultimate-cromo.vercel.app/';
       });
     };
 
