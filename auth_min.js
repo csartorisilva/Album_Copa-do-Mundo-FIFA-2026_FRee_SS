@@ -1,6 +1,23 @@
 /* auth_min.js – Minimal authentication logic */
 
-// Ensure supabase client is initialized in supabase_config.js and exposed as `supabase`
+let supabaseClient = null;
+
+const hasValidConfig = typeof window.SUPABASE_URL !== 'undefined' && 
+                       typeof window.SUPABASE_KEY !== 'undefined' && 
+                       window.SUPABASE_URL !== "" && 
+                       window.SUPABASE_KEY !== "" && 
+                       !window.SUPABASE_KEY.includes('REAL_AQUI');
+
+if (hasValidConfig) {
+  try {
+    supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+    window.supabaseClient = supabaseClient;
+  } catch (err) {
+    console.error("Erro ao inicializar o cliente Supabase:", err);
+  }
+} else {
+  console.warn("Configurações do Supabase ausentes ou usando valores de exemplo (SUA_CHAVE_ANON_REAL_AQUI).");
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const tabLogin = document.getElementById('tab-login');
@@ -29,15 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!supabaseClient) {
+      alert("Erro de Configuração: O arquivo 'supabase_config.js' não foi carregado ou contém chaves inválidas (de exemplo). Se você está na Vercel, certifique-se de configurar as variáveis de ambiente ou implantar a branch 'gh-pages' que contém as credenciais injetadas.");
+      return;
+    }
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const isLogin = tabLogin.classList.contains('active');
     try {
       let result;
       if (isLogin) {
-        result = await supabase.auth.signInWithPassword({ email, password });
+        result = await supabaseClient.auth.signInWithPassword({ email, password });
       } else {
-        result = await supabase.auth.signUp({ email, password });
+        result = await supabaseClient.auth.signUp({ email, password });
       }
       if (result.error) {
         // Show the raw Supabase error message

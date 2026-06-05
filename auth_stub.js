@@ -24,8 +24,9 @@ window.authDb = {
   },
   // Simple logout using Supabase if client exists
   async logout() {
-    if (window.supabase) {
-      await supabase.auth.signOut();
+    const client = window.supabaseClient || window.supabase;
+    if (client && client.auth) {
+      await client.auth.signOut();
     }
     return;
   },
