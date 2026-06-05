@@ -940,11 +940,29 @@ async function initApp() {
           }
         });
       }
-      // Sincroniza figurinhas
+      // Sincroniza figurinhas de duas vias (puxa e empurra)
       const activeAlbumId = storage.getCurrentAlbumId();
       const albums = storage.getAlbums();
       if (activeAlbumId && albums[activeAlbumId]) {
+        // Envia as locais para garantir sincronização
         authDb.syncStickers(albums[activeAlbumId].stickers);
+        
+        // Puxa as mais recentes da nuvem se existirem
+        const client = window.supabaseClient || window.supabase;
+        if (client) {
+          client.from('profiles').select('stickers').eq('uid', user.uid).maybeSingle().then(result => {
+            if (result.data && result.data.stickers && Object.keys(result.data.stickers).length > 0) {
+              const localAlbums = storage.getAlbums();
+              const currentId = storage.getCurrentAlbumId();
+              if (currentId && localAlbums[currentId]) {
+                localAlbums[currentId].stickers = { ...localAlbums[currentId].stickers, ...result.data.stickers };
+                storage.setAlbums(localAlbums);
+                // Atualiza a visualização caso esteja na rota inicial
+                route();
+              }
+            }
+          }).catch(e => console.error("Erro ao sincronizar figurinhas da nuvem no startup:", e));
+        }
       }
     } else {
       // Se não está logado, busca o IP para geolocalização temporária

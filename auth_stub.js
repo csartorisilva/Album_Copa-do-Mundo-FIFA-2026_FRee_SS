@@ -1,5 +1,5 @@
 // auth_stub.js – Minimal stub to replace the previous authDb object
-// Provides no‑op implementations for methods used throughout app.js after the login UI was replaced.
+// Provides implementations for methods used throughout app.js after the login UI was replaced.
 window.authDb = {
   getCurrentUser() {
     try {
@@ -17,13 +17,40 @@ window.authDb = {
     return null;
   },
   async updateLocation(lat, lng) {
-    // No persistence needed for the minimal version
-    return;
+    const user = this.getCurrentUser();
+    if (!user) return;
+    const client = window.supabaseClient || window.supabase;
+    if (client) {
+      try {
+        await client.from('profiles').upsert({
+          uid: user.uid,
+          name: user.name,
+          latitude: lat,
+          longitude: lng,
+          last_seen: new Date().toISOString()
+        });
+      } catch (e) {
+        console.error("Erro ao salvar localização:", e);
+      }
+    }
   },
-  // Sticker sync placeholder
+  // Sticker sync cloud implementation
   async syncStickers(stickers) {
-    // No‑op – real sync is handled elsewhere if needed
-    return;
+    const user = this.getCurrentUser();
+    if (!user) return;
+    const client = window.supabaseClient || window.supabase;
+    if (client) {
+      try {
+        await client.from('profiles').upsert({
+          uid: user.uid,
+          name: user.name,
+          stickers: stickers,
+          last_seen: new Date().toISOString()
+        });
+      } catch (e) {
+        console.error("Erro ao sincronizar figurinhas:", e);
+      }
+    }
   },
   // Simple logout using Supabase if client exists
   async logout() {

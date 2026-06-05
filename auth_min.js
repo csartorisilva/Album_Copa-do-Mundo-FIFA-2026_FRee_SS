@@ -95,10 +95,38 @@ document.addEventListener('DOMContentLoaded', () => {
         const displayName = user.user_metadata?.username || user.user_metadata?.full_name || email.split('@')[0];
         const uid = user.id;
         localStorage.setItem('album_auth_session', JSON.stringify({ uid, name: displayName, email }));
+
+        // Pull stickers from profiles table to sync to new device immediately
+        try {
+          const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('uid', uid)
+            .maybeSingle();
+
+          if (profile && profile.stickers && Object.keys(profile.stickers).length > 0) {
+            let activeAlbumId = localStorage.getItem('currentAlbumId');
+            let albums = {};
+            try {
+              albums = JSON.parse(localStorage.getItem('albums') || '{}');
+            } catch (e) {}
+
+            if (!activeAlbumId || Object.keys(albums).length === 0) {
+              activeAlbumId = "album-" + Math.random().toString(36).substring(2, 9);
+              localStorage.setItem('currentAlbumId', activeAlbumId);
+              albums[activeAlbumId] = { name: 'Meu Álbum Principal', stickers: {} };
+            }
+
+            albums[activeAlbumId].stickers = { ...albums[activeAlbumId].stickers, ...profile.stickers };
+            localStorage.setItem('albums', JSON.stringify(albums));
+          }
+        } catch (syncErr) {
+          console.error("Erro ao puxar progresso do banco de dados na autenticação:", syncErr);
+        }
       }
 
       // Success – redirect to album page
-          window.location.href = 'album.html?v=' + Date.now();
+      window.location.href = 'album.html?v=' + Date.now();
     } catch (err) {
       // Unexpected error
       alert(err.message || 'Erro inesperado');
