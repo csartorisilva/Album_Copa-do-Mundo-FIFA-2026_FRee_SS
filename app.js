@@ -3349,7 +3349,7 @@ function createMiniStickerCapsule(key) {
     const variant = key.split('-')[2];
     const capVariant = variant ? variant.charAt(0).toUpperCase() + variant.slice(1) : '';
     pName = (legendsData[i - 1] ? legendsData[i - 1].name : "Lendário " + i) + ' ' + capVariant;
-    el.textContent = legendsData[i - 1] ? legendsData[i - 1].name :Lendário ${i}"} " + capVariant;
+    el.textContent = (legendsData[i - 1] ? legendsData[i - 1].name : "Lendario " + i) + " " + capVariant;
   } else if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][i - 1]) {
     pName = albumData[code][i - 1].nome;
     el.textContent = code + " " + i;
