@@ -3958,48 +3958,10 @@ function renderTrades(container) {
 
   async function renderEstouTrocandoBoard(subContainer) {
     subContainer.innerHTML = '';
-    loadEstouTrocandoState();
-
-    const mainBoard = document.createElement('div');
-    mainBoard.className = 'space-y-4 animate-fade-in';
-
-    // 1. Placar Superior
-    const scoreCard = document.createElement('div');
-    scoreCard.className = 'glass-panel p-3.5 rounded-xl border border-white/5 bg-[#131735]/40 flex justify-between items-center w-full';
-
-    const infoDiv = document.createElement('div');
-    infoDiv.className = 'flex items-center gap-3.5';
-
-    const negCount = estouTrocandoState.negotiating.length;
-    const matCount = estouTrocandoState.matched.length;
-
-    infoDiv.innerHTML = `
-      <div class="flex items-center gap-1.5">
-        <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
-        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Negociação:</span>
-        <span class="text-xs font-black text-white">${negCount}</span>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
-        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Deu Match:</span>
-        <span class="text-xs font-black text-white">${matCount}</span>
-      </div>
-    `;
-
-    const btnReset = document.createElement('button');
-    btnReset.className = 'py-1 px-3 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 font-bold text-[9px] uppercase tracking-wider rounded-lg transition-all duration-200 active:scale-95';
-    btnReset.textContent = '🔄 Limpar Fluxo';
-    btnReset.onclick = () => {
-      if (confirm('Tem certeza de que deseja limpar todas as figurinhas em negociação e combinadas deste painel?')) {
-        estouTrocandoState = { negotiating: [], matched: [] };
-        saveEstouTrocandoState();
-        renderEstouTrocandoBoard(subContainer);
-      }
-    };
-
-    scoreCard.appendChild(infoDiv);
-    scoreCard.appendChild(btnReset);
-    mainBoard.appendChild(scoreCard);
+    
+    let selectedKeys = [];
+    let transitioningKeys = [];
+    let isTransitioning = false;
 
     // Obter dados do álbum
     const albumId = storage.getCurrentAlbumId();
@@ -4007,42 +3969,38 @@ function renderTrades(container) {
     const album = albums[albumId] || { stickers: {} };
     const userStickers = album.stickers || {};
 
-    // 2. Colunas Superiores (Faltantes e À Troca)
-    const colsGrid = document.createElement('div');
-    colsGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+    const mainBoard = document.createElement('div');
+    mainBoard.className = 'glass-panel p-5 rounded-2xl border border-white/5 bg-[#120e16]/60 flex flex-col gap-4 animate-fade-in w-full';
 
-    // Faltantes Col
-    const colFaltantes = document.createElement('div');
-    colFaltantes.className = 'glass-panel p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/[0.02] flex flex-col gap-2.5';
+    // Header Row with Title and Print Button
+    const headerRow = document.createElement('div');
+    headerRow.className = 'flex justify-between items-center w-full pb-2 border-b border-white/5';
 
-    const faltantesHeaderRow = document.createElement('div');
-    faltantesHeaderRow.className = 'flex justify-between items-center w-full';
-
-    const faltantesTitle = document.createElement('h3');
-    faltantesTitle.className = 'text-[10px] font-black text-yellow-400 uppercase tracking-widest flex items-center gap-1.5';
-    faltantesTitle.innerHTML = '🟨 Faltantes';
-    faltantesHeaderRow.appendChild(faltantesTitle);
+    const boardTitle = document.createElement('h3');
+    boardTitle.className = 'text-xs font-black text-yellow-400 uppercase tracking-widest flex items-center gap-1.5';
+    boardTitle.innerHTML = '🟨 Trocas - Figurinhas Faltantes';
+    headerRow.appendChild(boardTitle);
 
     const btnPrintMissing = document.createElement('button');
-    btnPrintMissing.className = 'py-0.5 px-2 bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500/20 text-yellow-400 font-bold text-[9px] uppercase tracking-wider rounded transition-all duration-200 active:scale-95 flex items-center gap-1 cursor-pointer';
+    btnPrintMissing.className = 'py-1 px-3 bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500/20 text-yellow-400 font-bold text-[10px] uppercase tracking-wider rounded-lg transition-all duration-200 active:scale-95 flex items-center gap-1 cursor-pointer';
     btnPrintMissing.innerHTML = '🖨️ Imprimir';
     btnPrintMissing.onclick = () => printMissingStickers();
-    faltantesHeaderRow.appendChild(btnPrintMissing);
+    headerRow.appendChild(btnPrintMissing);
+    
+    mainBoard.appendChild(headerRow);
 
-    colFaltantes.appendChild(faltantesHeaderRow);
-
-    // Filtro e Ordenação para faltantes
+    // Search and Sort controls
     const filterSortRow = document.createElement('div');
-    filterSortRow.className = 'flex gap-2 w-full';
+    filterSortRow.className = 'flex gap-3 w-full';
 
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.placeholder = 'Buscar...';
-    searchInput.className = 'flex-1 min-w-0 bg-[#131735]/80 text-white placeholder-gray-500 border border-white/5 focus:border-yellow-500/40 text-[10px] px-2.5 py-1.5 rounded-lg focus:outline-none transition-all duration-200';
+    searchInput.className = 'flex-1 min-w-0 bg-[#131735]/80 text-white placeholder-gray-500 border border-white/5 focus:border-yellow-500/40 text-[11px] px-3 py-2 rounded-xl focus:outline-none transition-all duration-200';
     filterSortRow.appendChild(searchInput);
 
     const sortSelect = document.createElement('select');
-    sortSelect.className = 'bg-[#131735]/80 text-white border border-white/5 focus:border-yellow-500/40 text-[10px] px-2 py-1.5 rounded-lg focus:outline-none cursor-pointer';
+    sortSelect.className = 'bg-[#131735]/80 text-white border border-white/5 focus:border-yellow-500/40 text-[11px] px-3 py-2 rounded-xl focus:outline-none cursor-pointer';
     sortSelect.innerHTML = `
       <option value="alpha">A-Z (Alfabética)</option>
       <option value="album">Álbum (Ordem)</option>
@@ -4054,88 +4012,74 @@ function renderTrades(container) {
     };
     filterSortRow.appendChild(sortSelect);
 
-    colFaltantes.appendChild(filterSortRow);
+    mainBoard.appendChild(filterSortRow);
 
-    const faltantesList = document.createElement('div');
-    faltantesList.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 gap-1.5 overflow-y-auto max-h-[300px] pr-1.5';
-    colFaltantes.appendChild(faltantesList);
+    // Grid container for the missing stickers
+    const stickersGrid = document.createElement('div');
+    stickersGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 overflow-y-auto max-h-[380px] pr-2 py-1';
+    mainBoard.appendChild(stickersGrid);
 
-    // À Troca Col
-    const colATroca = document.createElement('div');
-    colATroca.className = 'glass-panel p-4 rounded-xl border border-blue-500/20 bg-blue-500/[0.02] flex flex-col gap-2.5';
+    // Action buttons container
+    const actionsRow = document.createElement('div');
+    actionsRow.className = 'grid grid-cols-2 gap-3 w-full mt-2 pt-3 border-t border-white/5';
 
-    const aTrocaTitle = document.createElement('h3');
-    aTrocaTitle.className = 'text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-1.5';
-    aTrocaTitle.innerHTML = '🟦 À Troca (Em Negociação)';
-    colATroca.appendChild(aTrocaTitle);
+    const btnVoltar = document.createElement('button');
+    btnVoltar.className = 'py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-1.5';
+    btnVoltar.innerHTML = '↩️ Voltar';
+    btnVoltar.disabled = true;
 
-    const aTrocaList = document.createElement('div');
-    aTrocaList.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 gap-1.5 overflow-y-auto max-h-[345px] pr-1.5';
-    colATroca.appendChild(aTrocaList);
+    const btnTroquei = document.createElement('button');
+    btnTroquei.className = 'py-3 rounded-xl bg-gradient-to-r from-green-500 to-green-700 hover:from-green-400 hover:to-green-600 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-green-500/10 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-1.5';
+    btnTroquei.innerHTML = '✔️ Troquei';
+    btnTroquei.disabled = true;
 
-    colsGrid.appendChild(colFaltantes);
-    colsGrid.appendChild(colATroca);
-    mainBoard.appendChild(colsGrid);
-
-    // 3. Quadrante Inferior (Deu Match)
-    const colDeuMatch = document.createElement('div');
-    colDeuMatch.className = 'glass-panel p-4 rounded-xl border border-green-500/20 bg-green-500/[0.02] flex flex-col gap-2.5 w-full';
-
-    const deuMatchTitle = document.createElement('h3');
-    deuMatchTitle.className = 'text-[10px] font-black text-green-400 uppercase tracking-widest flex items-center gap-1.5';
-    deuMatchTitle.innerHTML = '🟩 Deu Match (Clique para colar)';
-    colDeuMatch.appendChild(deuMatchTitle);
-
-    const deuMatchList = document.createElement('div');
-    deuMatchList.className = 'grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-1.5 overflow-y-auto max-h-[220px] pr-1.5';
-    colDeuMatch.appendChild(deuMatchList);
-    mainBoard.appendChild(colDeuMatch);
+    actionsRow.appendChild(btnVoltar);
+    actionsRow.appendChild(btnTroquei);
+    mainBoard.appendChild(actionsRow);
 
     subContainer.appendChild(mainBoard);
 
-    // Auxiliares de renderização
-    function updateLists() {
-      // Limpar listas
-      faltantesList.innerHTML = '';
-      aTrocaList.innerHTML = '';
-      deuMatchList.innerHTML = '';
-
-      // Gerar faltantes disponíveis para negociação
-      const allStickerKeys = [];
-      groupsData.forEach(g => {
-        g.teams.forEach(t => {
-          for (let i = 1; i <= 20; i++) {
-            allStickerKeys.push(`${t.code}-${i}`);
-          }
-        });
+    // Pre-calculate all stickers keys
+    const allStickerKeys = [];
+    groupsData.forEach(g => {
+      g.teams.forEach(t => {
+        for (let i = 1; i <= 20; i++) {
+          allStickerKeys.push(`${t.code}-${i}`);
+        }
       });
-      for (let i = 1; i <= 19; i++) allStickerKeys.push(`FWC-${i}`);
-      for (let i = 1; i <= 14; i++) allStickerKeys.push(`CC-${i}`);
+    });
+    for (let i = 1; i <= 19; i++) allStickerKeys.push(`FWC-${i}`);
+    for (let i = 1; i <= 14; i++) allStickerKeys.push(`CC-${i}`);
 
-      const variants = ['ouro', 'prata', 'bronze', 'bordo'];
-      for (let i = 1; i <= 20; i++) {
-        variants.forEach(variant => {
-          allStickerKeys.push(`EXTRAS-${i}-${variant}`);
+    const variants = ['ouro', 'prata', 'bronze', 'bordo'];
+    for (let i = 1; i <= 20; i++) {
+      variants.forEach(variant => {
+        allStickerKeys.push(`EXTRAS-${i}-${variant}`);
+      });
+    }
+
+    function updateButtonsState() {
+      const hasSelected = selectedKeys.length > 0;
+      btnTroquei.disabled = !hasSelected || isTransitioning;
+      btnVoltar.disabled = !hasSelected || isTransitioning;
+    }
+
+    function updateLists() {
+      stickersGrid.innerHTML = '';
+
+      const filterVal = searchInput.value.toLowerCase().trim();
+      let missingKeys = allStickerKeys.filter(key => {
+        const isOwned = userStickers[key] ? userStickers[key].owned : false;
+        return !isOwned;
+      });
+
+      if (filterVal) {
+        missingKeys = missingKeys.filter(key => {
+          const displayLabel = getStickerDisplayLabel(key).toLowerCase();
+          return displayLabel.includes(filterVal) || key.toLowerCase().includes(filterVal);
         });
       }
 
-      // Filtrar as faltantes
-      const filterVal = searchInput.value.toLowerCase().trim();
-      const missingKeys = allStickerKeys.filter(key => {
-        const isOwned = userStickers[key] ? userStickers[key].owned : false;
-        const isNegotiating = estouTrocandoState.negotiating.includes(key);
-        const isMatched = estouTrocandoState.matched.includes(key);
-        
-        if (isOwned || isNegotiating || isMatched) return false;
-
-        if (filterVal) {
-          const displayLabel = getStickerDisplayLabel(key).toLowerCase();
-          return displayLabel.includes(filterVal) || key.toLowerCase().includes(filterVal);
-        }
-        return true;
-      });
-
-      // Ordenar as faltantes
       if (missingStickersSortOrder === 'alpha') {
         missingKeys.sort((a, b) => {
           const labelA = getStickerDisplayLabel(a);
@@ -4144,96 +4088,90 @@ function renderTrades(container) {
         });
       }
 
-      // Renderizar Faltantes (Amarelo)
       if (missingKeys.length === 0) {
-        faltantesList.innerHTML = '<p class="text-center text-[10px] text-gray-500 py-4 col-span-3">Nenhuma figurinha.</p>';
+        stickersGrid.className = 'flex items-center justify-center w-full py-8';
+        stickersGrid.innerHTML = '<p class="text-center text-xs text-gray-500 py-4 col-span-full">Nenhuma figurinha faltante.</p>';
       } else {
+        stickersGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 overflow-y-auto max-h-[380px] pr-2 py-1';
         missingKeys.forEach(key => {
           const pill = document.createElement('div');
-          pill.className = 'px-2 py-1.5 rounded-lg border border-yellow-500/30 bg-yellow-500/10 text-yellow-300 text-[9px] font-black uppercase tracking-wider text-center cursor-pointer hover:bg-yellow-500/20 active:scale-95 transition-all duration-150';
-          pill.textContent = getStickerDisplayLabel(key);
-          pill.onclick = () => {
-            estouTrocandoState.negotiating.push(key);
-            saveEstouTrocandoState();
-            updateLists();
-            updateStatsRow();
-          };
-          faltantesList.appendChild(pill);
-        });
-      }
+          
+          const isSelected = selectedKeys.includes(key);
+          const isTransitioningGreen = transitioningKeys.includes(key);
 
-      // Renderizar À Troca (Azul)
-      if (estouTrocandoState.negotiating.length === 0) {
-        aTrocaList.innerHTML = '<p class="text-center text-[10px] text-gray-500 py-4 col-span-3">Nenhuma em negociação.</p>';
-      } else {
-        estouTrocandoState.negotiating.forEach(key => {
-          const pill = document.createElement('div');
-          pill.className = 'px-2 py-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-300 text-[9px] font-black uppercase tracking-wider text-center cursor-pointer hover:bg-blue-500/20 active:scale-95 transition-all duration-150';
-          pill.textContent = getStickerDisplayLabel(key);
-          pill.onclick = () => {
-            // Mover para Match
-            estouTrocandoState.negotiating = estouTrocandoState.negotiating.filter(k => k !== key);
-            estouTrocandoState.matched.push(key);
-            saveEstouTrocandoState();
-            updateLists();
-            updateStatsRow();
-          };
-          aTrocaList.appendChild(pill);
-        });
-      }
+          if (isTransitioningGreen) {
+            pill.className = 'px-3 py-2.5 rounded-xl border-2 border-green-500/50 bg-green-500/20 text-green-300 text-xs font-black uppercase tracking-wider text-center transition-all duration-150 shadow-md shadow-green-500/5 cursor-default';
+          } else if (isSelected) {
+            pill.className = 'px-3 py-2.5 rounded-xl border-2 border-blue-500/50 bg-blue-500/20 text-blue-300 text-xs font-black uppercase tracking-wider text-center cursor-pointer hover:bg-blue-500/30 active:scale-95 transition-all duration-150 shadow-md shadow-blue-500/5 select-none';
+          } else {
+            pill.className = 'px-3 py-2.5 rounded-xl border-2 border-yellow-500/20 bg-yellow-500/[0.03] text-yellow-400/80 text-xs font-black uppercase tracking-wider text-center cursor-pointer hover:bg-yellow-500/10 active:scale-95 transition-all duration-150 select-none';
+          }
 
-      // Renderizar Deu Match (Verde)
-      if (estouTrocandoState.matched.length === 0) {
-        deuMatchList.innerHTML = '<p class="text-center text-[10px] text-gray-500 py-4 col-span-full">Nenhum match pendente.</p>';
-      } else {
-        estouTrocandoState.matched.forEach(key => {
-          const pill = document.createElement('div');
-          pill.className = 'px-2 py-1.5 rounded-lg border border-green-500/30 bg-green-500/10 text-green-300 text-[9px] font-black uppercase tracking-wider text-center cursor-pointer hover:bg-green-500/20 active:scale-95 transition-all duration-150';
           pill.textContent = getStickerDisplayLabel(key);
+
           pill.onclick = () => {
-            // Colar figurinha!
-            if (!album.stickers[key]) {
-              album.stickers[key] = { owned: true, duplicate: 0 };
-            } else {
-              album.stickers[key].owned = true;
+            if (isTransitioning || isTransitioningGreen) return;
+            if (!isSelected) {
+              selectedKeys.push(key);
+              updateLists();
+              updateButtonsState();
             }
-            
-            // Remover do fluxo
-            estouTrocandoState.matched = estouTrocandoState.matched.filter(k => k !== key);
-            
-            // Salvar tudo
-            storage.setAlbums(albums);
-            authDb.syncStickers(album.stickers);
-            saveEstouTrocandoState();
-            
-            // Atualizar UI
-            renderHeader(); // Atualiza barra superior
-            updateLists();
-            updateStatsRow();
           };
-          deuMatchList.appendChild(pill);
+
+          pill.ondblclick = (e) => {
+            e.stopPropagation();
+            if (isTransitioning || isTransitioningGreen) return;
+            if (isSelected) {
+              selectedKeys = selectedKeys.filter(k => k !== key);
+              updateLists();
+              updateButtonsState();
+            }
+          };
+
+          stickersGrid.appendChild(pill);
         });
       }
     }
 
-    function updateStatsRow() {
-      const n = estouTrocandoState.negotiating.length;
-      const m = estouTrocandoState.matched.length;
-      infoDiv.innerHTML = `
-        <div class="flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
-          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Negociação:</span>
-          <span class="text-xs font-black text-white">${n}</span>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
-          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Deu Match:</span>
-          <span class="text-xs font-black text-white">${m}</span>
-        </div>
-      `;
-    }
+    btnTroquei.onclick = async () => {
+      if (selectedKeys.length === 0 || isTransitioning) return;
 
-    // Input listener com debounce simples
+      isTransitioning = true;
+      btnTroquei.disabled = true;
+      btnVoltar.disabled = true;
+
+      transitioningKeys = [...selectedKeys];
+      selectedKeys = [];
+      updateLists();
+
+      setTimeout(async () => {
+        transitioningKeys.forEach(key => {
+          if (!album.stickers[key]) {
+            album.stickers[key] = { owned: true, duplicate: 0 };
+          } else {
+            album.stickers[key].owned = true;
+          }
+        });
+
+        storage.setAlbums(albums);
+        await authDb.syncStickers(album.stickers);
+
+        transitioningKeys = [];
+        isTransitioning = false;
+
+        if (typeof renderHeader === 'function') renderHeader();
+        updateLists();
+        updateButtonsState();
+      }, 2000);
+    };
+
+    btnVoltar.onclick = () => {
+      if (selectedKeys.length === 0 || isTransitioning) return;
+      selectedKeys = [];
+      updateLists();
+      updateButtonsState();
+    };
+
     searchInput.oninput = () => {
       updateLists();
     };
