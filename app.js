@@ -2204,7 +2204,7 @@ function renderHome(container) {
     const progBadge = document.createElement('span');
     if (item.prog.owned === item.limit) {
       progBadge.className = 'badge-neon-gamer completed';
-      progBadge.textContent = '✓';
+      progBadge.textContent = '🏆';
     } else {
       progBadge.className = 'badge-neon-gamer';
       progBadge.textContent = item.prog.owned + "/" + item.limit;
@@ -2306,7 +2306,7 @@ function renderHome(container) {
       const progBadge = document.createElement('span');
       if (teamStats.owned === limit) {
         progBadge.className = 'badge-neon-gamer completed';
-        progBadge.textContent = '✓';
+        progBadge.textContent = '🏆';
       } else {
         progBadge.className = 'badge-neon-gamer';
         progBadge.textContent = teamStats.owned + "/" + limit;
@@ -4759,21 +4759,20 @@ function updateHeaderSearchSuggestions(query) {
     const textMatches = textQuery === '' || matchName.includes(textQuery) || matchCode.includes(textQuery);
 
     if (textMatches) {
+      if (!groupedSuggestions[group.code]) {
+        groupedSuggestions[group.code] = {
+          name: group.name,
+          code: group.code,
+          flag: flagEmojis[group.code] || '🏳️',
+          stickers: []
+        };
+      }
       for (let i = 1; i <= group.limit; i++) {
         const key = group.code + "-" + i;
         const isOwned = stickers[key]?.owned;
 
         if (!isOwned) {
           if (hasNum && i !== searchNum) continue;
-
-          if (!groupedSuggestions[group.code]) {
-            groupedSuggestions[group.code] = {
-              name: group.name,
-              code: group.code,
-              flag: flagEmojis[group.code] || '🏳️',
-              stickers: []
-            };
-          }
           groupedSuggestions[group.code].stickers.push({
             key: key,
             label: group.code + " " + i,
@@ -4792,21 +4791,20 @@ function updateHeaderSearchSuggestions(query) {
       const textMatches = textQuery === '' || matchName.includes(textQuery) || matchCode.includes(textQuery);
 
       if (textMatches) {
+        if (!groupedSuggestions[t.code]) {
+          groupedSuggestions[t.code] = {
+            name: t.name,
+            code: t.code,
+            flag: flagEmojis[t.code] || '🏳️',
+            stickers: []
+          };
+        }
         for (let i = 1; i <= 20; i++) {
           const key = t.code + "-" + i;
           const isOwned = stickers[key]?.owned;
 
           if (!isOwned) {
             if (hasNum && i !== searchNum) continue;
-
-            if (!groupedSuggestions[t.code]) {
-              groupedSuggestions[t.code] = {
-                name: t.name,
-                code: t.code,
-                flag: flagEmojis[t.code] || '🏳️',
-                stickers: []
-              };
-            }
             groupedSuggestions[t.code].stickers.push({
               key: key,
               label: t.code + " " + i,
@@ -4824,24 +4822,32 @@ function updateHeaderSearchSuggestions(query) {
     const variants = ['ouro', 'prata', 'bronze', 'bordo'];
     const capVariants = { ouro: 'Ouro', prata: 'Prata', bronze: 'Bronze', bordo: 'Bordo' };
     
+    if (!groupedSuggestions['EXTRAS'] && textQuery !== '') {
+      groupedSuggestions['EXTRAS'] = {
+        name: 'Premium',
+        code: 'EXTRAS',
+        flag: flagEmojis['EXTRAS'] || '✨',
+        stickers: []
+      };
+    }
+
     legendsData.forEach((legend, idx) => {
       const matchLegendName = legend.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       if (textQuery === '' || matchLegendName.includes(textQuery)) {
+        if (!groupedSuggestions['EXTRAS']) {
+          groupedSuggestions['EXTRAS'] = {
+            name: 'Premium',
+            code: 'EXTRAS',
+            flag: flagEmojis['EXTRAS'] || '✨',
+            stickers: []
+          };
+        }
         variants.forEach(variant => {
           const key = "EXTRAS-" + idx + 1 + "-" + variant;
           const isOwned = stickers[key]?.owned;
 
           if (!isOwned) {
             if (hasNum && (idx + 1) !== searchNum) return;
-
-            if (!groupedSuggestions['EXTRAS']) {
-              groupedSuggestions['EXTRAS'] = {
-                name: 'Premium',
-                code: 'EXTRAS',
-                flag: flagEmojis['EXTRAS'] || '✨',
-                stickers: []
-              };
-            }
             groupedSuggestions['EXTRAS'].stickers.push({
               key: key,
               label: "LEG " + idx + 1 + "-" + capVariants[variant],
