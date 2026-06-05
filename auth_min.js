@@ -89,6 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(result.error.message);
         return;
       }
+      
+      if (result.data && result.data.user) {
+        const user = result.data.user;
+        const displayName = user.user_metadata?.username || user.user_metadata?.full_name || email.split('@')[0];
+        const uid = user.id;
+        localStorage.setItem('album_auth_session', JSON.stringify({ uid, name: displayName, email }));
+      }
+
       // Success – redirect to album page
       window.location.href = 'album.html';
     } catch (err) {

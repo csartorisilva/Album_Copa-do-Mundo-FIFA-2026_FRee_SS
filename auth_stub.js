@@ -1,9 +1,12 @@
 // auth_stub.js – Minimal stub to replace the previous authDb object
 // Provides no‑op implementations for methods used throughout app.js after the login UI was replaced.
 window.authDb = {
-  // Returns the current user (null means not logged in)
   getCurrentUser() {
-    return null;
+    try {
+      return JSON.parse(localStorage.getItem('album_auth_session')) || null;
+    } catch (e) {
+      return null;
+    }
   },
   // Demo mode flag – keep false for real usage
   isDemoMode() {
@@ -24,6 +27,7 @@ window.authDb = {
   },
   // Simple logout using Supabase if client exists
   async logout() {
+    localStorage.removeItem('album_auth_session');
     const client = window.supabaseClient || window.supabase;
     if (client && client.auth) {
       await client.auth.signOut();
