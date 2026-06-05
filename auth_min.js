@@ -111,14 +111,17 @@ document.addEventListener('DOMContentLoaded', () => {
               albums = JSON.parse(localStorage.getItem('albums') || '{}');
             } catch (e) {}
 
+            // If local is empty or doesn't exist, initialize
             if (!activeAlbumId || Object.keys(albums).length === 0) {
               activeAlbumId = "album-" + Math.random().toString(36).substring(2, 9);
               localStorage.setItem('currentAlbumId', activeAlbumId);
               albums[activeAlbumId] = { name: 'Meu Álbum Principal', stickers: {} };
             }
 
-            albums[activeAlbumId].stickers = { ...albums[activeAlbumId].stickers, ...profile.stickers };
+            // Sync stickers from Supabase directly
+            albums[activeAlbumId].stickers = profile.stickers;
             localStorage.setItem('albums', JSON.stringify(albums));
+            console.log("Progresso sincronizado do banco de dados na autenticação!");
           }
         } catch (syncErr) {
           console.error("Erro ao puxar progresso do banco de dados na autenticação:", syncErr);
