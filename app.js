@@ -1509,7 +1509,7 @@ function renderLogin(container) {
         targetElement.classList.add('hidden');
         return;
       }
-      targetElement.textContent = message;
+      targetElement.innerHTML = message;
       if (type === 'error') {
         // MODO DIAGNÓSTICO: Fundo preto, texto amarelo brilhante, fonte de 18px
         targetElement.className = 'text-[18px] font-black text-center p-5 rounded-xl border-4 border-[#FFC726] bg-[#000000] text-[#FFC726] block my-4 animate-pulse w-full max-w-full shadow-2xl';
@@ -1660,6 +1660,9 @@ function renderLogin(container) {
         if (msg === "Invalid login credentials") {
           msg = "Credenciais de login inválidas. Por favor, verifique seu e-mail/usuário e senha.";
         }
+        if (msg.includes("Timeout") || msg.includes("expirou")) {
+          msg += "<br/><br/><span style='display:block; font-weight: normal; font-size:11px; line-height: 1.4; color: #ccc; text-align: left; background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);'>💡 <strong>Dica de Conexão Corporativa:</strong> Se você está no notebook da empresa ou conectado a uma VPN, o firewall corporativo pode estar bloqueando a nuvem do Supabase. Desconecte a VPN por 30 segundos ou conecte seu notebook no roteador 4G/5G do seu celular (hotspot) apenas para fazer este login. Uma vez logado, você poderá ativar a VPN e usar o app normalmente, pois o progresso do álbum fica salvo no seu computador e será sincronizado quando você estiver em uma rede livre!</span>";
+        }
         showFeedback(msg, 'error', feedbackMsgLogin);
       } finally {
         btnLoginSubmit.disabled = false;
@@ -1730,6 +1733,9 @@ function renderLogin(container) {
         let msg = err.message || err;
         if (msg === "Invalid login credentials") {
           msg = "Credenciais de login inválidas. Por favor, verifique seu e-mail/usuário e senha.";
+        }
+        if (msg.includes("Timeout") || msg.includes("expirou")) {
+          msg += "<br/><br/><span style='display:block; font-weight: normal; font-size:11px; line-height: 1.4; color: #ccc; text-align: left; background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);'>💡 <strong>Dica de Conexão Corporativa:</strong> Se você está no notebook da empresa ou conectado a uma VPN, o firewall corporativo pode estar bloqueando a nuvem do Supabase. Desconecte a VPN por 30 segundos ou conecte seu notebook no roteador 4G/5G do seu celular (hotspot) apenas para fazer este cadastro. Uma vez cadastrado, você poderá ativar a VPN e usar o app normalmente, pois o progresso do álbum fica salvo no seu computador e será sincronizado quando você estiver em uma rede livre!</span>";
         }
         showFeedback(msg, 'error', feedbackMsgRegister);
       } finally {
