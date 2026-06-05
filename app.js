@@ -3495,6 +3495,51 @@ function renderTrades(container) {
   headerRow.appendChild(rightHeader);
   mainDiv.appendChild(headerRow);
 
+  // Sorting and Action Controls Row
+  const controlsRow = document.createElement('div');
+  controlsRow.className = 'flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center bg-white/5 p-3 rounded-xl border border-white/10 mb-4';
+
+  // Left: Sort selector
+  const sortContainer = document.createElement('div');
+  sortContainer.className = 'flex items-center gap-2';
+  const sortLabel = document.createElement('span');
+  sortLabel.className = 'text-xs text-gray-400 font-bold uppercase';
+  sortLabel.textContent = 'Ordenar:';
+  
+  const sortSelect = document.createElement('select');
+  sortSelect.className = 'bg-[#131735] text-white border border-white/20 rounded-lg text-xs py-1.5 px-3 focus:outline-none focus:border-copaYellow cursor-pointer';
+  
+  const optAlpha = document.createElement('option');
+  optAlpha.value = 'alpha';
+  optAlpha.textContent = 'Ordem Alfabética (A-Z)';
+  
+  const optAlbum = document.createElement('option');
+  optAlbum.value = 'album';
+  optAlbum.textContent = 'Ordem do Álbum';
+
+  // Load selected preference from sessionStorage or default to 'alpha'
+  const currentSort = sessionStorage.getItem('missingSortPref') || 'alpha';
+  sortSelect.appendChild(optAlpha);
+  sortSelect.appendChild(optAlbum);
+  sortSelect.value = currentSort;
+  
+  sortContainer.appendChild(sortLabel);
+  sortContainer.appendChild(sortSelect);
+  controlsRow.appendChild(sortContainer);
+
+  // Right: Action button to apply changes
+  const actionContainer = document.createElement('div');
+  actionContainer.className = 'flex items-center gap-2';
+
+  const btnCommit = document.createElement('button');
+  btnCommit.className = 'w-full sm:w-auto py-1.5 px-4 bg-copaGreen hover:bg-copaGreen/80 text-darkBg font-black text-xs uppercase tracking-wider rounded-lg transition-all active:scale-95 cursor-pointer shadow-md shadow-copaGreen/20 flex items-center justify-center gap-1';
+  btnCommit.innerHTML = '📥 Efetivar Colagem (<span id="selectedCount">0</span>)';
+  btnCommit.style.display = 'none'; // Only show when at least one sticker is selected
+  actionContainer.appendChild(btnCommit);
+  controlsRow.appendChild(actionContainer);
+
+  mainDiv.appendChild(controlsRow);
+
   // Load Album Data
   const albumId = storage.getCurrentAlbumId();
   const albums = storage.getAlbums();
@@ -3514,20 +3559,70 @@ function renderTrades(container) {
     return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
   };
 
+  // Keep track of keys marked for adding (selected to turn blue)
+  const selectedToGlue = new Set();
+
+  const updateCommitButton = () => {
+    const count = selectedToGlue.size;
+    document.getElementById('selectedCount').textContent = count;
+    if (count > 0) {
+      btnCommit.style.display = 'flex';
+    } else {
+      btnCommit.style.display = 'none';
+    }
+  };
+
+  btnCommit.onclick = async () => {
+    if (selectedToGlue.size === 0) return;
+    
+    // Mark all selected keys as owned: true
+    selectedToGlue.forEach(key => {
+      if (!userStickers[key]) {
+        userStickers[key] = { owned: false, qty: 0 };
+      }
+      userStickers[key].owned = true;
+      if (userStickers[key].qty === 0) {
+        userStickers[key].qty = 1;
+      }
+    });
+
+    // Save album data
+    album.stickers = userStickers;
+    albums[albumId] = album;
+    storage.saveAlbums(albums);
+
+    // Refresh UI
+    renderMissingStickers();
+  };
+
+  sortSelect.onchange = () => {
+    sessionStorage.setItem('missingSortPref', sortSelect.value);
+    renderMissingStickers();
+  };
+
   const teamsToProcess = [];
   
   // FWC
-  teamsToProcess.push({ name: 'FIFA World Cup', code: 'FWC', count: 19 });
+  teamsToProcess.push({ name: 'FIFA World Cup', code: 'FWC', count: 19, orderIndex: 1 });
   // CC
-  teamsToProcess.push({ name: 'Cidades Sede', code: 'CC', count: 14 });
+  teamsToProcess.push({ name: 'Cidades Sede', code: 'CC', count: 14, orderIndex: 2 });
+  
   // Normal Teams
+  let orderCounter = 3;
   groupsData.forEach(g => {
     if (g.id !== 'EXTRAS') {
       g.teams.forEach(t => {
-        teamsToProcess.push({ name: t.name, code: t.code, count: 20 });
+        teamsToProcess.push({ name: t.name, code: t.code, count: 20, orderIndex: orderCounter++ });
       });
     }
   });
+
+  // Sort teams list based on selection
+  if (sortSelect.value === 'alpha') {
+    teamsToProcess.sort((a, b) => a.name.localeCompare(b.name, 'pt', { sensitivity: 'base' }));
+  } else {
+    teamsToProcess.sort((a, b) => a.orderIndex - b.orderIndex);
+  }
 
   let totalMissing = 0;
   
@@ -3568,9 +3663,33 @@ function renderTrades(container) {
       grid.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mt-1';
       
       missingKeys.forEach(num => {
+        const key = team.code + '-' + num;
         const item = document.createElement('div');
-        item.className = 'bg-white/5 border border-white/10 rounded-lg py-2 text-center text-white font-bold text-sm shadow-inner truncate px-1';
+        item.className = 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-lg py-2 text-center font-bold text-sm shadow-inner truncate px-1 cursor-pointer select-none transition duration-150';
         item.textContent = team.code + ' ' + num;
+        
+        // Single click: turns blue (ready to change / mark as owned)
+        item.onclick = (e) => {
+          e.preventDefault();
+          if (selectedToGlue.has(key)) {
+            // Already selected, do nothing on single click, let dblclick handle revert
+          } else {
+            selectedToGlue.add(key);
+            item.className = 'bg-blue-500/20 border border-blue-500/40 text-blue-400 rounded-lg py-2 text-center font-bold text-sm shadow-inner truncate px-1 cursor-pointer select-none transition duration-150';
+            updateCommitButton();
+          }
+        };
+
+        // Double click: reverts to yellow
+        item.ondblclick = (e) => {
+          e.preventDefault();
+          if (selectedToGlue.has(key)) {
+            selectedToGlue.delete(key);
+            item.className = 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-lg py-2 text-center font-bold text-sm shadow-inner truncate px-1 cursor-pointer select-none transition duration-150';
+            updateCommitButton();
+          }
+        };
+
         grid.appendChild(item);
       });
       
@@ -4775,7 +4894,7 @@ function updateHeaderSearchSuggestions(query) {
         flagHtml = `<span class="text-sm select-none">🛡️</span>`;
       } else {
         const flagCode = (flagMap[group.code] || 'us').toLowerCase();
-    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
+        flagHtml = `<img src="https://flagcdn.com/w40/${flagCode}.png" class="w-4 h-3 object-cover rounded-sm select-none" />`;
       }
 
       leftDiv.innerHTML = `
