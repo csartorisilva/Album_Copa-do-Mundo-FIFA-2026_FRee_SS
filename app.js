@@ -564,7 +564,7 @@ function checkAlbumEntryPopup() {
 
   const desc = document.createElement('p');
   desc.className = 'text-xs text-gray-300';
-  desc.innerHTML = `Você está visualizando a coleção:<br><strong class="text-white text-sm">${album.name}</strong>`;
+  desc.innerHTML = "Você está visualizando a coleção:<br><strong class=\"text-white text-sm\">" + album.name + "</strong>";
   content.appendChild(desc);
 
   const btnRow = document.createElement('div');
@@ -601,7 +601,7 @@ function checkAlbumEntryPopup() {
 function shareApp() {
   const title = 'Ultimate Cromo FIFA 2026';
   const link = window.location.origin + window.location.pathname;
-  const text = `Eu uso o app-web (${link}) para o controle do meu álbum, ele tem um excelente layout e a funcionalidade de Trocas Qualificadas, onde o próprio app encontra as figurinhas faltantes para trocar.`;
+  const text = "Eu uso o app-web (" + link + ") para o controle do meu álbum, ele tem um excelente layout e a funcionalidade de Trocas Qualificadas, onde o próprio app encontra as figurinhas faltantes para trocar.";
   shareText(title, text);
 }
 
@@ -650,18 +650,18 @@ function hasQualifiedTrade(key) {
 // Para pos 1  → "Escudo [SIGLA]", pos 13 → "Time [SIGLA]", resto → nome do jogador
 function getStickerDisplayName(code, num) {
   if (code === 'EXTRAS') {
-    return legendsData[num - 1] ? legendsData[num - 1].name : `EXTRAS ${num}`;
+    return legendsData[num - 1] ? legendsData[num - 1].name : "EXTRAS " + num;
   }
   if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][num - 1]) {
     const entry = albumData[code][num - 1];
     const baseName = entry.nome || '';
     // Posição 1 = escudo do clube, posição 13 = foto do time
-    if (num === 1 || entry.tipo === 'brasao') return `Escudo ${code}`;
-    if (num === 13 || entry.tipo === 'time')  return `Time ${code}`;
+    if (num === 1 || entry.tipo === 'brasao') return "Escudo " + code;
+    if (num === 13 || entry.tipo === 'time')  return "Time " + code;
     return baseName;
   }
   // Fallback para genérico
-  return playerNames[num] || `${code} ${num}`;
+  return playerNames[num] || code + " " + num;
 }
 
 // Captura de foto nativa usando base64
@@ -756,10 +756,10 @@ function triggerCameraCapture(key, onComplete) {
         if (album && album.stickers[key]) {
           album.stickers[key].photo = base64;
           storage.setAlbums(albums);
-          console.log(`Cloud Sync: Photo for ${key} uploaded to global database.`);
+          console.log("Cloud Sync: Photo for " + key + " uploaded to global database.");
 
           // --- Atualiza o nome real no label do card (NOVA LÓGICA) ---
-          const cardEl = document.getElementById(`card-${key}`);
+          const cardEl = document.getElementById("card-" + key);
           if (cardEl) {
             const nameLabel = cardEl.querySelector('.player-name-label');
             if (nameLabel) {
@@ -800,7 +800,7 @@ function openFullscreenCard(key) {
   const num = parseInt(parts[1], 10);
   
   const isExtras = (code === 'EXTRAS');
-  const stickerName = isExtras ? legendsData[num - 1].name : `${code} ${num}`;
+  const stickerName = isExtras ? legendsData[num - 1].name : code + " " + num;
   
   let playerPhotoSrc = null;
   if (sticker && sticker.photo) {
@@ -856,7 +856,7 @@ function openFullscreenCard(key) {
   btnShare.className = 'flex-1 px-4 py-2.5 bg-copaYellow hover:bg-opacity-90 text-black text-xs font-black uppercase tracking-wider rounded-xl transition';
   btnShare.textContent = 'Compartilhar Cromo';
   btnShare.onclick = () => {
-    const textShare = `Olha o meu card de ${stickerName} colado no app Ultimate Cromo FIFA 2026!`;
+    const textShare = "Olha o meu card de " + stickerName + " colado no app Ultimate Cromo FIFA 2026!";
     shareText(stickerName, textShare);
   };
   btnRow.appendChild(btnShare);
@@ -985,7 +985,7 @@ function createNewAlbum() {
   renderHeader();
   location.hash = '#home';
   route();
-  alert(`Álbum "${name.trim()}" criado com sucesso!`);
+  alert("Álbum \"" + name.trim() + "\" criado com sucesso!");
 }
 
 // Renderiza a barra superior (seletor de álbum e perfil)
@@ -1013,7 +1013,7 @@ function renderHeader() {
         <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-copaGreen rounded-full border-2 border-[#070d1e] block"></span>
       `;
       authBtn.style.position = 'relative';
-      authBtn.title = `Logado como ${user.name}`;
+      authBtn.title = "Logado como " + user.name;
       authBtn.className = 'w-7 h-7 rounded-full border-2 border-copaGreen/60 hover:border-copaGreen bg-white/5 flex items-center justify-center text-xs overflow-visible transition-all duration-200 relative';
     } else {
       authBtn.innerHTML = `
@@ -1060,7 +1060,7 @@ function renderHeader() {
         if (deferredPrompt) {
           deferredPrompt.prompt();
           const { outcome } = await deferredPrompt.userChoice;
-          console.log(`PWA install choice: ${outcome}`);
+          console.log("PWA install choice: " + outcome);
           deferredPrompt = null;
           renderHeader();
         }
@@ -1256,12 +1256,12 @@ function renderLogin(container) {
     details.className = 'w-full text-center text-xs space-y-2 mt-2 pt-2 border-t border-white/5 text-gray-400';
     
     const dbMode = document.createElement('p');
-    dbMode.innerHTML = `Banco de Dados: <span class="${isDemo ? 'text-copaYellow' : 'text-copaGreen'} font-bold">${isDemo ? 'Modo Simulado (Demo)' : 'Nuvem Real (Supabase)'}</span>`;
+    dbMode.innerHTML = "Banco de Dados: <span class=\"" + isDemo ? 'text-copaYellow' : 'text-copaGreen' + " font-bold\">" + isDemo ? 'Modo Simulado (Demo)' : 'Nuvem Real (Supabase)' + "</span>";
     details.appendChild(dbMode);
 
     const locationText = document.createElement('p');
     if (user.latitude && user.longitude) {
-      locationText.innerHTML = `GPS: <span class="text-white font-bold">${user.latitude.toFixed(4)}, ${user.longitude.toFixed(4)}</span>`;
+      locationText.innerHTML = "GPS: <span class=\"text-white font-bold\">" + user.latitude.toFixed(4) + ", " + user.longitude.toFixed(4) + "</span>";
     } else {
       locationText.innerHTML = `GPS: <span class="text-red-400 font-bold">Não Compartilhado</span>`;
     }
@@ -1327,7 +1327,7 @@ function renderLogin(container) {
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
       const date = new Date().toISOString().slice(0, 10);
-      downloadAnchor.setAttribute("download", `backup_album_fifa_2026_${date}.json`);
+      downloadAnchor.setAttribute("download", "backup_album_fifa_2026_" + date + ".json");
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -1823,7 +1823,7 @@ function renderLogin(container) {
 
       const strDay = parts[0].padStart(2, '0');
       const strMonth = parts[1].padStart(2, '0');
-      const birthdateYYYYMMDD = `${year}-${strMonth}-${strDay}`;
+      const birthdateYYYYMMDD = year + "-" + strMonth + "-" + strDay;
  
       try {
         btnRegisterSubmit.disabled = true;
@@ -1969,7 +1969,7 @@ function renderHome(container) {
     const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
     let owned = 0;
     for (let i = 1; i <= limit; i++) {
-      if (album.stickers[`${code}-${i}`]?.owned) owned++;
+      if (album.stickers[code + "-" + i]?.owned) owned++;
     }
     return { owned, total: limit };
   }
@@ -1982,7 +1982,7 @@ function renderHome(container) {
     if (!album) return { owned: 0, total: 48 };
     let owned = 0;
     groupsData.forEach(g => g.teams.forEach(t => {
-      if (album.stickers[`${t.code}-1`]?.owned) owned++;
+      if (album.stickers[t.code + "-1"]?.owned) owned++;
     }));
     return { owned, total: 48 };
   }
@@ -1997,7 +1997,7 @@ function renderHome(container) {
     let owned = 0;
     legendsData.forEach((_, idx) => {
       variants.forEach(v => {
-        if (album.stickers[`EXTRAS-${idx + 1}-${v}`]?.owned) owned++;
+        if (album.stickers["EXTRAS-" + idx + 1 + "-" + v]?.owned) owned++;
       });
     });
     return { owned, total: legendsData.length * 4 };
@@ -2093,7 +2093,7 @@ function renderHome(container) {
   mainProgressBarBg.className = 'h-1 bg-white/5 rounded-full overflow-hidden border border-white/10 w-full';
   const mainProgressBarFill = document.createElement('div');
   mainProgressBarFill.className = 'h-full bg-gradient-to-r from-copaBlue via-copaGreen to-copaYellow rounded-full transition-all duration-500';
-  mainProgressBarFill.style.width = `${stats.percent}%`;
+  mainProgressBarFill.style.width = stats.percent + "%";
   mainProgressBarBg.appendChild(mainProgressBarFill);
   mainProgressContainer.appendChild(mainProgressBarBg);
 
@@ -2164,9 +2164,9 @@ function renderHome(container) {
 
   specialItems.forEach(item => {
     const card = document.createElement('div');
-    card.id = `country-card-${item.code}`;
+    card.id = "country-card-" + item.code;
     card.className = 'selection-card-futz';
-    card.onclick = () => location.hash = `#team-${item.code}`;
+    card.onclick = () => location.hash = "#team-" + item.code;
 
     // Logo vaza por cima com crest-floating
     const crestImg = document.createElement('img');
@@ -2197,7 +2197,7 @@ function renderHome(container) {
     const progressBar = document.createElement('div');
     progressBar.className = 'h-full bg-gradient-to-r from-copaGreen to-emerald-400';
     const percent = (item.prog.owned / item.limit) * 100;
-    progressBar.style.width = `${percent}%`;
+    progressBar.style.width = percent + "%";
     progressContainer.appendChild(progressBar);
     bottomRow.appendChild(progressContainer);
 
@@ -2208,7 +2208,7 @@ function renderHome(container) {
       progBadge.textContent = '✓';
     } else {
       progBadge.className = 'badge-neon-gamer';
-      progBadge.textContent = `${item.prog.owned}/${item.limit}`;
+      progBadge.textContent = item.prog.owned + "/" + item.limit;
     }
     card.appendChild(progBadge);
     card.appendChild(bottomRow);
@@ -2241,9 +2241,9 @@ function renderHome(container) {
     const sortedTeams = [...g.teams].sort((a, b) => a.rank - b.rank);
     sortedTeams.forEach(team => {
       const card = document.createElement('div');
-      card.id = `country-card-${team.code}`;
+      card.id = "country-card-" + team.code;
       card.className = 'selection-card-futz';
-      card.onclick = () => location.hash = `#team-${team.code}`;
+      card.onclick = () => location.hash = "#team-" + team.code;
 
       // Injeta o Balãozinho de Fase (FG, R16, etc.)
       const cachedData = localStorage.getItem(STANDINGS_CACHE_KEY);
@@ -2254,7 +2254,7 @@ function renderHome(container) {
 
       // Escudo real flutuante
       const crestImg = document.createElement('img');
-      crestImg.src = crestsMap[team.code] || `https://flagcdn.com/w80/${flagCode}.png`; // fallback
+      crestImg.src = crestsMap[team.code] || "https://flagcdn.com/w80/" + flagCode + ".png"; // fallback
       crestImg.alt = team.name;
       crestImg.loading = 'lazy';
       crestImg.decoding = 'async';
@@ -2291,14 +2291,14 @@ function renderHome(container) {
       const progressBar = document.createElement('div');
       progressBar.className = 'h-full bg-gradient-to-r from-copaGreen to-emerald-400';
       const percent = (teamStats.owned / limit) * 100;
-      progressBar.style.width = `${percent}%`;
+      progressBar.style.width = percent + "%";
       progressContainer.appendChild(progressBar);
       bottomRow.appendChild(progressContainer);
 
       // Badge de Fase da Copa (ex: FG, R16, etc.) se aplicável
       if (phaseInfo) {
         const phaseBadge = document.createElement('span');
-        phaseBadge.className = `card-phase-badge absolute top-3 left-3 text-[7px] font-black px-1.5 py-0.2 rounded border uppercase tracking-wider ${phaseInfo.color}`;
+        phaseBadge.className = "card-phase-badge absolute top-3 left-3 text-[7px] font-black px-1.5 py-0.2 rounded border uppercase tracking-wider " + phaseInfo.color;
         phaseBadge.textContent = phaseInfo.label;
         card.appendChild(phaseBadge);
       }
@@ -2310,7 +2310,7 @@ function renderHome(container) {
         progBadge.textContent = '✓';
       } else {
         progBadge.className = 'badge-neon-gamer';
-        progBadge.textContent = `${teamStats.owned}/${limit}`;
+        progBadge.textContent = teamStats.owned + "/" + limit;
       }
       card.appendChild(progBadge);
       card.appendChild(bottomRow);
@@ -2336,19 +2336,19 @@ function getTeamProgress(teamCode) {
   let owned = 0;
   if (teamCode === 'ESCUDOS') {
     groupsData.forEach(g => g.teams.forEach(t => {
-      if (album.stickers[`${t.code}-1`]?.owned) owned++;
+      if (album.stickers[t.code + "-1"]?.owned) owned++;
     }));
   } else if (teamCode === 'EXTRAS') {
     const variants = ['ouro', 'prata', 'bronze', 'bordo'];
     legendsData.forEach((_, idx) => {
       variants.forEach(v => {
-        if (album.stickers[`EXTRAS-${idx + 1}-${v}`]?.owned) owned++;
+        if (album.stickers["EXTRAS-" + idx + 1 + "-" + v]?.owned) owned++;
       });
     });
   } else {
     const limit = (teamCode === 'FWC') ? 19 : (teamCode === 'CC') ? 14 : 20;
     for (let i = 1; i <= limit; i++) {
-      const key = `${teamCode}-${i}`;
+      const key = teamCode + "-" + i;
       if (album.stickers[key] && album.stickers[key].owned) {
         owned++;
       }
@@ -2414,7 +2414,7 @@ function renderImport(container) {
     const userConsent = prompt(
       "ATENÇÃO: Você está prestes a apagar todas as figurinhas coladas e repetidas deste álbum!\n\n" +
       "Esta ação é irreversível.\n" +
-      `Para confirmar que deseja prosseguir, digite "${confirmationWord}" abaixo:`
+      "Para confirmar que deseja prosseguir, digite \"" + confirmationWord + "\" abaixo:"
     );
     if (userConsent === confirmationWord) {
       const albumId = storage.getCurrentAlbumId();
@@ -2489,7 +2489,7 @@ function processImport(mode) {
       }
     }
     if (foundLegendIndex !== -1) {
-      parsedKeys.add(`EXTRAS-${foundLegendIndex + 1}`);
+      parsedKeys.add("EXTRAS-" + foundLegendIndex + 1);
       return;
     }
 
@@ -2505,7 +2505,7 @@ function processImport(mode) {
         }
       }
       if (itemLegendIndex !== -1) {
-        parsedKeys.add(`EXTRAS-${itemLegendIndex + 1}`);
+        parsedKeys.add("EXTRAS-" + itemLegendIndex + 1);
         return;
       }
 
@@ -2522,7 +2522,7 @@ function processImport(mode) {
         nums.forEach(n => {
           const numVal = parseInt(n, 10);
           if (numVal >= 1 && numVal <= 20) {
-            parsedKeys.add(`${code}-${numVal}`);
+            parsedKeys.add(code + "-" + numVal);
           }
         });
       } else if (/^[0-9\s]+$/.test(item)) {
@@ -2537,18 +2537,18 @@ function processImport(mode) {
             const stickerIdx = (idx % 20) + 1;
             if (teamIdx >= 0 && teamIdx < 48) {
               const teamCode = allTeams[teamIdx];
-              parsedKeys.add(`${teamCode}-${stickerIdx}`);
+              parsedKeys.add(teamCode + "-" + stickerIdx);
             }
           } else if (numVal >= 1 && numVal <= 20) {
             if (currentCode) {
-              parsedKeys.add(`${currentCode}-${numVal}`);
+              parsedKeys.add(currentCode + "-" + numVal);
             } else {
               const idx = numVal - 1;
               const teamIdx = Math.floor(idx / 20);
               const stickerIdx = (idx % 20) + 1;
               if (teamIdx >= 0 && teamIdx < 48) {
                 const teamCode = allTeams[teamIdx];
-                parsedKeys.add(`${teamCode}-${stickerIdx}`);
+                parsedKeys.add(teamCode + "-" + stickerIdx);
               }
             }
           }
@@ -2563,14 +2563,14 @@ function processImport(mode) {
     groupsData.forEach(g => {
       g.teams.forEach(t => {
         for (let i = 1; i <= 20; i++) {
-          allStickerKeys.push(`${t.code}-${i}`);
+          allStickerKeys.push(t.code + "-" + i);
         }
       });
     });
     const specials = ['FWC', 'CC', 'EXTRAS'];
     specials.forEach(code => {
       for (let i = 1; i <= 20; i++) {
-        allStickerKeys.push(`${code}-${i}`);
+        allStickerKeys.push(code + "-" + i);
       }
     });
 
@@ -2583,7 +2583,7 @@ function processImport(mode) {
     });
 
     storage.setAlbums(albums);
-    alert(`Sucesso! Álbum atualizado: as ${parsedKeys.size} figurinhas informadas foram marcadas como FALTANTES, e todas as demais do álbum foram marcadas como COLADAS.`);
+    alert("Sucesso! Álbum atualizado: as " + parsedKeys.size + " figurinhas informadas foram marcadas como FALTANTES, e todas as demais do álbum foram marcadas como COLADAS.");
   } else {
     // Modos "Tenho" ou "Repetidas" padrão
     let importCount = 0;
@@ -2592,7 +2592,7 @@ function processImport(mode) {
       importCount++;
     });
     storage.setAlbums(albums);
-    alert(`Sucesso! ${importCount} figurinhas adicionadas.`);
+    alert("Sucesso! " + importCount + " figurinhas adicionadas.");
   }
 
   location.hash = '#home';
@@ -2730,7 +2730,7 @@ function renderTeamPage(code, container) {
     if (teamObj) {
       const pi = getPhaseInfo(teamObj, standingsForTeam);
       const phaseBadge = document.createElement('span');
-      phaseBadge.className = `text-[8px] font-black px-1.5 py-0.5 rounded border ${pi.color} ml-1`;
+      phaseBadge.className = "text-[8px] font-black px-1.5 py-0.5 rounded border " + pi.color + " ml-1";
       phaseBadge.textContent = pi.description;
       teamTitle.appendChild(phaseBadge);
     }
@@ -2742,7 +2742,7 @@ function renderTeamPage(code, container) {
   const titlesSub = document.createElement('p');
   titlesSub.className = 'text-[9px] text-gray-400 font-bold tracking-tight mt-0.5';
   if (titleInfo) {
-    titlesSub.innerHTML = `<span class="text-copaYellow font-black">Títulos Mundiais:</span> ${titleInfo.years}`;
+    titlesSub.innerHTML = "<span class=\"text-copaYellow font-black\">Títulos Mundiais:</span> " + titleInfo.years;
   } else {
     if (code === 'FWC') {
       titlesSub.textContent = 'Figurinhas brilhantes';
@@ -2780,14 +2780,14 @@ function renderTeamPage(code, container) {
   const progLabel = document.createElement('div');
   progLabel.className = 'flex justify-between items-center text-[9px] text-gray-400 font-bold uppercase';
   const percent = Math.round((stats.owned / limit) * 100);
-  progLabel.innerHTML = `<span>Progresso de Conclusão</span> <span id="teamProgText" class="text-copaGreen font-bold">${stats.owned}/${limit} (${percent}%)</span>`;
+  progLabel.innerHTML = "<span>Progresso de Conclusão</span> <span id=\"teamProgText\" class=\"text-copaGreen font-bold\">" + stats.owned + "/" + limit + " (" + percent + "%)</span>";
   
   const progBg = document.createElement('div');
   progBg.className = 'h-2 bg-white/5 border border-white/10 rounded-full overflow-hidden';
   const progFill = document.createElement('div');
   progFill.id = 'teamProgBarFill';
   progFill.className = 'h-full bg-gradient-to-r from-copaBlue via-copaGreen to-copaYellow rounded-full transition-all duration-300';
-  progFill.style.width = `${percent}%`;
+  progFill.style.width = percent + "%";
   
   progBg.appendChild(progFill);
   progressWrapper.appendChild(progLabel);
@@ -2797,7 +2797,7 @@ function renderTeamPage(code, container) {
   const countSub = document.createElement('p');
   countSub.className = 'text-[9px] text-gray-400 text-right mt-1 font-bold';
   countSub.id = 'teamProgressLabel';
-  countSub.textContent = `${stats.owned} de ${limit} figurinhas coladas`;
+  countSub.textContent = stats.owned + " de " + limit + " figurinhas coladas";
   progressWrapper.appendChild(countSub);
 
   headerPanel.appendChild(progressWrapper);
@@ -2825,23 +2825,23 @@ function renderTeamPage(code, container) {
     groupsData.forEach(g => g.teams.forEach(t => allTeamsList.push(t)));
     
     allTeamsList.forEach(team => {
-      const originalKey = `${team.code}-1`;
+      const originalKey = team.code + "-1";
       const card = document.createElement('div');
       card.className = 'sticker-card';
-      card.id = `card-${originalKey}`;
+      card.id = "card-" + originalKey;
 
       const inner = document.createElement('div');
       inner.className = 'card-inner';
 
       const cardBack = document.createElement('div');
       cardBack.className = 'card-back';
-      const backLogoComp = createLogoComposition(`${team.code} 1`, false);
+      const backLogoComp = createLogoComposition(team.code + " 1", false);
       cardBack.appendChild(backLogoComp);
       inner.appendChild(cardBack);
 
       const cardFront = document.createElement('div');
       cardFront.className = 'card-front relative flex flex-col justify-between p-2 overflow-visible';
-      const frontLogoComp = createLogoComposition(`${team.code} 1`, false);
+      const frontLogoComp = createLogoComposition(team.code + " 1", false);
       cardFront.appendChild(frontLogoComp);
 
       // Frente superior
@@ -2863,7 +2863,7 @@ function renderTeamPage(code, container) {
       // Nome
       const playerName = document.createElement('div');
       playerName.className = 'player-name-label';
-      playerName.textContent = `${team.name} Escudo`;
+      playerName.textContent = team.name + " Escudo";
       cardFront.appendChild(playerName);
 
       const frontActions = document.createElement('div');
@@ -2914,24 +2914,24 @@ function renderTeamPage(code, container) {
       cardsGrid.className = 'grid grid-cols-4 gap-2 flex-1';
       
       variants.forEach(variant => {
-        const key = `EXTRAS-${idx + 1}-${variant}`;
-        const stickerCode = `${legend.name}`;
+        const key = "EXTRAS-" + idx + 1 + "-" + variant;
+        const stickerCode = legend.name;
         
         const card = document.createElement('div');
         card.className = 'sticker-card special';
-        card.id = `card-${key}`;
+        card.id = "card-" + key;
 
         const inner = document.createElement('div');
         inner.className = 'card-inner';
 
         const cardBack = document.createElement('div');
-        cardBack.className = `card-back special ${variant}`;
+        cardBack.className = "card-back special " + variant;
         const backLogoComp = createLogoComposition(stickerCode, true);
         cardBack.appendChild(backLogoComp);
         inner.appendChild(cardBack);
 
         const cardFront = document.createElement('div');
-        cardFront.className = `card-front special shiny-effect ${variant} relative flex flex-col justify-between p-2 overflow-visible`;
+        cardFront.className = "card-front special shiny-effect " + variant + " relative flex flex-col justify-between p-2 overflow-visible";
         
         const frontLogoComp = createLogoComposition(stickerCode, true);
         cardFront.appendChild(frontLogoComp);
@@ -2980,15 +2980,15 @@ function renderTeamPage(code, container) {
   } else {
     // FIFA (FWC) e Coca-Cola (CC) e normais
     for (let i = 1; i <= limit; i++) {
-      const key = `${code}-${i}`;
+      const key = code + "-" + i;
       const card = document.createElement('div');
       card.className = 'sticker-card';
-      card.id = `card-${key}`;
+      card.id = "card-" + key;
 
       const inner = document.createElement('div');
       inner.className = 'card-inner';
 
-      const stickerCode = `${code} ${i}`;
+      const stickerCode = code + " " + i;
       
       const cardBack = document.createElement('div');
       cardBack.className = 'card-back';
@@ -3028,7 +3028,7 @@ function renderTeamPage(code, container) {
 
       const playerName = document.createElement('div');
       playerName.className = 'player-name-label';
-      let nameText = playerNames[i] || `${code} ${i}`;
+      let nameText = playerNames[i] || code + " " + i;
       if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][i - 1]) {
         nameText = albumData[code][i - 1].nome;
       }
@@ -3071,7 +3071,7 @@ function updateTeamProgressLabel(code, delayCheckmark = false) {
   // 1. Atualiza o texto descritivo
   const label = document.getElementById('teamProgressLabel');
   if (label) {
-    label.textContent = `${stats.owned} de ${limit} figurinhas coladas`;
+    label.textContent = stats.owned + " de " + limit + " figurinhas coladas";
   }
   
   // 2. Atualiza a barra de progresso
@@ -3079,8 +3079,8 @@ function updateTeamProgressLabel(code, delayCheckmark = false) {
   const progBar = document.getElementById('teamProgBarFill');
   if (progText && progBar) {
     const percent = Math.round((stats.owned / limit) * 100);
-    progText.textContent = `${stats.owned}/${limit} (${percent}%)`;
-    progBar.style.width = `${percent}%`;
+    progText.textContent = stats.owned + "/" + limit + " (" + percent + "%)";
+    progBar.style.width = percent + "%";
   }
   
   // 3. Adiciona ou remove o ícone de Check (✓) verde no título
@@ -3224,7 +3224,7 @@ function updateCard(card, key) {
       badge.className = 'rep-badge';
       card.appendChild(badge);
     }
-    badge.textContent = `+${duplicates}`;
+    badge.textContent = "+" + duplicates;
   } else if (badge) {
     badge.remove();
   }
@@ -3236,7 +3236,7 @@ function updateCard(card, key) {
 
     if (isOwned) {
       const btnLeft = document.createElement('button');
-      btnLeft.className = `action-btn ${duplicates > 0 ? 'btn-minus' : 'btn-remove'}`;
+      btnLeft.className = "action-btn " + duplicates > 0 ? 'btn-minus' : 'btn-remove';
       btnLeft.innerHTML = duplicates > 0 ? '–' : '×';
       btnLeft.title = duplicates > 0 ? 'Remover 1 repetida' : 'Remover do álbum';
       btnLeft.onclick = (e) => {
@@ -3342,17 +3342,17 @@ function createMiniStickerCapsule(key) {
   const isSpecial = (code === 'EXTRAS');
 
   const el = document.createElement('div');
-  el.className = `text-[9px] font-black px-2 py-1 rounded border tracking-wide uppercase transition-all duration-150 select-none cursor-pointer ${isSpecial ? 'bg-copaYellow/10 text-copaYellow border-copaYellow/20 hover:bg-copaYellow/20' : 'bg-copaGreen/10 text-copaGreen border-copaGreen/20 hover:bg-copaGreen/20'}`;
+  el.className = "text-[9px] font-black px-2 py-1 rounded border tracking-wide uppercase transition-all duration-150 select-none cursor-pointer " + isSpecial ? 'bg-copaYellow/10 text-copaYellow border-copaYellow/20 hover:bg-copaYellow/20' : 'bg-copaGreen/10 text-copaGreen border-copaGreen/20 hover:bg-copaGreen/20';
   
   let pName = key;
   if (isSpecial) {
     const variant = key.split('-')[2];
     const capVariant = variant ? variant.charAt(0).toUpperCase() + variant.slice(1) : '';
-    pName = (legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`) + ' ' + capVariant;
-    el.textContent = `${legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`} ${capVariant}`;
+    pName = (legendsData[i - 1] ? legendsData[i - 1].name : "Lendário " + i) + ' ' + capVariant;
+    el.textContent = legendsData[i - 1] ? legendsData[i - 1].name :Lendário ${i}"} " + capVariant;
   } else if (typeof albumData !== 'undefined' && albumData[code] && albumData[code][i - 1]) {
     pName = albumData[code][i - 1].nome;
-    el.textContent = `${code} ${i}`;
+    el.textContent = code + " " + i;
   } else {
     pName = playerNames[i] || key;
     el.textContent = key;
@@ -3364,9 +3364,9 @@ function createMiniStickerCapsule(key) {
 function getStickerNameForShare(key) {
   const parts = key.split('-');
   if (parts[0] === 'EXTRAS') {
-    const name = legendsData[parseInt(parts[1], 10) - 1] ? legendsData[parseInt(parts[1], 10) - 1].name : `Lendário ${parts[1]}`;
+    const name = legendsData[parseInt(parts[1], 10) - 1] ? legendsData[parseInt(parts[1], 10) - 1].name : "Lendário " + parts[1];
     const cat = parts[2] ? parts[2].charAt(0).toUpperCase() + parts[2].slice(1) : '';
-    return `${name} ${cat}`;
+    return name + " " + cat;
   }
   return getStickerDisplayName(parts[0], parseInt(parts[1], 10));
 }
@@ -3377,10 +3377,10 @@ function shareTextViaSystem(title, text) {
       title: title,
       text: text
     }).catch(err => {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+      window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
     });
   } else {
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), '_blank');
   }
 }
 
@@ -3396,7 +3396,7 @@ let estouTrocandoState = {
 function loadEstouTrocandoState() {
   const albumId = storage.getCurrentAlbumId();
   if (!albumId) return;
-  const key = `estou_trocando_${albumId}`;
+  const key = "estou_trocando_" + albumId;
   try {
     const saved = localStorage.getItem(key);
     if (saved) {
@@ -3415,7 +3415,7 @@ function loadEstouTrocandoState() {
 function saveEstouTrocandoState() {
   const albumId = storage.getCurrentAlbumId();
   if (!albumId) return;
-  const key = `estou_trocando_${albumId}`;
+  const key = "estou_trocando_" + albumId;
   localStorage.setItem(key, JSON.stringify(estouTrocandoState));
 }
 
@@ -3426,10 +3426,10 @@ function getStickerDisplayLabel(key) {
   if (code === 'EXTRAS') {
     const variant = parts[2] || '';
     const legendIndex = parseInt(num, 10) - 1;
-    const name = (legendsData && legendsData[legendIndex]) ? legendsData[legendIndex].name : `LÉG ${num}`;
-    return `${name} (${variant.toUpperCase()})`;
+    const name = (legendsData && legendsData[legendIndex]) ? legendsData[legendIndex].name : "LÉG " + num;
+    return name + " (" + variant.toUpperCase() + ")";
   }
-  return `${code} ${num}`;
+  return code + " " + num;
 }
 
 
@@ -3535,7 +3535,7 @@ const newLogic = `function renderTrades(container) {
   teamsToProcess.forEach(team => {
     const missingKeys = [];
     for(let i=1; i<=team.count; i++) {
-      const key = \`\${team.code}-\${i}\`;
+      const key = \"\" + team.code + "-\" + i + "\";
       if (isMissing(key)) missingKeys.push(i); // Push number
     }
 
@@ -3558,7 +3558,7 @@ const newLogic = `function renderTrades(container) {
       
       const missingCount = document.createElement('span');
       missingCount.className = 'bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full text-[10px] font-bold';
-      missingCount.textContent = \`Faltam \${missingKeys.length}\`;
+      missingCount.textContent = \"Faltam \" + missingKeys.length + "\";
       
       teamHeader.appendChild(crestImg);
       teamHeader.appendChild(teamName);
@@ -3571,7 +3571,7 @@ const newLogic = `function renderTrades(container) {
       missingKeys.forEach(num => {
         const item = document.createElement('div');
         item.className = 'bg-white/5 border border-white/10 rounded-lg py-2 text-center text-white font-bold text-sm shadow-inner truncate px-1';
-        item.textContent = \`\${team.code} \${num}\`;
+        item.textContent = \"\" + team.code + " \" + num + "\";
         grid.appendChild(item);
       });
       
@@ -3626,7 +3626,11 @@ function printMissingStickers() {
   teamsToProcess.forEach(team => {
     const missingKeys = [];
     for(let i=1; i<=team.count; i++) {
-      if (isMissing(\`\${team.code}-\${i}\`)) missingKeys.push(i);
+      if (isMissing(team.code + '-' + i)) missingKeys.push(i);
+    }
+  });
+}
+
 function shareText(title, text) {
   if (navigator.share) {
     navigator.share({
@@ -3729,7 +3733,7 @@ function shareMissingList() {
     grouped[code] = [];
     const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
     for (let i = 1; i <= limit; i++) {
-      const key = `${code}-${i}`;
+      const key = code + '-' + i;
       const sticker = album.stickers[key];
       const isOwned = sticker && sticker.owned;
       if (!isOwned) {
@@ -3747,9 +3751,9 @@ function shareMissingList() {
       if (code === 'EXTRAS') {
         formattedList = nums.map(n => legendsData[n - 1].name).join(', ');
       } else {
-        formattedList = nums.map(n => `${code} ${n}`).join(', ');
+        formattedList = nums.map(n => code + ' ' + n).join(', ');
       }
-      text += `${code}: ${formattedList}\n`;
+      text += code + ": " + formattedList + "\n";
     }
   });
 
@@ -3799,11 +3803,11 @@ function shareDuplicatesList() {
       hasDuplicates = true;
       let formattedList;
       if (code === 'EXTRAS') {
-        formattedList = list.map(item => `${legendsData[item.num - 1].name} (x${item.count})`).join(', ');
+        formattedList = list.map(item => legendsData[item.num - 1].name + ' (x' + item.count + ')').join(', ');
       } else {
-        formattedList = list.map(item => `${code} ${item.num} (x${item.count})`).join(', ');
+        formattedList = list.map(item => code + ' ' + item.num + ' (x' + item.count + ')').join(', ');
       }
-      text += `${code}: ${formattedList}\n`;
+      text += code + ': ' + formattedList + '\n';
     }
   });
 
@@ -3919,7 +3923,7 @@ function renderCollectorProfile(uid, container) {
         const variants = ['ouro', 'prata', 'bronze', 'bordo'];
         for (let i = 1; i <= 20; i++) {
           variants.forEach(v => {
-            const key = `${code}-${i}-${v}`;
+            const key = code + "-" + i + "-" + v;
             const userSticker = userStickers[key];
             const userOwned = userSticker ? userSticker.owned : false;
             const userDup = userSticker ? (userSticker.duplicate || 0) : 0;
@@ -3950,7 +3954,7 @@ function renderCollectorProfile(uid, container) {
       } else {
         const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
         for (let i = 1; i <= limit; i++) {
-          const key = `${code}-${i}`;
+          const key = code + "-" + i;
           
           const userSticker = userStickers[key];
           const userOwned = userSticker ? userSticker.owned : false;
@@ -3992,7 +3996,7 @@ function renderCollectorProfile(uid, container) {
       if (code === 'EXTRAS') return;
       const limit = (code === 'FWC') ? 19 : (code === 'CC') ? 14 : 20;
       for (let i = 1; i <= limit; i++) {
-        const key = `${code}-${i}`;
+        const key = code + "-" + i;
         
         const userSticker = userStickers[key];
         const userOwned = userSticker ? userSticker.owned : false;
@@ -4020,7 +4024,7 @@ function renderCollectorProfile(uid, container) {
       const collectorDupExtrasOfVariant = [];
 
       for (let i = 1; i <= 20; i++) {
-        const key = `EXTRAS-${i}-${variant}`;
+        const key = "EXTRAS-" + i + "-" + variant;
         
         const userSticker = userStickers[key];
         const userOwned = userSticker ? userSticker.owned : false;
@@ -4055,24 +4059,24 @@ function renderCollectorProfile(uid, container) {
     crossTabs.className = 'flex border-b border-white/5 text-[9px] font-bold text-gray-400 tracking-wider uppercase';
 
     const tabPerfect = document.createElement('button');
-    tabPerfect.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'perfect' ? 'active-tab' : ''}`;
-    tabPerfect.innerHTML = `Match Perfeito ${hasMatchPerfect ? '⭐' : ''}`;
+    tabPerfect.className = "flex-1 py-2 text-center hover:text-white transition " + activeProfileTab === 'perfect' ? 'active-tab' : '';
+    tabPerfect.innerHTML = "Match Perfeito " + hasMatchPerfect ? '⭐' : '';
     tabPerfect.onclick = () => {
       activeProfileTab = 'perfect';
       setProfileTabState();
     };
 
     const tabHeHas = document.createElement('button');
-    tabHeHas.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'heHas' ? 'active-tab' : ''}`;
-    tabHeHas.textContent = `Ele Tem (${cardsHeHas.length})`;
+    tabHeHas.className = "flex-1 py-2 text-center hover:text-white transition " + activeProfileTab === 'heHas' ? 'active-tab' : '';
+    tabHeHas.textContent = "Ele Tem (" + cardsHeHas.length + ")";
     tabHeHas.onclick = () => {
       activeProfileTab = 'heHas';
       setProfileTabState();
     };
 
     const tabYouHave = document.createElement('button');
-    tabYouHave.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'youHave' ? 'active-tab' : ''}`;
-    tabYouHave.textContent = `Ele Não Tem (${cardsHeLacks.length})`;
+    tabYouHave.className = "flex-1 py-2 text-center hover:text-white transition " + activeProfileTab === 'youHave' ? 'active-tab' : '';
+    tabYouHave.textContent = "Ele Não Tem (" + cardsHeLacks.length + ")";
     tabYouHave.onclick = () => {
       activeProfileTab = 'youHave';
       setProfileTabState();
@@ -4088,9 +4092,9 @@ function renderCollectorProfile(uid, container) {
     mainDiv.appendChild(crossTabsCard);
 
     function setProfileTabState() {
-      tabPerfect.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'perfect' ? 'active-tab' : ''}`;
-      tabHeHas.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'heHas' ? 'active-tab' : ''}`;
-      tabYouHave.className = `flex-1 py-2 text-center hover:text-white transition ${activeProfileTab === 'youHave' ? 'active-tab' : ''}`;
+      tabPerfect.className = "flex-1 py-2 text-center hover:text-white transition " + activeProfileTab === 'perfect' ? 'active-tab' : '';
+      tabHeHas.className = "flex-1 py-2 text-center hover:text-white transition " + activeProfileTab === 'heHas' ? 'active-tab' : '';
+      tabYouHave.className = "flex-1 py-2 text-center hover:text-white transition " + activeProfileTab === 'youHave' ? 'active-tab' : '';
 
       tabContentContainer.innerHTML = '';
 
@@ -4174,7 +4178,7 @@ function renderCollectorProfile(uid, container) {
             const userGivesNames = strictUserGives.map(k => getStickerNameForShare(k)).join(', ');
             const userReceivesNames = strictUserReceives.map(k => getStickerNameForShare(k)).join(', ');
             const appLink = window.location.origin + window.location.pathname;
-            const textMessage = `Fala, ${collector.name}! Vi seu perfil no Ultimate Cromo 2026. Temos um Match Perfeito de trocas! 🔄\nPosso te entregar: ${userGivesNames}\nE receber de você: ${userReceivesNames}\nO que acha?\nGerencie seu álbum também. Baixe o Ultimate Cromo FIFA/Panini 2026: ${appLink}`;
+            const textMessage = "Fala, " + collector.name + "! Vi seu perfil no Ultimate Cromo 2026. Temos um Match Perfeito de trocas! 🔄\nPosso te entregar: " + userGivesNames + "\nE receber de você: " + userReceivesNames + "\nO que acha?\nGerencie seu álbum também. Baixe o Ultimate Cromo FIFA/Panini 2026: " + appLink;
             shareTextViaSystem('Match Perfeito - Ultimate Cromo 2026', textMessage);
           };
           strictBox.appendChild(btnShareStrict);
@@ -4235,7 +4239,7 @@ function renderCollectorProfile(uid, container) {
             const userGivesNames = remainingUserGives.map(k => getStickerNameForShare(k)).join(', ');
             const userReceivesNames = remainingUserReceives.map(k => getStickerNameForShare(k)).join(', ');
             const appLink = window.location.origin + window.location.pathname;
-            const textMessage = `Fala, ${collector.name}! Vi seu perfil no Ultimate Cromo 2026 e tenho uma proposta para podermos dar Match! 🔄\nMinhas repetidas que te faltam: ${userGivesNames}\nFigurinhas suas que me faltam: ${userReceivesNames}\nO que acha?\nGerencie seu álbum e envie propostas também. Baixe o Ultimate Cromo FIFA/Panini 2026: ${appLink}`;
+            const textMessage = "Fala, " + collector.name + "! Vi seu perfil no Ultimate Cromo 2026 e tenho uma proposta para podermos dar Match! 🔄\nMinhas repetidas que te faltam: " + userGivesNames + "\nFigurinhas suas que me faltam: " + userReceivesNames + "\nO que acha?\nGerencie seu álbum e envie propostas também. Baixe o Ultimate Cromo FIFA/Panini 2026: " + appLink;
             shareTextViaSystem('Proposta de Troca - Ultimate Cromo 2026', textMessage);
           };
           potentialBox.appendChild(btnSharePotential);
@@ -4319,12 +4323,12 @@ function openCustomProposalModal(collector, userStickers) {
   const variants = ['ouro', 'prata', 'bronze', 'bordo'];
   for (let i = 1; i <= 20; i++) {
     variants.forEach(v => {
-      const key = `EXTRAS-${i}-${v}`;
+      const key = "EXTRAS-" + i + "-" + v;
       const sticker = userStickers[key];
       if (sticker && sticker.duplicate > 0) {
-        const name = legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`;
+        const name = legendsData[i - 1] ? legendsData[i - 1].name : "Lendário " + i;
         const cat = v.charAt(0).toUpperCase() + v.slice(1);
-        userPremiumDupes.push({ key, label: `${name} ${cat} (${sticker.duplicate}x)` });
+        userPremiumDupes.push({ key, label: name + " " + cat + " (" + sticker.duplicate + "x)" });
       }
     });
   }
@@ -4333,12 +4337,12 @@ function openCustomProposalModal(collector, userStickers) {
   const collectorPremiumCards = [];
   for (let i = 1; i <= 20; i++) {
     variants.forEach(v => {
-      const key = `EXTRAS-${i}-${v}`;
+      const key = "EXTRAS-" + i + "-" + v;
       const sticker = collector.stickers[key];
       if (sticker && (sticker.owned || sticker.duplicate > 0)) {
-        const name = legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`;
+        const name = legendsData[i - 1] ? legendsData[i - 1].name : "Lendário " + i;
         const cat = v.charAt(0).toUpperCase() + v.slice(1);
-        collectorPremiumCards.push({ key, label: `${name} ${cat}` });
+        collectorPremiumCards.push({ key, label: name + " " + cat });
       }
     });
   }
@@ -4347,24 +4351,24 @@ function openCustomProposalModal(collector, userStickers) {
   if (userPremiumDupes.length === 0) {
     for (let i = 1; i <= 20; i++) {
       variants.forEach(v => {
-        const name = legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`;
+        const name = legendsData[i - 1] ? legendsData[i - 1].name : "Lendário " + i;
         const cat = v.charAt(0).toUpperCase() + v.slice(1);
-        userPremiumDupes.push({ key: `EXTRAS-${i}-${v}`, label: `${name} ${cat}` });
+        userPremiumDupes.push({ key: "EXTRAS-" + i + "-" + v, label: name + " " + cat });
       });
     }
   }
   if (collectorPremiumCards.length === 0) {
     for (let i = 1; i <= 20; i++) {
       variants.forEach(v => {
-        const name = legendsData[i - 1] ? legendsData[i - 1].name : `Lendário ${i}`;
+        const name = legendsData[i - 1] ? legendsData[i - 1].name : "Lendário " + i;
         const cat = v.charAt(0).toUpperCase() + v.slice(1);
-        collectorPremiumCards.push({ key: `EXTRAS-${i}-${v}`, label: `${name} ${cat}` });
+        collectorPremiumCards.push({ key: "EXTRAS-" + i + "-" + v, label: name + " " + cat });
       });
     }
   }
 
-  const userOptionsHtml = userPremiumDupes.map(item => `<option value="${item.key}">${item.label}</option>`).join('');
-  const collectorOptionsHtml = collectorPremiumCards.map(item => `<option value="${item.key}">${item.label}</option>`).join('');
+  const userOptionsHtml = userPremiumDupes.map(item => "<option value=\"" + item.key + "\">" + item.label + "</option>").join('');
+  const collectorOptionsHtml = collectorPremiumCards.map(item => "<option value=\"" + item.key + "\">" + item.label + "</option>").join('');
 
   sheet.innerHTML = `
     <div class="flex justify-between items-center border-b border-white/5 pb-3">
@@ -4399,17 +4403,17 @@ function openCustomProposalModal(collector, userStickers) {
 
     const userStickerNum = parseInt(userVal.split('-')[1], 10);
     const userStickerVar = userVal.split('-')[2];
-    const userStickerName = legendsData[userStickerNum - 1] ? legendsData[userStickerNum - 1].name : `Lendário ${userStickerNum}`;
-    const userStickerFull = `${userStickerName} ${userStickerVar.charAt(0).toUpperCase() + userStickerVar.slice(1)}`;
+    const userStickerName = legendsData[userStickerNum - 1] ? legendsData[userStickerNum - 1].name : "Lendário " + userStickerNum;
+    const userStickerFull = userStickerName + " " + userStickerVar.charAt(0).toUpperCase() + userStickerVar.slice(1);
 
     const collectorStickerNum = parseInt(collectorVal.split('-')[1], 10);
     const collectorStickerVar = collectorVal.split('-')[2];
-    const collectorStickerName = legendsData[collectorStickerNum - 1] ? legendsData[collectorStickerNum - 1].name : `Lendário ${collectorStickerNum}`;
-    const collectorStickerFull = `${collectorStickerName} ${collectorStickerVar.charAt(0).toUpperCase() + collectorStickerVar.slice(1)}`;
+    const collectorStickerName = legendsData[collectorStickerNum - 1] ? legendsData[collectorStickerNum - 1].name : "Lendário " + collectorStickerNum;
+    const collectorStickerFull = collectorStickerName + " " + collectorStickerVar.charAt(0).toUpperCase() + collectorStickerVar.slice(1);
 
     const appLink = window.location.origin + window.location.pathname;
 
-    const messageText = `Fala! Vi seu perfil no Ultimate Cromo 2026 e tenho uma proposta para as figurinhas Premium (Legends)! 🔄\nGostaria de oferecer a minha extra ${userStickerFull} em troca da sua ${collectorStickerFull}. O que acha?\nGerencie seu álbum e envie propostas customizadas também. Baixe o Ultimate Cromo FIFA/Panini 2026: ${appLink}`;
+    const messageText = "Fala! Vi seu perfil no Ultimate Cromo 2026 e tenho uma proposta para as figurinhas Premium (Legends)! 🔄\nGostaria de oferecer a minha extra " + userStickerFull + " em troca da sua " + collectorStickerFull + ". O que acha?\nGerencie seu álbum e envie propostas customizadas também. Baixe o Ultimate Cromo FIFA/Panini 2026: " + appLink;
 
     if (navigator.share) {
       navigator.share({
@@ -4418,11 +4422,11 @@ function openCustomProposalModal(collector, userStickers) {
       }).then(() => {
         modal.remove();
       }).catch(err => {
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`, '_blank');
+        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(messageText), '_blank');
         modal.remove();
       });
     } else {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`, '_blank');
+      window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(messageText), '_blank');
       modal.remove();
     }
   };
@@ -4639,7 +4643,7 @@ function updateHeaderSearchSuggestions(query) {
 
     if (textMatches) {
       for (let i = 1; i <= group.limit; i++) {
-        const key = `${group.code}-${i}`;
+        const key = group.code + "-" + i;
         const isOwned = stickers[key]?.owned;
 
         if (!isOwned) {
@@ -4655,7 +4659,7 @@ function updateHeaderSearchSuggestions(query) {
           }
           groupedSuggestions[group.code].stickers.push({
             key: key,
-            label: `${group.code} ${i}`,
+            label: group.code + " " + i,
             number: i
           });
         }
@@ -4672,7 +4676,7 @@ function updateHeaderSearchSuggestions(query) {
 
       if (textMatches) {
         for (let i = 1; i <= 20; i++) {
-          const key = `${t.code}-${i}`;
+          const key = t.code + "-" + i;
           const isOwned = stickers[key]?.owned;
 
           if (!isOwned) {
@@ -4688,7 +4692,7 @@ function updateHeaderSearchSuggestions(query) {
             }
             groupedSuggestions[t.code].stickers.push({
               key: key,
-              label: `${t.code} ${i}`,
+              label: t.code + " " + i,
               number: i
             });
           }
@@ -4707,7 +4711,7 @@ function updateHeaderSearchSuggestions(query) {
       const matchLegendName = legend.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       if (textQuery === '' || matchLegendName.includes(textQuery)) {
         variants.forEach(variant => {
-          const key = `EXTRAS-${idx + 1}-${variant}`;
+          const key = "EXTRAS-" + idx + 1 + "-" + variant;
           const isOwned = stickers[key]?.owned;
 
           if (!isOwned) {
@@ -4723,7 +4727,7 @@ function updateHeaderSearchSuggestions(query) {
             }
             groupedSuggestions['EXTRAS'].stickers.push({
               key: key,
-              label: `LEG ${idx + 1}-${capVariants[variant]}`,
+              label: "LEG " + idx + 1 + "-" + capVariants[variant],
               number: idx + 1
             });
           }
@@ -4787,7 +4791,7 @@ function updateHeaderSearchSuggestions(query) {
         if (group.isSpecialLink) {
           location.hash = group.hash;
         } else {
-          location.hash = `#team-${group.code}`;
+          location.hash = "#team-" + group.code;
         }
       };
       itemRow.appendChild(leftDiv);
@@ -4812,22 +4816,22 @@ function updateHeaderSearchSuggestions(query) {
         group.stickers.forEach(st => {
           const pill = document.createElement('button');
           pill.className = 'bg-[#1a1e43]/60 hover:bg-copaYellow hover:text-darkBg text-copaYellow border border-copaYellow/30 hover:border-copaYellow text-[10px] font-bold px-2 py-0.5 rounded transition duration-150 flex-shrink-0 cursor-pointer';
-          pill.textContent = `[${st.label}]`;
+          pill.textContent = "[" + st.label + "]";
           pill.onclick = () => {
             suggestionsBox.classList.add('hidden');
             searchInput.value = '';
 
             const currentHash = location.hash || '#home';
-            if (currentHash === `#team-${group.code}`) {
-              const el = document.getElementById(`card-${st.key}`);
+            if (currentHash === "#team-" + group.code) {
+              const el = document.getElementById("card-" + st.key);
               if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 el.classList.add('pulse-highlight');
                 setTimeout(() => el.classList.remove('pulse-highlight'), 3000);
               }
             } else {
-              sessionStorage.setItem('scrollTargetSticker', `card-${st.key}`);
-              location.hash = `#team-${group.code}`;
+              sessionStorage.setItem('scrollTargetSticker', "card-" + st.key);
+              location.hash = "#team-" + group.code;
             }
           };
           rightDiv.appendChild(pill);
