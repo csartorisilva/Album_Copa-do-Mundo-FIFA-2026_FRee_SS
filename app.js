@@ -2203,10 +2203,10 @@ function renderHome(container) {
     // Badge de Progresso Gamer no canto inferior direito
     const progBadge = document.createElement('div');
     if (item.prog.owned === item.limit) {
-      progBadge.className = 'absolute inset-0 flex flex-col items-center justify-center bg-[#090c1f]/45 backdrop-blur-[1px] rounded-xl z-20 pointer-events-none';
+      progBadge.className = 'absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-end z-20 pointer-events-none w-full';
       progBadge.innerHTML = `
         <span class="text-3xl filter drop-shadow-[0_0_12px_rgba(255,199,38,0.7)] animate-bounce select-none">🏆</span>
-        <span class="text-[9px] font-black text-copaGreen uppercase tracking-widest mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Completo</span>
+        <span class="text-[9px] font-black text-copaGreen uppercase tracking-widest mt-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Completo</span>
       `;
       bottomRow.style.display = 'none'; // Hide progress bar row when complete
     } else {
@@ -2309,10 +2309,10 @@ function renderHome(container) {
       // Badge de Progresso Gamer no canto inferior direito
       const progBadge = document.createElement('div');
       if (teamStats.owned === limit) {
-        progBadge.className = 'absolute inset-0 flex flex-col items-center justify-center bg-[#090c1f]/45 backdrop-blur-[1px] rounded-xl z-20 pointer-events-none';
+        progBadge.className = 'absolute bottom-1.5 left-1/2 -translate-x-1/2 flex flex-col items-center justify-end z-20 pointer-events-none w-full';
         progBadge.innerHTML = `
           <span class="text-2xl filter drop-shadow-[0_0_12px_rgba(255,199,38,0.7)] animate-bounce select-none">🏆</span>
-          <span class="text-[8px] font-black text-copaGreen uppercase tracking-widest mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Completo</span>
+          <span class="text-[8px] font-black text-copaGreen uppercase tracking-widest mt-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Completo</span>
         `;
         bottomRow.style.display = 'none'; // Hide progress bar row when complete
       } else {
