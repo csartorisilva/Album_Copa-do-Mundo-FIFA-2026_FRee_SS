@@ -1,5 +1,5 @@
-# Credenciais de Banco de Dados
-supabase_config.js
+# Credenciais de Banco de Dados (rastreadas para facilitar o deploy estático)
+# supabase_config.js removido do ignore
 
 # Outros arquivos temporários / locais
 node_modules/
