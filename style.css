@@ -109,7 +109,8 @@ body {
   perspective: 2000px;
   transform-style: preserve-3d;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* 3D Page Flip transition classes */
