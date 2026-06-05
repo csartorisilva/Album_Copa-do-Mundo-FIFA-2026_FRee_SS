@@ -1,4 +1,4 @@
-// app.js – lógica principal do álbum de figurinhas FIFA 2026
+﻿// app.js – lógica principal do álbum de figurinhas FIFA 2026
 // Tema Ultimate FIFA - Modo Escuro & Glassmorphism com Card Flip 3D
 
 // Override do alert() nativo do navegador com um modal customizado, responsivo e elegante
@@ -2697,7 +2697,7 @@ function renderTeamPage(code, container) {
   if (code !== 'FWC' && code !== 'CC' && code !== 'EXTRAS' && code !== 'ESCUDOS') {
     const flagImg = document.createElement('img');
     const flagCode = (flagMap[code] || 'us').toLowerCase();
-    flagImg.src = `https://flagcdn.com/w40/${flagCode}.png`;
+    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
     flagImg.loading = 'lazy';
     flagImg.decoding = 'async';
     flagImg.className = 'w-5.5 h-3.5 object-cover border border-white/20 rounded shadow-sm inline-block mr-1 align-middle';
@@ -2854,7 +2854,7 @@ function renderTeamPage(code, container) {
 
       const miniCrest = document.createElement('img');
       const flagCode = (flagMap[team.code] || 'us').toLowerCase();
-      miniCrest.src = `https://flagcdn.com/w40/${flagCode}.png`;
+    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
       miniCrest.alt = 'Bandeira';
       miniCrest.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
       frontHeader.appendChild(miniCrest);
@@ -2897,7 +2897,7 @@ function renderTeamPage(code, container) {
       
       const flagImg = document.createElement('img');
       const flagCode = legend.country.toLowerCase();
-      flagImg.src = `https://flagcdn.com/w40/${flagCode}.png`;
+    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
       flagImg.loading = 'lazy';
       flagImg.decoding = 'async';
       flagImg.className = 'w-6 h-4 object-cover border border-white/20 rounded shadow-sm flex-shrink-0';
@@ -2945,7 +2945,7 @@ function renderTeamPage(code, container) {
         frontHeader.appendChild(teamTag);
 
         const miniCrest = document.createElement('img');
-        miniCrest.src = `https://flagcdn.com/w40/${flagCode}.png`;
+    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
         miniCrest.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
         frontHeader.appendChild(miniCrest);
         cardFront.appendChild(frontHeader);
@@ -3020,7 +3020,7 @@ function renderTeamPage(code, container) {
         miniCrest.className = 'w-10 h-5 object-contain bg-white/10 p-0.5 rounded border border-white/20';
       } else {
         const flagCode = (flagMap[code] || 'us').toLowerCase();
-        miniCrest.src = crestsMap[code] || `https://flagcdn.com/w40/${flagCode}.png`;
+    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
         miniCrest.className = 'w-5 h-5 object-contain rounded-full border border-white/20 bg-white/10';
       }
       frontHeader.appendChild(miniCrest);
@@ -3512,7 +3512,7 @@ const newLogic = `function renderTrades(container) {
   const getCrestUrlHelper = (code) => {
     if (code === 'FWC') return 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
     if (code === 'CC') return './crests/Logo CocaZero Copa1.png';
-    return crestsMap[code] || \`https://flagcdn.com/w40/\${flagMap[code] || 'un'}.png\`;
+    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
   };
 
   const teamsToProcess = [];
@@ -3606,7 +3606,7 @@ function printMissingStickers() {
   const getCrestUrlHelper = (code) => {
     if (code === 'FWC') return 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
     if (code === 'CC') return './crests/Logo CocaZero Copa1.png';
-    return crestsMap[code] || \`https://flagcdn.com/w40/\${flagMap[code] || 'un'}.png\`;
+    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
   };
 
   const teamsToProcess = [];
@@ -4774,7 +4774,7 @@ function updateHeaderSearchSuggestions(query) {
         flagHtml = `<span class="text-sm select-none">🛡️</span>`;
       } else {
         const flagCode = (flagMap[group.code] || 'us').toLowerCase();
-        flagHtml = `<img src="https://flagcdn.com/w40/${flagCode}.png" class="w-5 h-3.5 object-cover border border-white/20 rounded shadow-sm flex-shrink-0" loading="lazy" alt="Bandeira" />`;
+    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
       }
 
       leftDiv.innerHTML = `
