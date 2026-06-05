@@ -1302,6 +1302,44 @@ function renderLogin(container) {
     };
     actionGrid.appendChild(btnGPS);
 
+    // Botão de Exportar Backup Completo
+    const btnExportBackup = document.createElement('button');
+    btnExportBackup.className = 'w-full py-3 rounded-xl bg-white/5 border border-white/10 hover:border-copaYellow/40 hover:bg-white/10 text-white font-bold text-xs transition duration-200 flex items-center justify-center gap-2';
+    btnExportBackup.innerHTML = `📤 Exportar Backup Completo`;
+    btnExportBackup.onclick = () => {
+      const backup = {
+        version: "1.0.0",
+        timestamp: Date.now(),
+        currentAlbumId: localStorage.getItem('currentAlbumId') || "",
+        albums: {},
+        session: null
+      };
+      
+      try {
+        backup.albums = JSON.parse(localStorage.getItem('albums') || '{}');
+      } catch(e) {}
+      
+      try {
+        backup.session = JSON.parse(localStorage.getItem('album_auth_session') || 'null');
+      } catch(e) {}
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      const date = new Date().toISOString().slice(0, 10);
+      downloadAnchor.setAttribute("download", `backup_album_fifa_2026_${date}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      navigator.clipboard.writeText(JSON.stringify(backup)).then(() => {
+        alert("Backup exportado! O arquivo JSON foi baixado e o código de restauração foi copiado para a área de transferência.");
+      }).catch(() => {
+        alert("Backup exportado e baixado com sucesso!");
+      });
+    };
+    actionGrid.appendChild(btnExportBackup);
+
     // Botão de Logout
     const btnLogout = document.createElement('button');
     btnLogout.className = 'w-full py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 font-bold text-xs transition duration-200';
@@ -1830,10 +1868,72 @@ function renderLogin(container) {
         <span>Pular por agora (continuar sem login)</span>
       </div>
       <span class="text-[9.5px] text-red-400/70 font-semibold text-center leading-tight mt-0.5">
-        Nota: Seu álbum e suas figurinhas não ficarão salvos.
+        Nota: Seu álbum e suas figurinhas não ficarão salvos na nuvem.
       </span>
     `;
     grid.appendChild(btnLater);
+
+    // Helper para restaurar backup
+    const importBackupData = (jsonStr) => {
+      try {
+        const backup = JSON.parse(jsonStr);
+        if (!backup || typeof backup !== 'object') {
+          throw new Error("O conteúdo fornecido não é um backup válido.");
+        }
+        if (backup.currentAlbumId) {
+          localStorage.setItem('currentAlbumId', backup.currentAlbumId);
+        }
+        if (backup.albums) {
+          localStorage.setItem('albums', JSON.stringify(backup.albums));
+        }
+        if (backup.session) {
+          localStorage.setItem('album_auth_session', JSON.stringify(backup.session));
+        }
+        sessionStorage.setItem('skippedLogin', 'false');
+        alert("Backup importado com sucesso! O aplicativo será recarregado.");
+        window.location.hash = '#home';
+        window.location.reload();
+      } catch (err) {
+        alert("Erro ao restaurar backup: " + err.message);
+      }
+    };
+
+    // Botão Importar/Restaurar Backup Completo
+    const btnImportBackup = document.createElement('button');
+    btnImportBackup.className = 'w-full py-3.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-copaGreen/40 transition duration-200 flex flex-col items-center justify-center gap-1 cursor-pointer';
+    btnImportBackup.innerHTML = `
+      <div class="flex items-center gap-1.5 text-gray-500 hover:text-gray-300 font-bold text-xs transition duration-200">
+        <span>📥 Restaurar Backup / Sincronizar Notebook</span>
+      </div>
+      <span class="text-[9px] text-gray-400 font-medium text-center leading-tight mt-0.5">
+        Importe o arquivo JSON ou código de backup do seu celular.
+      </span>
+    `;
+    btnImportBackup.onclick = () => {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.json';
+      fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          importBackupData(evt.target.result);
+        };
+        reader.readAsText(file);
+      };
+
+      const userChoice = confirm("Deseja carregar um ARQUIVO de backup (.json)?\n\n(Clique em 'Cancelar' para colar o CÓDIGO de texto do backup)");
+      if (userChoice) {
+        fileInput.click();
+      } else {
+        const code = prompt("Cole o código de backup (JSON) gerado no seu celular:");
+        if (code) {
+          importBackupData(code);
+        }
+      }
+    };
+    grid.appendChild(btnImportBackup);
  
     wrapper.appendChild(grid);
   }
