@@ -2118,7 +2118,7 @@ function renderHome(container) {
   mainProgressText.className = 'flex justify-between items-center text-xs font-semibold text-gray-300';
   const remaining = stats.total - stats.owned;
   mainProgressText.innerHTML = `
-    <div><span class="text-sm font-black text-white">${stats.owned}</span> / ${stats.total} Coladas <span class="text-red-400 font-bold ml-1 text-xs">(- ${remaining})</span></div>
+    <div><span class="text-sm font-black text-white">${stats.owned}</span> / ${stats.total} <span class="text-red-400 font-bold ml-1 text-xs">(- ${remaining})</span></div>
     <div class="text-sm font-black text-white">${stats.percent}%</div>
   `;
   mainProgressContainer.appendChild(mainProgressText);
