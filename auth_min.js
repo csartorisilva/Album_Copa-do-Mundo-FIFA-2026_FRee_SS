@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isLogin) {
         if (users[email] && users[email].password === password) {
           localStorage.setItem('album_auth_session', JSON.stringify({ uid: users[email].uid, name: email.split('@')[0], email }));
-          window.location.href = 'album.html';
+              window.location.href = 'album.html?v=' + Date.now();
         } else {
           alert('ATENÇÃO: Conexão com banco de dados indisponível no momento.\nModo Offline Ativado: Credenciais locais inválidas. Tente cadastrar primeiro.');
         }
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
           users[email] = { uid, password };
           localStorage.setItem('mock_users', JSON.stringify(users));
           localStorage.setItem('album_auth_session', JSON.stringify({ uid, name: email.split('@')[0], email }));
-          window.location.href = 'album.html';
+              window.location.href = 'album.html?v=' + Date.now();
         }
       }
       return;
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Success – redirect to album page
-      window.location.href = 'album.html';
+          window.location.href = 'album.html?v=' + Date.now();
     } catch (err) {
       // Unexpected error
       alert(err.message || 'Erro inesperado');
