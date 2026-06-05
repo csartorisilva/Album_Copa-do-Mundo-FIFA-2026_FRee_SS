@@ -3692,11 +3692,11 @@ function shareOwnedList() {
       hasStickers = true;
       let formattedList;
       if (code === 'EXTRAS') {
-        formattedList = nums.map(n => legendsData[n - 1].name).join(', ');
+        formattedList = nums.map(function(n) { return legendsData[n - 1].name; }).join(', ');
       } else {
-        formattedList = nums.map(n => `${code} ${n}`).join(', ');
+        formattedList = nums.map(function(n) { return code + ' ' + n; }).join(', ');
       }
-      text += `${code}: ${formattedList}\n`;
+      text += code + ': ' + formattedList + '\n';
     }
   });
 
