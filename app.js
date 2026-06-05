@@ -2201,10 +2201,13 @@ function renderHome(container) {
     bottomRow.appendChild(progressContainer);
 
     // Badge de Progresso Gamer no canto inferior direito
-    const progBadge = document.createElement('span');
+    const progBadge = document.createElement('div');
     if (item.prog.owned === item.limit) {
-      progBadge.className = 'text-[9px] font-black text-copaGreen uppercase tracking-wider absolute bottom-3 right-3 flex items-center gap-1';
-      progBadge.innerHTML = '🏆 <span class="hidden sm:inline">Completo</span>';
+      progBadge.className = 'absolute inset-0 flex flex-col items-center justify-center bg-[#090c1f]/45 backdrop-blur-[1px] rounded-xl z-20 pointer-events-none';
+      progBadge.innerHTML = `
+        <span class="text-3xl filter drop-shadow-[0_0_12px_rgba(255,199,38,0.7)] animate-bounce select-none">🏆</span>
+        <span class="text-[9px] font-black text-copaGreen uppercase tracking-widest mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Completo</span>
+      `;
       bottomRow.style.display = 'none'; // Hide progress bar row when complete
     } else {
       progBadge.className = 'badge-neon-gamer';
@@ -2304,10 +2307,13 @@ function renderHome(container) {
       }
 
       // Badge de Progresso Gamer no canto inferior direito
-      const progBadge = document.createElement('span');
+      const progBadge = document.createElement('div');
       if (teamStats.owned === limit) {
-        progBadge.className = 'text-[7.5px] font-black text-copaGreen uppercase tracking-wider absolute bottom-2.5 right-2 flex items-center gap-0.5';
-        progBadge.innerHTML = '🏆 <span class="hidden sm:inline">Completo</span>';
+        progBadge.className = 'absolute inset-0 flex flex-col items-center justify-center bg-[#090c1f]/45 backdrop-blur-[1px] rounded-xl z-20 pointer-events-none';
+        progBadge.innerHTML = `
+          <span class="text-2xl filter drop-shadow-[0_0_12px_rgba(255,199,38,0.7)] animate-bounce select-none">🏆</span>
+          <span class="text-[8px] font-black text-copaGreen uppercase tracking-widest mt-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Completo</span>
+        `;
         bottomRow.style.display = 'none'; // Hide progress bar row when complete
       } else {
         progBadge.className = 'badge-neon-gamer';
