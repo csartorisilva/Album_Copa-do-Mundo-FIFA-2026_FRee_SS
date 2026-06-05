@@ -2853,7 +2853,7 @@ function renderTeamPage(code, container) {
 
       const miniCrest = document.createElement('img');
       const flagCode = (flagMap[team.code] || 'us').toLowerCase();
-    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
+      miniCrest.src = "https://flagcdn.com/w40/" + flagCode + ".png";
       miniCrest.alt = 'Bandeira';
       miniCrest.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
       frontHeader.appendChild(miniCrest);
@@ -2896,7 +2896,7 @@ function renderTeamPage(code, container) {
       
       const flagImg = document.createElement('img');
       const flagCode = legend.country.toLowerCase();
-    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
+      flagImg.src = "https://flagcdn.com/w40/" + flagCode + ".png";
       flagImg.loading = 'lazy';
       flagImg.decoding = 'async';
       flagImg.className = 'w-6 h-4 object-cover border border-white/20 rounded shadow-sm flex-shrink-0';
@@ -2944,7 +2944,8 @@ function renderTeamPage(code, container) {
         frontHeader.appendChild(teamTag);
 
         const miniCrest = document.createElement('img');
-    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
+        const flagCode = legend.country.toLowerCase();
+        miniCrest.src = "https://flagcdn.com/w40/" + flagCode + ".png";
         miniCrest.className = 'w-5 h-3.5 object-cover rounded border border-white/20';
         frontHeader.appendChild(miniCrest);
         cardFront.appendChild(frontHeader);
@@ -3019,7 +3020,7 @@ function renderTeamPage(code, container) {
         miniCrest.className = 'w-10 h-5 object-contain bg-white/10 p-0.5 rounded border border-white/20';
       } else {
         const flagCode = (flagMap[code] || 'us').toLowerCase();
-    return crestsMap[code] || "https://flagcdn.com/w40/" + (flagMap[code] || 'un') + ".png";
+        miniCrest.src = "https://flagcdn.com/w40/" + flagCode + ".png";
         miniCrest.className = 'w-5 h-5 object-contain rounded-full border border-white/20 bg-white/10';
       }
       frontHeader.appendChild(miniCrest);
