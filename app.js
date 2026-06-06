@@ -2065,7 +2065,7 @@ function renderHome(container) {
       </svg>`
     },
     {
-      title: 'Premium',
+      title: 'LEGENDS',
       desc: 'Lendários',
       hash: '#team-EXTRAS',
       prog: premProg,
@@ -2171,7 +2171,7 @@ function renderHome(container) {
       grayscale: false
     },
     {
-      name: 'Premium',
+      name: 'LEGENDS',
       code: 'EXTRAS',
       limit: legendsData.length * 4,
       prog: premProg,
@@ -2684,13 +2684,13 @@ function renderTeamPage(code, container) {
   crest.loading = 'lazy';
   crest.decoding = 'async';
   if (code === 'FWC') {
-    crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/FIFA_logo_without_slogan.svg/120px-FIFA_logo_without_slogan.svg.png';
+    crest.src = `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="8" fill="#0033A0"/><path d="M12 12h8v24h-8zm16 0h8v24h-8z" fill="#FFC726"/><text x="24" y="29" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="14" fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">FWC</text></svg>`);
     crest.className = 'w-10 h-10 object-contain rounded bg-white/5 p-1 border border-white/10';
   } else if (code === 'CC') {
     crest.src = './crests/Logo CocaZero Copa1.png';
     crest.className = 'w-10 h-10 object-contain rounded bg-white/5 p-1 border border-white/10';
   } else if (code === 'EXTRAS') {
-    crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/100px-Golden_Ball.svg.png';
+    crest.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Golden_Ball.svg/120px-Golden_Ball.svg.png';
     crest.className = 'w-10 h-10 object-contain';
   } else if (code === 'ESCUDOS') {
     crest.src = `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12v12c0 10 8 18 18 20 10-2 18-10 18-20V12L24 4z" fill="#FFC726" opacity="0.85"/><path d="M24 10L10 17v9c0 7.5 6 13.5 14 15 8-1.5 14-7.5 14-15v-9L24 10z" fill="#090a1a" opacity="0.3"/><text x="24" y="28" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="9" fill="white">ESCUDO</text></svg>`);
@@ -2775,7 +2775,7 @@ function renderTeamPage(code, container) {
     } else if (code === 'CC') {
       titlesSub.textContent = 'Metálicos';
     } else if (code === 'EXTRAS') {
-      titlesSub.textContent = 'Figurinhas Premium';
+      titlesSub.textContent = 'Figurinhas Legends';
     } else {
       titlesSub.textContent = 'Sem títulos mundiais';
     }
