@@ -1267,7 +1267,54 @@ function renderLogin(container) {
     wrapper.appendChild(title);
 
     const profileBox = document.createElement('div');
-    profileBox.className = 'flex flex-col items-center gap-4 mb-6 bg-white/5 p-4 rounded-xl border border-white/5';
+    profileBox.className = 'flex flex-col items-center gap-4 mb-6 bg-white/5 p-4 rounded-xl border border-white/5 relative';
+
+    // Botão de Sincronizar Nuvem (Canto superior oposto ou direito superior)
+    const btnSyncCloud = document.createElement('button');
+    btnSyncCloud.className = 'absolute top-3 right-3 p-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-copaGreen/40 hover:bg-white/10 text-copaGreen transition-all duration-200 cursor-pointer flex items-center justify-center';
+    btnSyncCloud.title = "Sincronizar Álbum da Nuvem";
+    btnSyncCloud.innerHTML = `
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+      </svg>
+    `;
+    btnSyncCloud.onclick = async () => {
+      const icon = btnSyncCloud.querySelector('svg');
+      if (icon) icon.classList.add('animate-spin');
+      btnSyncCloud.disabled = true;
+
+      const client = window.supabaseClient || window.supabase;
+      if (client) {
+        try {
+          const { data: profile, error } = await client.from('profiles').select('stickers').eq('uid', user.uid).maybeSingle();
+          if (error) throw error;
+          
+          if (profile && profile.stickers && Object.keys(profile.stickers).length > 0) {
+            const localAlbums = storage.getAlbums();
+            const currentId = storage.getCurrentAlbumId();
+            if (currentId && localAlbums[currentId]) {
+              localAlbums[currentId].stickers = profile.stickers;
+              storage.setAlbums(localAlbums);
+              alert("Sincronização concluída! " + Object.values(profile.stickers).filter(s => s && s.owned).length + " figurinhas carregadas com sucesso.");
+              window.location.reload();
+            }
+          } else {
+            alert("Nenhum progresso de figurinhas encontrado na nuvem para este usuário.");
+          }
+        } catch (e) {
+          console.error(e);
+          alert("Erro ao sincronizar da nuvem: " + (e.message || e));
+        } finally {
+          if (icon) icon.classList.remove('animate-spin');
+          btnSyncCloud.disabled = false;
+        }
+      } else {
+        alert("Erro: Banco de dados Supabase inativo ou offline.");
+        if (icon) icon.classList.remove('animate-spin');
+        btnSyncCloud.disabled = false;
+      }
+    };
+    profileBox.appendChild(btnSyncCloud);
 
     const avatar = document.createElement('img');
     avatar.src = user.photo_url;
