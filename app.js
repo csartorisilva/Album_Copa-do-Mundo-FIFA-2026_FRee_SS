@@ -944,24 +944,34 @@ async function initApp() {
       const activeAlbumId = storage.getCurrentAlbumId();
       const albums = storage.getAlbums();
       if (activeAlbumId && albums[activeAlbumId]) {
-        // Envia as locais para garantir sincronização
-        authDb.syncStickers(albums[activeAlbumId].stickers);
-        
+        const localStickers = albums[activeAlbumId].stickers || {};
+        const localCount = Object.keys(localStickers).length;
+
         // Puxa as mais recentes da nuvem se existirem
         const client = window.supabaseClient || window.supabase;
         if (client) {
           client.from('profiles').select('stickers').eq('uid', user.uid).maybeSingle().then(result => {
-            if (result.data && result.data.stickers && Object.keys(result.data.stickers).length > 0) {
+            const cloudStickers = (result.data && result.data.stickers) ? result.data.stickers : null;
+            const cloudCount = cloudStickers ? Object.keys(cloudStickers).length : 0;
+
+            if (cloudCount > localCount) {
+              // Cloud tem mais dados (ex: novo dispositivo logado), baixa a nuvem
               const localAlbums = storage.getAlbums();
               const currentId = storage.getCurrentAlbumId();
               if (currentId && localAlbums[currentId]) {
-                localAlbums[currentId].stickers = { ...localAlbums[currentId].stickers, ...result.data.stickers };
+                localAlbums[currentId].stickers = { ...localAlbums[currentId].stickers, ...cloudStickers };
                 storage.setAlbums(localAlbums);
-                // Atualiza a visualização caso esteja na rota inicial
                 route();
               }
+            } else if (localCount > 0) {
+              // Local tem mais dados ou mesmo número, envia/atualiza a nuvem
+              authDb.syncStickers(localStickers);
             }
-          }).catch(e => console.error("Erro ao sincronizar figurinhas da nuvem no startup:", e));
+          }).catch(e => {
+            console.error("Erro ao sincronizar figurinhas da nuvem no startup:", e);
+            // Fallback de envio se der erro na leitura
+            if (localCount > 0) authDb.syncStickers(localStickers);
+          });
         }
       }
     } else {
