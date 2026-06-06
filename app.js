@@ -945,16 +945,16 @@ async function initApp() {
       const albums = storage.getAlbums();
       if (activeAlbumId && albums[activeAlbumId]) {
         const localStickers = albums[activeAlbumId].stickers || {};
-        const localCount = Object.keys(localStickers).length;
+        const localOwnedCount = Object.values(localStickers).filter(s => s && s.owned).length;
 
         // Puxa as mais recentes da nuvem se existirem
         const client = window.supabaseClient || window.supabase;
         if (client) {
           client.from('profiles').select('stickers').eq('uid', user.uid).maybeSingle().then(result => {
             const cloudStickers = (result.data && result.data.stickers) ? result.data.stickers : null;
-            const cloudCount = cloudStickers ? Object.keys(cloudStickers).length : 0;
+            const cloudOwnedCount = cloudStickers ? Object.values(cloudStickers).filter(s => s && s.owned).length : 0;
 
-            if (cloudCount > localCount) {
+            if (cloudOwnedCount > localOwnedCount) {
               // Cloud tem mais dados (ex: novo dispositivo logado), baixa a nuvem
               const localAlbums = storage.getAlbums();
               const currentId = storage.getCurrentAlbumId();
@@ -963,14 +963,13 @@ async function initApp() {
                 storage.setAlbums(localAlbums);
                 route();
               }
-            } else if (localCount > 0) {
-              // Local tem mais dados ou mesmo número, envia/atualiza a nuvem
+            } else if (localOwnedCount > cloudOwnedCount) {
+              // Local tem mais dados, envia/atualiza a nuvem imediatamente
               authDb.syncStickers(localStickers);
             }
           }).catch(e => {
             console.error("Erro ao sincronizar figurinhas da nuvem no startup:", e);
-            // Fallback de envio se der erro na leitura
-            if (localCount > 0) authDb.syncStickers(localStickers);
+            if (localOwnedCount > 0) authDb.syncStickers(localStickers);
           });
         }
       }
