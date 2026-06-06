@@ -971,6 +971,33 @@ async function initApp() {
             console.error("Erro ao sincronizar figurinhas da nuvem no startup:", e);
             if (localOwnedCount > 0) authDb.syncStickers(localStickers);
           });
+
+          // ATIVAR REALTIME: Escuta alterações na tabela 'profiles' para este usuário em tempo real
+          try {
+            client.channel('public:profiles:uid=' + user.uid)
+              .on('postgres_changes', {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'profiles',
+                filter: 'uid=eq.' + user.uid
+              }, payload => {
+                console.log("Realtime: Atualização recebida do banco de dados na nuvem", payload);
+                if (payload.new && payload.new.stickers) {
+                  const cloudStickers = payload.new.stickers;
+                  const localAlbums = storage.getAlbums();
+                  const currentId = storage.getCurrentAlbumId();
+                  if (currentId && localAlbums[currentId]) {
+                    // Sobrescreve local apenas se o conteúdo do banco de dados mudou de fato
+                    localAlbums[currentId].stickers = cloudStickers;
+                    storage.setAlbums(localAlbums);
+                    route(); // Atualiza a tela instantaneamente
+                  }
+                }
+              })
+              .subscribe();
+          } catch(realtimeErr) {
+            console.warn("Erro ao registrar canal Realtime do Supabase:", realtimeErr);
+          }
         }
       }
     } else {
