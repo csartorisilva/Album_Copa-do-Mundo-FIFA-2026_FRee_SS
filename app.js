@@ -1274,7 +1274,7 @@ function renderLogin(container) {
     details.className = 'w-full text-center text-xs space-y-2 mt-2 pt-2 border-t border-white/5 text-gray-400';
     
     const dbMode = document.createElement('p');
-    dbMode.innerHTML = "Banco de Dados: <span class=\"" + isDemo ? 'text-copaYellow' : 'text-copaGreen' + " font-bold\">" + isDemo ? 'Modo Simulado (Demo)' : 'Nuvem Real (Supabase)' + "</span>";
+    dbMode.innerHTML = "Banco de Dados: <span class=\"" + (isDemo ? 'text-copaYellow' : 'text-copaGreen') + " font-bold\">" + (isDemo ? 'Modo Simulado (Demo)' : 'Nuvem Real (Supabase)') + "</span>";
     details.appendChild(dbMode);
 
     const locationText = document.createElement('p');
