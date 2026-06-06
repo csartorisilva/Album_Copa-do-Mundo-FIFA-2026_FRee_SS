@@ -3725,7 +3725,10 @@ function renderTrades(container) {
       teamBlock.className = 'glass-panel p-4 rounded-xl border-white/5 flex flex-col gap-3';
       
       const teamHeader = document.createElement('div');
-      teamHeader.className = 'flex items-center gap-3 border-b border-white/5 pb-2';
+      teamHeader.className = 'flex items-center justify-between w-full border-b border-white/5 pb-2';
+      
+      const leftSection = document.createElement('div');
+      leftSection.className = 'flex items-center gap-3';
       
       const crestImg = document.createElement('img');
       crestImg.src = getCrestUrlHelper(team.code);
@@ -3739,8 +3742,10 @@ function renderTrades(container) {
       missingCount.className = 'bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full text-[10px] font-bold';
       missingCount.textContent = 'Faltam ' + missingKeys.length;
       
-      teamHeader.appendChild(crestImg);
-      teamHeader.appendChild(teamName);
+      leftSection.appendChild(crestImg);
+      leftSection.appendChild(teamName);
+      
+      teamHeader.appendChild(leftSection);
       teamHeader.appendChild(missingCount);
       teamBlock.appendChild(teamHeader);
       
