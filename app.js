@@ -3616,6 +3616,9 @@ function renderTrades(container) {
     album.stickers = userStickers;
     albums[albumId] = album;
     storage.saveAlbums(albums);
+    
+    // Sincroniza com a nuvem/demo
+    authDb.syncStickers(album.stickers);
 
     // Refresh UI
     renderMissingStickers();
